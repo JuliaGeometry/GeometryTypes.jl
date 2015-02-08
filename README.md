@@ -1,3 +1,3 @@
 # Bounds
 
-[![Build Status](https://travis-ci.org/threecsg/Bounds.jl.svg?branch=master)](https://travis-ci.org/threecsg/Bounds.jl)
+[![Build Status](https://travis-ci.org/ThreeCSG/Bounds.jl.svg?branch=master)](https://travis-ci.org/ThreeCSG/Bounds.jl)
