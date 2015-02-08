@@ -32,9 +32,20 @@ function update!{T, N}(b::Bound{T, N}, v)
     end
 end
 
-function (==){T1, N1, T2, N2}(b1::Bound{T1, N1}, b2::Bound{T2, N2})
-    N1 == N2 && b1.min == b2.min && b1.max == b2.max || return false
+function (==){T1, T2, N}(b1::Bound{T1, N}, b2::Bound{T2, N})
+    b1.min == b2.min && b1.max == b2.max || return false
     return true
 end
+
+@inline isequal(b1::Bound, b2::Bound) = b1 == b2
+
+function Base.contains{T1, T2, N}(b1::Bound{T1,N}, b2::Bound{T2, N})
+    for i = 1:N
+        b2.max[i] <= b1.max[i] && b2.min[i] >= b1.min[i] || return false
+    end
+    return true
+end
+
+@inline Base.in(b1::Bound, b2::Bound) = contains(b2, b1)
 
 end # module
