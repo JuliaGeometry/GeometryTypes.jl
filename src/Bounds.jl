@@ -1,4 +1,5 @@
 module Bounds
+using Compat
 
 export AbstractBound, Bound, update!
 
