@@ -1,5 +1,6 @@
 module GeometryTypes
 
-# package code goes here
+using FixedSizeArrays
+include("types.jl")
 
 end # module
