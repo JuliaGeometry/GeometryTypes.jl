@@ -1,7 +1,9 @@
 module Orthotopes
 using Compat
 
-export AbstractOrthotope, Orthotope, update!
+import Base.split
+
+export AbstractOrthotope, Orthotope, update!, split
 
 abstract AbstractOrthotope{T, N}
 
@@ -65,6 +67,19 @@ end
 
 function meets{T1, T2, N}(b1::Orthotope{T1,N}, b2::Orthotope{T2, N})
     b1.min == b2.max || b1.max == b2.min
+end
+
+# Splits an orthotope into two new ones along an axis
+# at a given axis value
+function split{T, N}(b::Orthotope{T,N}, axis::Int, value::T)
+    b1max = copy(b.max)
+    b1max[axis] = value
+
+    b2min = copy(b.min)
+    b2min[axis] = value
+
+    return Orthotope{T, N}(b.min, b1max),
+           Orthotope{T, N}(b2min, b.max)
 end
 
 end # module
