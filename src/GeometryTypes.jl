@@ -8,31 +8,37 @@ export column
 include("types.jl")
 
 # Immutable Vector type
+export Vector1
 export Vector2
 export Vector3
 export Vector4
 
 #Mutable Vector type
+export MVector1
 export MVector2
 export MVector3
 export MVector4
 
 # Immutable Point type
+export Point1
 export Point2
 export Point3
 export Point4
 
 #Mutable Point type
+export MPoint1
 export MPoint2
 export MPoint3
 export MPoint4
 
 # Immutable Normal type
+export Normal1
 export Normal2
 export Normal3
 export Normal4
 
 #Mutable Normal type
+export MNormal1
 export MNormal2
 export MNormal3
 export MNormal4
@@ -78,6 +84,7 @@ export MRectangle
 
 
 
+export Matrix1x1
 export Matrix1x2
 export Matrix1x3
 export Matrix1x4

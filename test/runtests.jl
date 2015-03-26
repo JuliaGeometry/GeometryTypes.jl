@@ -83,78 +83,68 @@ v2 = Vec3d(6.0,5.0,4.0)
 
 
 # type conversion
-@assert isa(convert(Vec3f,v1),Vec3f)
-println(v1)
-println("got here")
-
-println(@which Vector3([1.0,2.0,3.0]))
-println("got hereeee22111")
+@assert isa(convert(Vec3f,v1), Vec3f)
 
 @show convert(Vec3d, [1.0,2.0,3.0])
 @assert isa(convert(Vector{Float64}, v1), Vector{Float64})
-println(@which convert(Vector{Float64}, v1))
 @assert convert(Vector{Float64}, v1) == [1.0,2.0,3.0]
-println("got here")
 
 
 # matrix operations
 
-typealias Mat1d Matrix1x1{Float64}
+#typealias Mat1d Matrix1x1{Float64}
 typealias Mat2d Matrix2x2{Float64}
 typealias Mat3d Matrix3x3{Float64}
 typealias Mat4d Matrix4x4{Float64}
 
-@assert zero(Mat2d) == Mat2d(0.0,0.0,0.0,0.0)
+@assert zeros(Mat2d) == Mat2d(0.0,0.0,0.0,0.0)
 
 v = Vec4d(1.0,2.0,3.0,4.0)
 r = row(v)
 c = column(v)
-println("jasdj")
 
-@show prod(Vector1(0))
-println(c*r)
+#@show prod(Vector1(0))
 @show a = c*r
 @show b=Mat4d(1.0,2.0,3.0,4.0,
-                     2.0,4.0,6.0,8.0,
-                     3.0,6.0,9.0,12.0,
-                     4.0,8.0,12.0,16.0)
+             2.0,4.0,6.0,8.0,
+             3.0,6.0,9.0,12.0,
+             4.0,8.0,12.0,16.0)
 
-println(a)
-println(b)
 @assert a==b
-println(r)
-println(c)
 @assert r*c == Matrix1x1(30.0)
-println(r')
-println(c)
-@assert r' == c
-@assert c' == r
-@assert row(r,1) == v
-@assert column(c,1) == v
-@assert row(r+c',1) == 2*v
+#@assert r' == c
+#@assert c' == r
+#@assert row(r,1) == v
+#@assert column(c,1) == v
+#@assert row(r+c',1) == 2*v
 @assert sum(r) == sum(v)
-@assert prod(c) == prod(v)#
+@assert prod(c) == prod(v)
 @show eye(Mat3d)
 @assert eye(Mat3d) == Mat3d(1.0,0.0,0.0,
 							0.0,1.0,0.0,
 							0.0,0.0,1.0)
-println(v)
-println(eye(Mat4d))
 #@assert v*eye(Mat4d)*v == 30.0
 @assert -r == -1.0*r
 #@assert diag(diagm(v)) == v
 
 # type conversion
 #@assert isa(convert(Matrix1x4{Float32},r),Matrix1x4{Float32})
-@show jm = rand(4,4)
-
-@show im = Matrix4x4(jm)
-
+jm = rand(4,4)
+im = convert(Matrix4x4, jm)
+#im = Matrix4x4(jm)
+println(im)
 @assert isa(im, Mat4d)
-@which jm == im
+
 im = convert(Mat4d,jm)
+
 @assert isa(im,Mat4d)
 #@assert jm == im
+
 @show jm2 = convert(Array{Float64,2},im)
 @assert isa(jm2, Array{Float64,2})
 @assert jm == jm2
+
+#Single valued constructor
+Matrix4x4(0.0) === zeros(Mat4d)
+Vector4(0) == Vector4(0,0,0,0)
+Point3(0) == Point3(0,0,0)
