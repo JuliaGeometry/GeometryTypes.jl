@@ -148,3 +148,15 @@ im = convert(Mat4d,jm)
 Matrix4x4(0.0) === zeros(Mat4d)
 Vector4(0) == Vector4(0,0,0,0)
 Point3(0) == Point3(0,0,0)
+
+for i=1:10000
+	v = rand(4)
+	m = rand(4,4)
+	vm = m * v
+	vfs = Vector4(v)
+	mfs = Matrix4x4(m)
+	fsvm = mfs * vfs
+	for i=1:4
+		@assert isapprox(fsvm[i], vm[i]) "$(fsvm[i])  $(vm[i])"
+	end
+end
