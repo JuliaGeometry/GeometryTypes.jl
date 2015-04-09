@@ -85,7 +85,6 @@ v2 = Vec3d(6.0,5.0,4.0)
 # type conversion
 @assert isa(convert(Vec3f,v1), Vec3f)
 
-@show convert(Vec3d, [1.0,2.0,3.0])
 @assert isa(convert(Vector{Float64}, v1), Vector{Float64})
 @assert convert(Vector{Float64}, v1) == [1.0,2.0,3.0]
 
