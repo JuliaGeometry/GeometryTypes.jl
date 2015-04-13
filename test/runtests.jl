@@ -1,7 +1,6 @@
 using HyperRectangles
 using Base.Test
 
-# write your own tests here
 a = HyperRectangle(Float64, 4)
 @test a == HyperRectangle{Float64,4}([Inf,Inf,Inf,Inf],[-Inf,-Inf,-Inf,-Inf])
 
@@ -13,6 +12,8 @@ update!(a, [1,2,3,4])
 update!(a, [5,6,7,8])
 
 @test a == HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[5.0,6.0,7.0,8.0])
+
+@test_throws AssertionError HyperRectangle([1.0,2.0,3.0],[1.0,2.0,3.0,4.0])
 
 b = HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[5.0,6.0,7.0,8.0])
 
