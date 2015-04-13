@@ -1,9 +1,7 @@
 module HyperRectangles
 using Compat
 
-import Base.split
-
-export AbstractHyperRectangle, HyperRectangle, update!, split
+export AbstractHyperRectangle, HyperRectangle, update!
 
 abstract AbstractHyperRectangle{T, N}
 
@@ -15,7 +13,7 @@ end
 function HyperRectangle{T}(max::Vector{T}, min::Vector{T})
     n = length(max)
     m = length(min)
-    @assert n == m
+    n == m || error("min and max vector lengths are different!")
     HyperRectangle{T, n}(min, max)
 end
 
@@ -71,7 +69,7 @@ end
 
 # Splits an HyperRectangle into two new ones along an axis
 # at a given axis value
-function split{T, N}(b::HyperRectangle{T,N}, axis::Int, value::T)
+function Base.split{T, N}(b::HyperRectangle{T,N}, axis::Int, value::T)
     b1max = copy(b.max)
     b1max[axis] = value
 
