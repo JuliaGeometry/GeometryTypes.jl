@@ -9,6 +9,6 @@ notifications:
   email: false
 script:
     - julia -e 'Pkg.clone(pwd())'
-    - julia --check-bounds=yes -e 'Pkg.test("Orthotopes", coverage=true)'
+    - julia --check-bounds=yes -e 'Pkg.test("HyperRectangles", coverage=true)'
 after_success:
-  - julia -e 'cd(Pkg.dir("Orthotopes")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+  - julia -e 'cd(Pkg.dir("HyperRectangles")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
