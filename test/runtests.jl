@@ -1,31 +1,40 @@
 using HyperRectangles
 using Base.Test
 
-a = HyperRectangle(Float64, 4)
-@test a == HyperRectangle{Float64,4}([Inf,Inf,Inf,Inf],[-Inf,-Inf,-Inf,-Inf])
+let
+    a = HyperRectangle(Float64, 4)
+    @test a == HyperRectangle{Float64,4}([Inf,Inf,Inf,Inf],[-Inf,-Inf,-Inf,-Inf])
 
-update!(a, [1,2,3,4])
+    update!(a, [1,2,3,4])
 
-@test a == HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[1.0,2.0,3.0,4.0])
-@test a != HyperRectangle{Float64,4}([3.0,2.0,3.0,4.0],[1.0,2.0,3.0,4.0])
+    @test a == HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[1.0,2.0,3.0,4.0])
+    @test a != HyperRectangle{Float64,4}([3.0,2.0,3.0,4.0],[1.0,2.0,3.0,4.0])
 
-update!(a, [5,6,7,8])
+    update!(a, [5,6,7,8])
 
-@test a == HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[5.0,6.0,7.0,8.0])
+    @test a == HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[5.0,6.0,7.0,8.0])
 
-@test_throws ErrorException HyperRectangle([1.0,2.0,3.0],[1.0,2.0,3.0,4.0])
 
-b = HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[5.0,6.0,7.0,8.0])
 
-@test in(a,b) && in(b,a) && contains(a,b) && contains(b,a)
+    @test max(a) == [5.0,6.0,7.0,8.0]
+    @test min(a) == [1.0,2.0,3.0,4.0]
 
-c = HyperRectangle{Float64,4}([1.1,2.1,3.1,4.1],[4.0,5.0,6.0,7.0])
+    @test_throws ErrorException HyperRectangle([1.0,2.0,3.0],[1.0,2.0,3.0,4.0])
 
-@test !in(a,c) && in(c,a) && contains(a,c) && !contains(c,a)
+    b = HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[5.0,6.0,7.0,8.0])
 
-# Testing split function
-d = HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[2.0,3.0,4.0,5.0])
-d1, d2 = split(d, 3, 3.5)
+    @test in(a,b) && in(b,a) && contains(a,b) && contains(b,a)
 
-@test d1.max[3] == 3.5 && d1.min[3] == 3.0
-@test d2.max[3] == 4.0 && d2.min[3] == 3.5
+    c = HyperRectangle([1.1,2.1,3.1,4.1],[4.0,5.0,6.0,7.0])
+
+    @test !in(a,c) && in(c,a) && contains(a,c) && !contains(c,a)
+end
+
+let
+    # Testing split function
+    d = HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[2.0,3.0,4.0,5.0])
+    d1, d2 = split(d, 3, 3.5)
+
+    @test d1.max[3] == 3.5 && d1.min[3] == 3.0
+    @test d2.max[3] == 4.0 && d2.min[3] == 3.5
+end
