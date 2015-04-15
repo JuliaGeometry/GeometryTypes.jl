@@ -10,7 +10,7 @@ type HyperRectangle{T, N} <: AbstractHyperRectangle{T, N}
     max::Vector{T}
 end
 
-function HyperRectangle{T}(max::Vector{T}, min::Vector{T})
+function HyperRectangle{T}(min::Vector{T}, max::Vector{T})
     n = length(max)
     m = length(min)
     n == m || error("min and max vector lengths are different!")
