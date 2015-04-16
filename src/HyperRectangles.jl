@@ -1,7 +1,7 @@
 module HyperRectangles
 using Compat
 
-export AbstractHyperRectangle, HyperRectangle, update!
+export AbstractHyperRectangle, HyperRectangle
 
 abstract AbstractHyperRectangle{T, N}
 
@@ -26,13 +26,6 @@ end
 @inline Base.max(b::HyperRectangle) = b.max
 @inline Base.min(b::HyperRectangle) = b.min
 
-function update!{T, N}(b::HyperRectangle{T, N}, v)
-    for i = 1:N
-        b.max[i] = max(b.max[i], v[i])
-        b.min[i] = min(b.min[i], v[i])
-    end
-end
-
 function (==){T1, T2, N}(b1::HyperRectangle{T1, N}, b2::HyperRectangle{T2, N})
     b1.min == b2.min && b1.max == b2.max
 end
@@ -48,25 +41,6 @@ end
 
 @inline Base.in(b1::HyperRectangle, b2::HyperRectangle) = contains(b2, b1)
 
-function during{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
-    for i = 1:N
-        b1.max[i] < b2.max[i] && b1.min[i] > b2.min[i] || return false
-    end
-    true
-end
-
-function starts{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
-    b1.min == b2.min
-end
-
-function finishes{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
-    b1.max == b2.max
-end
-
-function meets{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
-    b1.min == b2.max || b1.max == b2.min
-end
-
 # Splits an HyperRectangle into two new ones along an axis
 # at a given axis value
 function Base.split{T, N}(b::HyperRectangle{T,N}, axis::Int, value::T)
@@ -79,5 +53,9 @@ function Base.split{T, N}(b::HyperRectangle{T,N}, axis::Int, value::T)
     return HyperRectangle{T, N}(b.min, b1max),
            HyperRectangle{T, N}(b2min, b.max)
 end
+
+# submodules
+include("Relations.jl")
+include("Operations.jl")
 
 end # module

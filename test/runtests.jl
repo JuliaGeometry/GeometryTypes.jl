@@ -1,6 +1,9 @@
 using HyperRectangles
+using HyperRectangles.Relations
+using HyperRectangles.Operations
 using Base.Test
 
+# test constructors and containment
 let
     a = HyperRectangle(Float64, 4)
     @test a == HyperRectangle{Float64,4}([Inf,Inf,Inf,Inf],[-Inf,-Inf,-Inf,-Inf])
@@ -12,16 +15,14 @@ let
 
     update!(a, [5,6,7,8])
 
-    @test a == HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[5.0,6.0,7.0,8.0])
-
-
+    b = HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[5.0,6.0,7.0,8.0])
+    @test a == b
+    @test isequal(a,b)
 
     @test max(a) == [5.0,6.0,7.0,8.0]
     @test min(a) == [1.0,2.0,3.0,4.0]
 
     @test_throws ErrorException HyperRectangle([1.0,2.0,3.0],[1.0,2.0,3.0,4.0])
-
-    b = HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[5.0,6.0,7.0,8.0])
 
     @test in(a,b) && in(b,a) && contains(a,b) && contains(b,a)
 
@@ -30,8 +31,8 @@ let
     @test !in(a,c) && in(c,a) && contains(a,c) && !contains(c,a)
 end
 
+# Testing split function
 let
-    # Testing split function
     d = HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[2.0,3.0,4.0,5.0])
     d1, d2 = split(d, 3, 3.5)
 
