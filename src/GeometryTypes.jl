@@ -4,6 +4,7 @@ using FixedSizeArrays
 
 export row
 export column
+export normalize
 
 include("types.jl")
 

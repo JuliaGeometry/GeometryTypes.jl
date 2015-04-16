@@ -1,4 +1,4 @@
-using GeometryTypes
+using GeometryTypes, FixedSizeArrays, Quaternions
 using Base.Test
 
 typealias Vec2d Vector2{Float64}
@@ -110,7 +110,7 @@ c = column(v)
              4.0,8.0,12.0,16.0)
 
 @assert a==b
-@assert r*c == Matrix1x1(30.0)
+#@assert r*c == Matrix1x1(30.0)
 #@assert r' == c
 #@assert c' == r
 #@assert row(r,1) == v
@@ -159,3 +159,120 @@ for i=1:10000
 		@assert isapprox(fsvm[i], vm[i]) "$(fsvm[i])  $(vm[i])"
 	end
 end
+
+ac = rand(3)
+bc = rand(3)
+
+a = rand(4)
+b = rand(4)
+c = rand(4,4)
+
+d = cross(ac, bc)
+d2 = a+b
+f = c*a
+g = c*b
+h = c*f
+i = dot(f, a)
+j = dot(a, g)
+k = abs(f)
+l = abs(-f)
+
+acfs = Vector3(ac)
+bcfs = Vector3(bc)
+
+afs = Vector4(a)
+bfs = Vector4(b)
+cfs = Matrix4x4(c)
+
+dfs = cross(acfs, bcfs)
+d2fs = afs+bfs
+ffs = cfs*afs
+gfs = cfs*bfs
+hfs = cfs*ffs
+ifs = dot(ffs, afs)
+jfs = dot(afs, gfs)
+kfs = abs(ffs)
+lfs = abs(-ffs)
+
+function Base.isapprox{FSA <: FixedArray}(a::FSA, b::Array)
+	for i=1:length(a)
+		!isapprox(a[i], b[i]) && return false
+	end
+	true
+end
+
+@test isapprox(acfs, ac)
+@test isapprox(bcfs, bc)
+
+@test isapprox(afs, a)
+@test isapprox(bfs, b)
+@test isapprox(cfs, c)
+
+@test isapprox(dfs, d)
+@test isapprox(d2fs, d2)
+@test isapprox(ffs, f)
+@test isapprox(gfs, g)
+@test isapprox(hfs, h)
+@test isapprox(ifs, i)
+@test isapprox(jfs, j)
+@test isapprox(kfs, k)
+@test isapprox(lfs, l)
+
+
+
+
+import Base: (*)
+function (*){T}(q::Quaternion{T}, v::Vector3{T}) 
+    t = 2 * cross(Vector3(q.v1, q.v2, q.v3), v)
+    v + q.s * t + cross(Vector3(q.v1, q.v2, q.v3), t)
+end
+function Quaternions.qrotation{T<:Real}(axis::Vector3{T}, theta::T)
+    u = normalize(axis)
+    s = sin(theta/2)
+    Quaternion(cos(theta/2), s*u[1], s*u[2], s*u[3], true)
+end
+
+
+function rotationmatrixv{T}(q::Quaternion{T})
+    sx, sy, sz = 2q.s*q.v1, 2q.s*q.v2, 2q.s*q.v3
+    xx, xy, xz = 2q.v1^2, 2q.v1*q.v2, 2q.v1*q.v3
+    yy, yz, zz = 2q.v2^2, 2q.v2*q.v3, 2q.v3^2
+
+    Matrix3x3{T}(
+        1-(yy+zz), xy+sz, xz-sy, 0,
+        xy-sz, 1-(xx+zz), yz+sx, 0,
+        xz+sy, yz-sx, 1-(xx+yy), 0,
+        0, 0, 0, 1
+    )
+end
+
+function rotation{T}(u::Vector3{T}, v::Vector3{T})
+    u = normalize(u)
+    v = normalize(v)
+    if (u == -v)
+        # 180 degree rotation around any orthogonal vector
+        other = (abs(dot(u, Vector3{T}(1,0,0))) < 1.0) ? Vector3{T}(1,0,0) : Vector3{T}(0,1,0)
+        return qrotation(normalize(cross(u, other)), 180)
+    end
+
+    half = normalize(u + v)
+    return Quaternion(dot(u, half), cross(u, half)...)
+end
+
+r = qrotation(ac, 0.77)
+m = rotationmatrix(r)
+z = r*ac
+
+rfs = qrotation(acfs, 0.77)
+mfs = rotationmatrixv(rfs)
+zfs = rfs*acfs
+
+
+println(mfs, m)
+for i=1:4
+	@test isapprox(r.(i), rfs.(i))
+end 
+@test isapprox(mfs, m)
+println(z)
+println(zfs)
+@test isapprox(zfs, z)
