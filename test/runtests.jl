@@ -39,3 +39,13 @@ let
     @test d1.max[3] == 3.5 && d1.min[3] == 3.0
     @test d2.max[3] == 4.0 && d2.min[3] == 3.5
 end
+
+#test points function
+let
+    a = HyperRectangle([0,0],[1,1])
+    pt_expa = Vector[[0,0],[0,1],[1,0],[1,1]]
+    @test points(a) == pt_expa
+    b = HyperRectangle([0,0,0],[1,1,1])
+    pt_expb = Vector[[0,0,0],[0,0,1],[0,1,0],[0,1,1],[1,0,0],[1,0,1],[1,1,0],[1,1,1]]
+    @test points(b) == pt_expb
+end
