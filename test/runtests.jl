@@ -5,8 +5,7 @@ using Base.Test
 
 # test constructors and containment
 let
-    a = HyperRectangle(Float64, 4)
-    @test a == HyperRectangle{Float64,4}([Inf,Inf,Inf,Inf],[-Inf,-Inf,-Inf,-Inf])
+    a= HyperRectangle{Float64,4}([Inf,Inf,Inf,Inf],[-Inf,-Inf,-Inf,-Inf])
 
     update!(a, [1,2,3,4])
 
@@ -48,4 +47,12 @@ let
     b = HyperRectangle([0,0,0],[1,1,1])
     pt_expb = Vector[[0,0,0],[0,0,1],[0,1,0],[0,1,1],[1,0,0],[1,0,1],[1,1,0],[1,1,1]]
     @test points(b) == pt_expb
+end
+
+# test empty constructor on 0.4
+if VERSION >= v"0.4.0-"
+    let
+        a = HyperRectangle{Float64, 4}()
+        @test a == HyperRectangle{Float64,4}([Inf,Inf,Inf,Inf],[-Inf,-Inf,-Inf,-Inf])
+    end
 end

@@ -17,12 +17,6 @@ function HyperRectangle{T}(min::Vector{T}, max::Vector{T})
     HyperRectangle{T, n}(min, max)
 end
 
-function HyperRectangle(t::DataType, n::Int)
-    max = fill(typemin(t), n)
-    min = fill(typemax(t), n)
-    HyperRectangle{t,n}(min, max)
-end
-
 @inline Base.max(b::HyperRectangle) = b.max
 @inline Base.min(b::HyperRectangle) = b.min
 
@@ -52,6 +46,14 @@ function Base.split{T, N}(b::HyperRectangle{T,N}, axis::Int, value::T)
 
     return HyperRectangle{T, N}(b.min, b1max),
            HyperRectangle{T, N}(b2min, b.max)
+end
+
+if VERSION >= v"0.4.0-"
+    function Base.call{T,N}(::Type{HyperRectangle{T,N}})
+        max = fill(typemin(T), N)
+        min = fill(typemax(T), N)
+        HyperRectangle{T,N}(min, max)
+    end
 end
 
 # submodules
