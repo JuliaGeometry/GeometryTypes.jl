@@ -48,6 +48,30 @@ function Base.split{T, N}(b::HyperRectangle{T,N}, axis::Int, value::T)
            HyperRectangle{T, N}(b2min, b.max)
 end
 
+function Base.union{T,N}(h1::HyperRectangle{T,N}, h2::HyperRectangle{T,N})
+    mins = zeros(T, N)
+    maxs = zeros(T, N)
+    for i = 1:N
+        mins[i] = min(h1.min[i], h2.min[i])
+        maxs[i] = max(h1.max[i], h2.max[i])
+    end
+    HyperRectangle{T,N}(mins, maxs)
+end
+
+function Base.diff(h1::HyperRectangle, h2::HyperRectangle)
+    h1
+end
+
+function Base.intersect{T,N}(h1::HyperRectangle{T,N}, h2::HyperRectangle{T,N})
+    mins = zeros(T, N)
+    maxs = zeros(T, N)
+    for i = 1:N
+        mins[i] = max(h1.min[i], h2.min[i])
+        maxs[i] = min(h1.max[i], h2.max[i])
+    end
+    HyperRectangle{T,N}(mins, maxs)
+end
+
 if VERSION >= v"0.4.0-"
     function Base.call{T,N}(::Type{HyperRectangle{T,N}})
         max = fill(typemin(T), N)
