@@ -48,6 +48,11 @@ function Base.split{T, N}(b::HyperRectangle{T,N}, axis::Int, value::T)
            HyperRectangle{T, N}(b2min, b.max)
 end
 
+#
+# Based on:
+# Near real-time CSG rendering using tree normalization and geometric pruning
+# Computer Graphics and Applications, IEEE
+#
 function Base.union{T,N}(h1::HyperRectangle{T,N}, h2::HyperRectangle{T,N})
     mins = zeros(T, N)
     maxs = zeros(T, N)
