@@ -1,6 +1,7 @@
 module Operations
 
 using HyperRectangles
+using Compat
 
 export update!, points, min_dist_dim, max_dist_dim,  minmax_dist_dim, min_euclideansq,
        max_euclideansq, minmax_euclideansq,  min_euclidean,  max_euclidean,  minmax_euclidean
