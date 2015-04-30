@@ -19,6 +19,7 @@ end
 
 @inline Base.max(b::HyperRectangle) = b.max
 @inline Base.min(b::HyperRectangle) = b.min
+@inline Base.length(b::HyperRectangle) = length(b.min)
 
 function (==){T1, T2, N}(b1::HyperRectangle{T1, N}, b2::HyperRectangle{T2, N})
     b1.min == b2.min && b1.max == b2.max
