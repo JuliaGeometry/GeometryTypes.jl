@@ -1,6 +1,9 @@
 using GeometryTypes, FixedSizeArrays, Quaternions
 using Base.Test
 
+
+
+
 typealias Vec2d Vector2{Float64}
 typealias Vec3d Vector3{Float64}
 typealias Vec4d Vector4{Float64}
@@ -96,7 +99,7 @@ typealias Mat2d Matrix2x2{Float64}
 typealias Mat3d Matrix3x3{Float64}
 typealias Mat4d Matrix4x4{Float64}
 
-@assert zeros(Mat2d) == Mat2d(0.0,0.0,0.0,0.0)
+@assert zero(Mat2d) == Mat2d(0.0,0.0,0.0,0.0)
 
 v = Vec4d(1.0,2.0,3.0,4.0)
 r = row(v)

@@ -3,7 +3,7 @@
 @gen_fixed_size_vector("Point",  	[:x,:y,:z,:w], 				1:4, false)
 @gen_fixed_size_vector("Normal",  	[:x,:y,:z,:w], 				1:4, false)
 
-@gen_fixed_size_vector("Face",   	[:a,:b,:c,:d,:e,:f,:g,:h], 	3:8, false)
+
 
 # generate mutable variant (will be MVector, MPoint, etc...)
 @gen_fixed_size_vector("Vector",    [:x,:y,:z,:w],              1:4, true)
@@ -11,11 +11,40 @@
 @gen_fixed_size_vector("Normal",    [:x,:y,:z,:w],              1:4, true)
 @gen_fixed_size_vector("UV",        [:u,:v],                    2:2, true)
 @gen_fixed_size_vector("UVW",       [:u,:v,:w],                 3:3, true)
-@gen_fixed_size_vector("Face",      [:a,:b,:c,:d,:e,:f,:g,:h],  3:8, true)
 
 #generating matrixes (Matrix1x1, Matrix1x2, etc...)
 gen_fixed_size_matrix(1:4, 1:4, false)
 gen_fixed_size_matrix(1:4, 1:4, true)
+
+abstract Face{Dim, T, IndexOffset} <: FixedVector{T, Dim}
+
+immutable Face3{T, IndexOffset} <: Face{3, T, IndexOffset}
+    a::T
+    b::T
+    c::T
+end
+immutable Face4{T, IndexOffset} <: Face{4, T, IndexOffset}
+    a::T
+    b::T
+    c::T
+    d::T
+end
+Base.call{T, Offset, S <: AbstractString}(::Type{Face3{T, Offset}}, x::Vector{S}) = Face3{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]))
+Base.call{T, Offset, S <: AbstractString}(::Type{Face4{T, Offset}}, x::Vector{S}) = Face4{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]), parse(T, x[4]))
+
+Base.getindex{T,N,FD, FT, Offset}(a::Array{T,N}, i::Face{FD, FT, Offset})                 = a[[(i-Offset)...]]
+Base.setindex!{T,N,FD, FT, Offset}(a::Array{T,N}, b::Array{T,N}, i::Face{FD, FT, Offset}) = (a[[(i-Offset)...]] = b)
+
+Base.convert{T, IndexOffset1}(::Type{Face3{T, IndexOffset1}}, f::Face3{T, IndexOffset1}) = f
+Base.convert{T, IndexOffset1, IndexOffset2}(t::Type{Face3{T, IndexOffset1}}, f::Face3{T, IndexOffset2}) = t((f+IndexOffset1-IndexOffset2)...)
+
+typealias Triangle{T} Face3{T, 0}
+
+typealias GLFace{Dim} Face{Dim, Cuint, -1} #offset is relative to julia, so -1 is 0-indexed
+typealias GLTriangle  Face3{Cuint, -1}
+typealias GLQuad      Face4{Cuint, -1}
+
+
 
 immutable UV{T} <: FixedVector{T, 2}
     u::T

@@ -52,22 +52,16 @@ export MUV
 export MUVW
 
 #Face Types
+export Face
 export Face3
 export Face4
-export Face5
-export Face6
-export Face7
-export Face8
-
-export MFace3
-export MFace4
-export MFace5
-export MFace6
-export MFace7
-export MFace8
-
-typealias Triangle{T} Face3{T}
 export Triangle
+
+export GLFace
+export GLTriangle
+export GLQuad
+
+
 
 # Some primitives
 export Cube
