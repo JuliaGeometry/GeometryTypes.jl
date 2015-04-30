@@ -2,8 +2,7 @@
 @gen_fixed_size_vector("Vector", 	[:x,:y,:z,:w],              1:4, false)
 @gen_fixed_size_vector("Point",  	[:x,:y,:z,:w], 				1:4, false)
 @gen_fixed_size_vector("Normal",  	[:x,:y,:z,:w], 				1:4, false)
-@gen_fixed_size_vector("UV",		[:u,:v], 				    2:2, false)
-@gen_fixed_size_vector("UVW",  		[:u,:v,:w], 				3:3, false)
+
 @gen_fixed_size_vector("Face",   	[:a,:b,:c,:d,:e,:f,:g,:h], 	3:8, false)
 
 # generate mutable variant (will be MVector, MPoint, etc...)
@@ -18,13 +17,26 @@
 gen_fixed_size_matrix(1:4, 1:4, false)
 gen_fixed_size_matrix(1:4, 1:4, true)
 
+immutable UV{T} <: FixedVector{T, 2}
+    u::T
+    v::T
+end
+immutable UVW{T} <: FixedVector{T, 3}
+    u::T
+    v::T
+    w::T
+end
+#Axis Aligned Bounding Box
 
-#Axis Aligned Cube
-immutable Cube{T}
+immutable AABB{T}
   min::Vector3{T}
   max::Vector3{T}
 end
 
+immutable Cube{T}
+  origin::Vector3{T}
+  width::Vector3{T}
+end
 immutable Circle{T}
     center::Point2{T}
     r::T
@@ -40,6 +52,11 @@ immutable Rectangle{T}
     h::T
 end
 
+immutable Quad{T}
+  downleft::Vector3{T}
+  width::Vector3{T}
+  height::Vector3{T}
+end
 
 
 type MCube{T}
