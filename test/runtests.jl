@@ -93,4 +93,12 @@ let
     @test min_euclidean(a, p) == sqrt(2.5)
     @test max_euclidean(a, p) == sqrt(8.5)
     @test minmax_euclidean(a, p) == (sqrt(2.5), sqrt(8.5))
+
+    p2 = [0.75, 0.75]
+    @test min_dist_dim(a, p2, 1) == 0.0
+    @test min_dist_dim(a, p2, 2) == 0.0
+
+    b2  = HyperRectangle([0.25, 0.25], [0.75,0.75])
+    @test min_dist_dim(a, b2, 1) == 0
+    @test min_dist_dim(a, b2, 2) == 0
 end
