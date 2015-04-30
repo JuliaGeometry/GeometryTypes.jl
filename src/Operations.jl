@@ -34,19 +34,19 @@ end
 
 # Min max distance functions between hrectangle and point for a given dimension
 @inline function min_dist_dim{T}(rect::HyperRectangle{T}, p::Vector{T}, dim::Int)
-    return abs(max(0, max(rect.min[dim] - p[dim], p[dim] - rect.max[dim])))
+    return max(zero(T), max(rect.min[dim] - p[dim], p[dim] - rect.max[dim]))
 end
 
 @inline function max_dist_dim{T}(rect::HyperRectangle{T}, p::Vector{T}, dim::Int)
-    return abs(max(rect.max[dim] - p[dim], p[dim] - rect.min[dim]))
+    return max(rect.max[dim] - p[dim], p[dim] - rect.min[dim])
 end
 
 @inline function min_dist_dim{T}(rect1::HyperRectangle{T}, rect2::HyperRectangle{T}, dim::Int)
-    return abs(max(0, max(rect1.min[dim] - rect2.max[dim], rect2.min[dim] - rect1.max[dim])))
+    return max(zero(T), max(rect1.min[dim] - rect2.max[dim], rect2.min[dim] - rect1.max[dim]))
 end
 
 @inline function max_dist_dim{T}(rect1::HyperRectangle{T},  rect2::HyperRectangle{T}, dim::Int)
-    return abs(max(rect1.max[dim] - rect2.min[dim],  rect2.max[dim] - rect1.min[dim]))
+    return max(rect1.max[dim] - rect2.min[dim],  rect2.max[dim] - rect1.min[dim])
 end
 
 
