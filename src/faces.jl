@@ -12,9 +12,10 @@ function Base.convert{FT1, FT2}(::Type{Vector{Face3{FT1}}}, f::Vector{Face4{FT2}
   end
   return fsn
 end
+Iterable(T) = Union(Vector{T}, Tuple{T})
 # This needs to be defined here, but should ultimately done by fixedsizearrays. Right now it would lead to ambiguities though.
-Base.call{T, Offset, S <: AbstractString}(::Type{Face3{T, Offset}}, x::Vector{S}) = Face3{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]))
-Base.call{T, Offset, S <: AbstractString}(::Type{Face4{T, Offset}}, x::Vector{S}) = Face4{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]), parse(T, x[4]))
+Base.call{T, Offset, S <: AbstractString}(::Type{Face3{T, Offset}}, x::Iterable(S)) = Face3{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]))
+Base.call{T, Offset, S <: AbstractString}(::Type{Face4{T, Offset}}, x::Iterable(S)) = Face4{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]), parse(T, x[4]))
 
 Base.getindex{T,N,FD, FT, Offset}(a::Array{T,N}, i::Face{FD, FT, Offset})                 = a[[(i-Offset)...]]
 Base.setindex!{T,N,FD, FT, Offset}(a::Array{T,N}, b::Array{T,N}, i::Face{FD, FT, Offset}) = (a[[(i-Offset)...]] = b)
