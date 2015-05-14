@@ -61,8 +61,6 @@ export GLFace
 export GLTriangle
 export GLQuad
 
-
-
 # Some primitives
 export Cube
 export Circle
@@ -70,14 +68,13 @@ export Sphere
 export Rectangle
 export Quad
 export AABB
+export Pyramid
 
 
 export MCube
 export MCircle
 export MSphere
 export MRectangle
-
-
 
 
 export Matrix1x1
@@ -121,20 +118,11 @@ export MMatrix4x2
 export MMatrix4x3
 export MMatrix4x4
 
-function maxper(v0::Vector3, v1::Vector3)
-	return Vector3(max(v0[1], v1[1]),
-            max(v0[2], v1[2]),
-            max(v0[3], v1[3]))
-end
-function minper(v0::Vector3, v1::Vector3)
-	return Vector3(min(v0[1], v1[1]),
-            min(v0[2], v1[2]),
-            min(v0[3], v1[3]))
-end
 
-Base.minimum{T, NDIM}(x::Array{Vector3{T},NDIM}) = reduce(minper, x)
-Base.maximum{T, NDIM}(x::Array{Vector3{T},NDIM}) = reduce(maxper, x)
+include("algorithms.jl")
+export normals
 
+include("faces.jl")
 
 
 end # module
