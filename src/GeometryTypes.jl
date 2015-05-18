@@ -63,11 +63,13 @@ export GLQuad
 
 # Some primitives
 export Cube
-export Circle
+export Circle                   # Simple circle object
+
 export Sphere
-export Rectangle
+export Rectangle                # Simple rectangle object
 export Quad
-export AABB
+export AABB                		# bounding slab (Axis Aligned Bounding Box)
+
 export Pyramid
 
 
