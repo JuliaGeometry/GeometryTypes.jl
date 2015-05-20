@@ -102,3 +102,26 @@ let
     @test min_dist_dim(a, b2, 1) == 0
     @test min_dist_dim(a, b2, 2) == 0
 end
+
+# Test set boolean operations
+let
+    a = HyperRectangle([0,0],[1,1])
+    b = HyperRectangle([1,1],[2,2])
+
+    @test union(a,b) == union(b,a)
+    @test union(a,b) == HyperRectangle(a.min, b.max)
+    @test intersect(a,b) == intersect(b,a)
+    @test intersect(a,b) == HyperRectangle(a.max, b.min)
+    @test diff(a,b) == a
+    @test diff(b,a) == b
+
+    c = HyperRectangle([0,0],[2,2])
+    d = HyperRectangle([1,1],[3,3])
+    @test union(c,d) == union(d,c)
+    @test union(c,d) == HyperRectangle(c.min, d.max)
+    @test intersect(c,d) == intersect(d,c)
+    @test intersect(c,d) == HyperRectangle(d.min, c.max)
+    @test diff(c,d) == c
+    @test diff(d,c) == d
+
+end
