@@ -19,15 +19,15 @@ function HyperRectangle{T}(min::Vector{T}, max::Vector{T})
     HyperRectangle{T, n}(min, max)
 end
 
-@inline Base.max(b::HyperRectangle) = b.max
-@inline Base.min(b::HyperRectangle) = b.min
-@inline Base.length(b::HyperRectangle) = length(b.min)
+Base.max(b::HyperRectangle) = b.max
+Base.min(b::HyperRectangle) = b.min
+Base.length(b::HyperRectangle) = length(b.min)
 
 function (==){T1, T2, N}(b1::HyperRectangle{T1, N}, b2::HyperRectangle{T2, N})
     b1.min == b2.min && b1.max == b2.max
 end
 
-@inline isequal(b1::HyperRectangle, b2::HyperRectangle) = b1 == b2
+isequal(b1::HyperRectangle, b2::HyperRectangle) = b1 == b2
 
 @doc """
 Check if HyperRectangles are contained in each other. This does not use
