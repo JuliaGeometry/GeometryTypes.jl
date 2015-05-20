@@ -36,7 +36,14 @@ function during{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
 end
 
 function finishes{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
-    b1.max == b2.max
+    if b1.max == b2.max
+        for i = 1:N
+            b1.min[i] > b2.min[i] || return false
+        end
+        return true
+    else
+        return false
+    end
 end
 
 end # module
