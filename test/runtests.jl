@@ -125,3 +125,21 @@ let
     @test diff(d,c) == d
 
 end
+
+# test relations
+let
+    a = HyperRectangle([0,0],[1,1])
+    b = HyperRectangle([1,1],[2,2])
+    c = HyperRectangle([0,0],[2,2])
+    d = HyperRectangle([1,1],[3,3])
+    e = HyperRectangle([3,3],[4,4])
+    d = HyperRectangle([0.25,0.25],[0.75,0.75])
+
+    @test finishes(b, c) && !finishes(c, b)
+    @test meets(a,b) && !meets(b,a)
+    @test before(a,e) && !before(e,a)
+    @test during(d,a) && !during(a,d)
+    @test starts(a,c) && !starts(c,a)
+    @test !overlaps(a,b) && !overlaps(b,a)
+
+end
