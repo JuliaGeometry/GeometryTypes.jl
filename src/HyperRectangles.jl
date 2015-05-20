@@ -42,11 +42,28 @@ function Base.contains{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T
 end
 
 @doc """
+Check if a point is contained in a HyperRectangle. This will return true if
+the point is on a face of the HyperRectangle.
+""" ->
+function Base.contains{T1, N}(b1::HyperRectangle{T1,N}, pt::AbstractVector)
+    for i = 1:N
+        pt[i] <= b1.max[i] && pt[i] >= b1.min[i] || return false
+    end
+    true
+end
+
+@doc """
 Check if HyperRectangles are contained in each other. This does not use
 strict inequality, so HyperRectangles may share faces and this will still
 return true.
 """ ->
-@inline Base.in(b1::HyperRectangle, b2::HyperRectangle) = contains(b2, b1)
+Base.in(b1::HyperRectangle, b2::HyperRectangle) = contains(b2, b1)
+
+@doc """
+Check if a point is contained in a HyperRectangle. This will return true if
+the point is on a face of the HyperRectangle.
+""" ->
+Base.in(pt::AbstractVector, b1::HyperRectangle) = contains(b1, pt)
 
 @doc """
 Splits an HyperRectangle into two new ones along an axis at a given axis value

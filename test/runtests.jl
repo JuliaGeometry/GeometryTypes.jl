@@ -143,3 +143,11 @@ let
     @test !overlaps(a,b) && !overlaps(b,a)
 
 end
+
+# test point membership
+let
+    a = HyperRectangle{Float64,4}([1.0,2.0,3.0,4.0],[5.0,6.0,7.0,8.0])
+    @test in([4,5,6,7],a) && contains(a,[4,5,6,7])
+    @test in([5,6,7,8],a) && contains(a,[5,6,7,8])
+    @test !in([6,7,8,9],a) && !contains(a,[6,7,8,9])
+end
