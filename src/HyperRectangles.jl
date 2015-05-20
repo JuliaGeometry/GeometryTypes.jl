@@ -1,6 +1,8 @@
 module HyperRectangles
 using Compat
 
+VERSION < v"0.4-" && using Docile
+
 export AbstractHyperRectangle, HyperRectangle
 
 abstract AbstractHyperRectangle{T, N}
@@ -27,6 +29,11 @@ end
 
 @inline isequal(b1::HyperRectangle, b2::HyperRectangle) = b1 == b2
 
+@doc """
+Check if HyperRectangles are contained in each other. This does not use
+strict inequality, so HyperRectangles may share faces and this will still
+return true.
+""" ->
 function Base.contains{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
     for i = 1:N
         b2.max[i] <= b1.max[i] && b2.min[i] >= b1.min[i] || return false
@@ -34,10 +41,16 @@ function Base.contains{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T
     true
 end
 
+@doc """
+Check if HyperRectangles are contained in each other. This does not use
+strict inequality, so HyperRectangles may share faces and this will still
+return true.
+""" ->
 @inline Base.in(b1::HyperRectangle, b2::HyperRectangle) = contains(b2, b1)
 
-# Splits an HyperRectangle into two new ones along an axis
-# at a given axis value
+@doc """
+Splits an HyperRectangle into two new ones along an axis at a given axis value
+""" ->
 function Base.split{T, N}(b::HyperRectangle{T,N}, axis::Int, value::T)
     b1max = copy(b.max)
     b1max[axis] = value
@@ -49,11 +62,9 @@ function Base.split{T, N}(b::HyperRectangle{T,N}, axis::Int, value::T)
            HyperRectangle{T, N}(b2min, b.max)
 end
 
-#
-# Based on:
-# Near real-time CSG rendering using tree normalization and geometric pruning
-# Computer Graphics and Applications, IEEE
-#
+@doc """
+Perform a union between two HyperRectangles.
+""" ->
 function Base.union{T,N}(h1::HyperRectangle{T,N}, h2::HyperRectangle{T,N})
     mins = zeros(T, N)
     maxs = zeros(T, N)
@@ -64,10 +75,16 @@ function Base.union{T,N}(h1::HyperRectangle{T,N}, h2::HyperRectangle{T,N})
     HyperRectangle{T,N}(mins, maxs)
 end
 
+@doc """
+Perform a difference between two HyperRectangles.
+""" ->
 function Base.diff(h1::HyperRectangle, h2::HyperRectangle)
     h1
 end
 
+@doc """
+Perform a intersection between two HyperRectangles.
+""" ->
 function Base.intersect{T,N}(h1::HyperRectangle{T,N}, h2::HyperRectangle{T,N})
     mins = zeros(T, N)
     maxs = zeros(T, N)
