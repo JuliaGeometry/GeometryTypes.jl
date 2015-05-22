@@ -123,6 +123,9 @@ export MMatrix4x4
 
 include("algorithms.jl")
 export normals
+export area
+export xwidth
+export yheight
 
 include("faces.jl")
 

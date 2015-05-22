@@ -25,3 +25,6 @@ Base.convert{T, IndexOffset1, IndexOffset2}(t::Type{Face3{T, IndexOffset1}}, f::
 
 
 
+
+Base.getindex{T}(a::Array{T,2}, rect::Rectangle)                 = a[rect.x+1:rect.w, rect.y+1:rect.h]
+Base.setindex!{T}(a::Array{T,2}, b::Array{T,2}, rect::Rectangle) = (a[rect.x+1:rect.w, rect.y+1:rect.h] = b)

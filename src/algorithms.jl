@@ -41,3 +41,7 @@ function Base.convert{T}(::Type{AABB}, geometry::Array{Point3{T}})
     AABB(Vector3{T}(vmin), Vector3{T}(vmax))
 end
 
+area(a::Rectangle)      = a.w*a.h
+xwidth(a::Rectangle)    = a.w + a.x
+yheight(a::Rectangle)   = a.h + a.y
+Base.isless(a::Rectangle, b::Rectangle) = isless(area(a), area(b))
