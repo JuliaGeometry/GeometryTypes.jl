@@ -14,21 +14,21 @@ function update!{T, N}(b::HyperRectangle{T, N}, v)
 end
 
 function points{T}(rect::HyperRectangle{T, 3})
-    Vector{T}[rect.min,
+    Vector{T}[copy(rect.min),
         [rect.min[1],rect.min[2],rect.max[3]],
         [rect.min[1],rect.max[2],rect.min[3]],
         [rect.min[1],rect.max[2],rect.max[3]],
         [rect.max[1],rect.min[2],rect.min[3]],
         [rect.max[1],rect.min[2],rect.max[3]],
         [rect.max[1],rect.max[2],rect.min[3]],
-        rect.max]
+        copy(rect.max)]
 end
 
 function points{T}(rect::HyperRectangle{T, 2})
-    Vector{T}[rect.min,
+    Vector{T}[copy(rect.min),
         [rect.min[1],rect.max[2]],
         [rect.max[1],rect.min[2]],
-        rect.max]
+        copy(rect.max)]
 end
 
 
