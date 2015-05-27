@@ -75,8 +75,8 @@ function Base.split{T, N}(b::HyperRectangle{T,N}, axis::Int, value::T)
     b2min = copy(b.min)
     b2min[axis] = value
 
-    return HyperRectangle{T, N}(b.min, b1max),
-           HyperRectangle{T, N}(b2min, b.max)
+    return HyperRectangle{T, N}(copy(b.min), b1max),
+           HyperRectangle{T, N}(b2min, copy(b.max))
 end
 
 @doc """
