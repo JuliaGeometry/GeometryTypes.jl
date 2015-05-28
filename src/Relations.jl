@@ -19,7 +19,7 @@ end
 
 function overlaps{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
     for i = 1:N
-        b1.max[i] > b2.min[i] && b1.max[i] < b2.min[i] || return false
+        b2.max[i] > b1.max[i] > b2.min[i] && b1.min[i] < b2.min[i] || return false
     end
     true
 end

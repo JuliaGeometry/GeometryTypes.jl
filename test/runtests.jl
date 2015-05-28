@@ -134,14 +134,17 @@ let
     d = HyperRectangle([1,1],[3,3])
     e = HyperRectangle([3,3],[4,4])
     d = HyperRectangle([0.25,0.25],[0.75,0.75])
+    f = HyperRectangle([0.9,0.9], [2.0,2.0])
 
-    @test finishes(b, c) && !finishes(c, b)
+    @test finishes(b,c) && !finishes(c,b)
+    @test !finishes(a,b)
     @test meets(a,b) && !meets(b,a)
     @test before(a,e) && !before(e,a)
     @test during(d,a) && !during(a,d)
     @test starts(a,c) && !starts(c,a)
+    @test !starts(a,b)
     @test !overlaps(a,b) && !overlaps(b,a)
-
+    @test overlaps(a,f) && !overlaps(f,a)
 end
 
 # test point membership
