@@ -2,6 +2,9 @@ module GeometryTypes
 
 using FixedSizeArrays
 
+import Base: *
+
+
 export row
 export column
 export normalize

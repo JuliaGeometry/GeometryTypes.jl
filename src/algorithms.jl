@@ -31,6 +31,10 @@ Base.maximum{T, NDIM}(x::Array{Vector3{T},NDIM}) = reduce(maxper, x)
 AABB(min_x, min_y, min_z, max_x, max_y, max_z) = AABB(Vector3(min_x, min_y, min_z), Vector3(max_x, max_y, max_z))
 AABB(min_x, min_y, min_z, max_x, max_y, max_z) = AABB(Vector3(min_x, min_y, min_z), Vector3(max_x, max_y, max_z))
 
+
+*{T}(m::Matrix4x4{T}, bb::AABB{T}) = AABB(Vector3{T}(m*Vector4{T}(bb.min..., one(T))), Vector3{T}(m*Vector4{T}(bb.max..., one(T))))
+
+
 function Base.convert{T}(::Type{AABB}, geometry::Array{Point3{T}}) 
     vmin = Point3(typemax(T))
     vmax = Point3(typemin(T))
