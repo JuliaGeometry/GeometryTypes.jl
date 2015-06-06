@@ -40,6 +40,15 @@ function Base.convert{T}(::Type{AABB}, geometry::Array{Point3{T}})
     end
     AABB(Vector3{T}(vmin), Vector3{T}(vmax))
 end
+function Base.convert{T}(::Type{AABB}, geometry::Array{Point2{T}}) 
+    vmin = Point2(typemax(T))
+    vmax = Point2(typemin(T))
+    @inbounds for i=1:length(geometry)
+         vmin = min(geometry[i], vmin)
+         vmax = max(geometry[i], vmax)
+    end
+    AABB(Vector3{T}(vmin...,0), Vector3{T}(vmax...,0))
+end
 
 area(a::Rectangle)      = a.w*a.h
 xwidth(a::Rectangle)    = a.w + a.x
