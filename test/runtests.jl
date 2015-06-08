@@ -1,4 +1,4 @@
-using GeometryTypes, FixedSizeArrays, Quaternions
+using GeometryTypes, FixedSizeArrays
 using Base.Test
 
 
@@ -220,61 +220,3 @@ end
 @test isapprox(jfs, j)
 @test isapprox(kfs, k)
 @test isapprox(lfs, l)
-
-
-
-
-import Base: (*)
-function (*){T}(q::Quaternion{T}, v::Vector3{T}) 
-    t = 2 * cross(Vector3(q.v1, q.v2, q.v3), v)
-    v + q.s * t + cross(Vector3(q.v1, q.v2, q.v3), t)
-end
-function Quaternions.qrotation{T<:Real}(axis::Vector3{T}, theta::T)
-    u = normalize(axis)
-    s = sin(theta/2)
-    Quaternion(cos(theta/2), s*u[1], s*u[2], s*u[3], true)
-end
-
-
-function rotationmatrixv{T}(q::Quaternion{T})
-    sx, sy, sz = 2q.s*q.v1, 2q.s*q.v2, 2q.s*q.v3
-    xx, xy, xz = 2q.v1^2, 2q.v1*q.v2, 2q.v1*q.v3
-    yy, yz, zz = 2q.v2^2, 2q.v2*q.v3, 2q.v3^2
-
-    Matrix3x3{T}(
-        1-(yy+zz), xy+sz, xz-sy,
-        xy-sz, 1-(xx+zz), yz+sx,
-        xz+sy, yz-sx, 1-(xx+yy),
-    )
-end
-
-function rotation{T}(u::Vector3{T}, v::Vector3{T})
-    u = normalize(u)
-    v = normalize(v)
-    if (u == -v)
-        # 180 degree rotation around any orthogonal vector
-        other = (abs(dot(u, Vector3{T}(1,0,0))) < 1.0) ? Vector3{T}(1,0,0) : Vector3{T}(0,1,0)
-        return qrotation(normalize(cross(u, other)), 180)
-    end
-
-    half = normalize(u + v)
-    return Quaternion(dot(u, half), cross(u, half)...)
-end
-
-r = qrotation(ac, 0.77)
-m = rotationmatrix(r)
-z = r*ac
-
-rfs = qrotation(acfs, 0.77)
-mfs = rotationmatrixv(rfs)
-zfs = rfs*acfs
-
-
-println(mfs, m)
-for i=1:4
-	@test isapprox(r.(i), rfs.(i))
-end 
-@test isapprox(mfs, m)
-println(z)
-println(zfs)
-@test isapprox(zfs, z)
