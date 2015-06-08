@@ -2,6 +2,6 @@
 
 [![Build Status](https://travis-ci.org/SimonDanisch/GeometryTypes.jl.svg?branch=master)](https://travis-ci.org/SimonDanisch/GeometryTypes.jl)
 
-#### WORK IN PROGRESS
+Geometry primtives building up on FixedSizeArrays.
 
-Geometry types for Julia building up on FixedSizeArrays
+Offers fixedsize matrices, vectors, points and some more primitivies for meshes and boundingboxes.
