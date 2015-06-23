@@ -82,20 +82,20 @@ immutable Pyramid{T} <: GeometryPrimitive
   width::T
 end
 
-type MCube{T}
+type MCube{T} <: GeometryPrimitive
   min::MVector3{T}
   max::MVector3{T}
 end
 
-type MCircle{T}
+type MCircle{T} <: GeometryPrimitive
     center::MPoint2{T}
     r::T
 end
-type MSphere{T}
+type MSphere{T} <: GeometryPrimitive
     center::MPoint3{T}
     r::T
 end
-type MRectangle{T}
+type MRectangle{T} <: GeometryPrimitive
     x::T
     y::T
     w::T
