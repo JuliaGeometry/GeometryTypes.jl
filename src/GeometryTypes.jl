@@ -65,6 +65,8 @@ export GLTriangle
 export GLQuad
 
 # Some primitives
+export GeometryPrimitive
+
 export Cube
 export Circle                   # Simple circle object
 

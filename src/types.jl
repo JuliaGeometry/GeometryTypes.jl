@@ -50,32 +50,33 @@ immutable AABB{T}
   max::Vector3{T}
 end
 
-immutable Cube{T}
+abstract GeometryPrimitive #abstract type for primitives
+immutable Cube{T} <: GeometryPrimitive
   origin::Vector3{T}
   width::Vector3{T}
 end
-immutable Circle{T}
+immutable Circle{T} <: GeometryPrimitive
     center::Point2{T}
     r::T
 end
-immutable Sphere{T}
+immutable Sphere{T} <: GeometryPrimitive
     center::Point3{T}
     r::T
 end
-immutable Rectangle{T}
+immutable Rectangle{T} <: GeometryPrimitive
     x::T
     y::T
     w::T
     h::T
 end
 
-immutable Quad{T}
+immutable Quad{T} <: GeometryPrimitive
   downleft::Vector3{T}
   width::Vector3{T}
   height::Vector3{T}
 end
 
-immutable Pyramid{T}
+immutable Pyramid{T} <: GeometryPrimitive
   middle::Point3{T}
   length::T
   width::T
