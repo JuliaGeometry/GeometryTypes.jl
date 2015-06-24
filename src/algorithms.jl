@@ -30,6 +30,7 @@ Base.maximum{T, NDIM}(x::Array{Vector3{T},NDIM}) = reduce(maxper, x)
     
 AABB(min_x, min_y, min_z, max_x, max_y, max_z) = AABB(Vector3(min_x, min_y, min_z), Vector3(max_x, max_y, max_z))
 AABB(min_x, min_y, min_z, max_x, max_y, max_z) = AABB(Vector3(min_x, min_y, min_z), Vector3(max_x, max_y, max_z))
+AABB{T}(r::Rectangle{T}) = AABB(Vector3(r.x, r.y, zero(T)), Vector3(xwidth(r), yheight(r), zero(T)))
 call{T}(::Type{AABB{T}}, aabb::AABB) = AABB(Vector3{T}(aabb.min), Vector3{T}(aabb.max))
 
 *{T}(m::Matrix4x4{T}, bb::AABB{T}) = AABB(Vector3{T}(m*Vector4{T}(bb.min..., one(T))), Vector3{T}(m*Vector4{T}(bb.max..., one(T))))
