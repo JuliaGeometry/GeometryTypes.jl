@@ -134,6 +134,7 @@ export yheight
 
 include("faces.jl")
 
+include("HyperRectangles/HyperRectangles.jl")
 
 end # module
 
