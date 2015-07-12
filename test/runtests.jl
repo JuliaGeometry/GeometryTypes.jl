@@ -1,8 +1,7 @@
 using GeometryTypes, FixedSizeArrays
 using Base.Test
 
-
-
+include("test_hyperrectangles.jl")
 
 typealias Vec2d Vector2{Float64}
 typealias Vec3d Vector3{Float64}
@@ -196,10 +195,10 @@ kfs = abs(ffs)
 lfs = abs(-ffs)
 
 function Base.isapprox{FSA <: FixedArray}(a::FSA, b::Array)
-	for i=1:length(a)
-		!isapprox(a[i], b[i]) && return false
-	end
-	true
+    for i=1:length(a)
+    !isapprox(a[i], b[i]) && return false
+    end
+    true
 end
 
 @test isapprox(acfs, ac)
