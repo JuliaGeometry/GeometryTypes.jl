@@ -44,13 +44,13 @@ immutable UVW{T} <: FixedVector{T, 3}
     w::T
 end
 #Axis Aligned Bounding Box
+abstract GeometryPrimitive #abstract type for primitives
 
-immutable AABB{T}
+immutable AABB{T} <: GeometryPrimitive
   min::Vector3{T}
   max::Vector3{T}
 end
 
-abstract GeometryPrimitive #abstract type for primitives
 immutable Cube{T} <: GeometryPrimitive
   origin::Vector3{T}
   width::Vector3{T}

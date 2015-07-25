@@ -1,9 +1,16 @@
 module GeometryTypes
 
 using FixedSizeArrays
+using Requires
+using ColorTypes
+using Compat
 
 import Base: *
-
+import Base.merge
+import Base.convert
+import Base.getindex
+import Base.show
+import Base.call
 
 export row
 export column
@@ -134,7 +141,46 @@ export yheight
 
 include("faces.jl")
 
-include("HyperRectangles/HyperRectangles.jl")
+#include("HyperRectangles/HyperRectangles.jl")
+
+
+include("meshtypes.jl")
+include("primitives.jl")
+
+export Mesh
+export HomogenousMesh
+export HMesh
+export NormalMesh
+export UVWMesh
+export UVMesh2D
+export UVMesh
+export PlainMesh
+export Mesh2D
+export NormalAttributeMesh
+export NormalColorMesh
+export NormalUVWMesh
+
+export GLMesh2D
+export GLNormalMesh
+export GLUVWMesh
+export GLUVMesh2D
+export GLUVMesh
+export GLPlainMesh
+export GLNormalAttributeMesh
+export GLNormalColorMesh
+export GLNormalUVWMesh
+
+export vertextype
+export facetype
+export normaltype
+export texturecoordinatetype
+export colortype
+
+
+export attributes
+export attributes_noVF
+
+export normals
 
 end # module
 
