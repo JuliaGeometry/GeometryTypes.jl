@@ -40,32 +40,32 @@ all_attributes{M <: HMesh}(m::M)       = Dict{Symbol, Any}(map(field -> (field =
 #Some Aliases
 typealias HMesh HomogenousMesh
 
-typealias PlainMesh{VT, FT}  HMesh{Point3{VT}, FT, Void, Void,  Void, Void, Void}
+typealias PlainMesh{VT, FT} HMesh{Point3{VT}, FT, Void, Void,  Void, Void, Void}
 typealias GLPlainMesh PlainMesh{Float32, GLTriangle} 
 
-typealias Mesh2D{VT, FT}  HMesh{Point2{VT}, FT, Void, Void,  Void, Void, Void}
+typealias Mesh2D{VT, FT} HMesh{Point2{VT}, FT, Void, Void,  Void, Void, Void}
 typealias GLMesh2D Mesh2D{Float32, GLTriangle} 
 
-typealias UVMesh{VT, FT, UVT}  HMesh{Point3{VT}, FT, Void, UV{UVT},  Void, Void, Void}
+typealias UVMesh{VT, FT, UVT} HMesh{Point3{VT}, FT, Void, UV{UVT},  Void, Void, Void}
 typealias GLUVMesh UVMesh{Float32, GLTriangle, Float32} 
 
 typealias UVWMesh{VT, FT, UVT} HMesh{Point3{VT}, FT, Void, UVW{UVT}, Void, Void, Void}
 typealias GLUVWMesh UVWMesh{Float32, GLTriangle, Float32} 
 
-typealias NormalMesh{VT, FT, NT}  HMesh{Point3{VT}, FT, Normal3{NT}, Void,  Void, Void, Void}
+typealias NormalMesh{VT, FT, NT} HMesh{Point3{VT}, FT, Normal3{NT}, Void,  Void, Void, Void}
 typealias GLNormalMesh NormalMesh{Float32, GLTriangle, Float32} 
 
-typealias UVMesh2D{VT, FT, UVT}  HMesh{Point2{VT}, FT, Void, UV{UVT},  Void, Void, Void}
+typealias UVMesh2D{VT, FT, UVT} HMesh{Point2{VT}, FT, Void, UV{UVT},  Void, Void, Void}
 typealias GLUVMesh2D UVMesh2D{Float32, GLTriangle, Float32} 
 
-typealias NormalColorMesh{VT, FT, NT, CT}  HMesh{Point3{VT}, FT, Normal3{NT}, Void,  CT, Void, Void}
+typealias NormalColorMesh{VT, FT, NT, CT} HMesh{Point3{VT}, FT, Normal3{NT}, Void,  CT, Void, Void}
 typealias GLNormalColorMesh NormalColorMesh{Float32, GLTriangle, Float32, RGBA{Float32}} 
 
 
 typealias NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} HMesh{Point3{VT}, FT, Normal3{NT}, Void,  Void, AT, A_ID_T}
 typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBAU8}, Float32} 
 
-typealias NormalUVWMesh{VT, FT, NT, UVT}  HMesh{Point3{VT}, FT, Normal3{NT}, UVW{UVT},  Void, Void, Void}
+typealias NormalUVWMesh{VT, FT, NT, UVT} HMesh{Point3{VT}, FT, Normal3{NT}, UVW{UVT},  Void, Void, Void}
 typealias GLNormalUVWMesh NormalUVWMesh{Float32, GLTriangle, Float32, Float32} 
 
 # Needed to not get into an stack overflow
@@ -148,7 +148,7 @@ function add_attribute(m::Mesh, attribute)
 end
 
 #Creates a new mesh from a pair of any and a const attribute
-function call{HM <: HMesh, ConstAttrib}(::Type{HM}, x::@compat(Tuple{Any, ConstAttrib}))
+function call{HM <: HMesh, ConstAttrib}(::Type{HM}, x::Tuple{Any, ConstAttrib})
     any, const_attribute = x
     add_attribute(HM(any), const_attribute)
 end
@@ -232,17 +232,15 @@ function getindex{T <: Color}(mesh::HMesh, ::Type{T})
 end
 
 
-merge(m1::Mesh, rest::Mesh...) = merge(tuple(m1, rest...))
-merge{M <: Mesh}(m::Vector{M}) = merge(tuple(m...))
+merge{M <: Mesh}(m::Vector{M}) = merge(m...)
 
 
 #Merges an arbitrary mesh. This function probably doesn't work for all types of meshes
-function merge{N, M <: Mesh}(meshes::NTuple{N, M})
-  m1 = first(meshes)
+function merge{M <: Mesh}(m1::M, meshes::M...)
     v = m1.vertices
     f = m1.faces
     attribs = attributes_noVF(m1)
-    for mesh in meshes[2:end]
+    for mesh in meshes
         append!(f, mesh.faces + length(v))
         append!(v, mesh.vertices)
         map(append!, values(attribs), values(attributes_noVF(mesh)))
@@ -253,15 +251,17 @@ function merge{N, M <: Mesh}(meshes::NTuple{N, M})
 end
 
 # A mesh with one constant attribute can be merged as an attribute mesh. Possible attributes are FSArrays
-function merge{N, _1, _2, _3, _4, ConstAttrib <: Color, _5, _6}(meshes::NTuple{N, HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6}})
-    m1 = first(meshes)
+function merge{_1, _2, _3, _4, ConstAttrib <: Color, _5, _6}(
+        m1::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6},
+        meshes::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6}...
+    )
     vertices = m1.vertices
     faces    = m1.faces
     attribs         = attributes_noVF(m1)
     color_attrib    = [RGBAU8(m1.color)]
     index           = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
     delete!(attribs, :color)
-    for mesh in meshes[2:end]
+    for mesh in meshes
         append!(faces, mesh.faces + length(vertices))
         append!(vertices, mesh.vertices)
         attribsb = attributes_noVF(mesh)
@@ -278,7 +278,7 @@ function merge{N, _1, _2, _3, _4, ConstAttrib <: Color, _5, _6}(meshes::NTuple{N
 end
 
 
-function Base.unique(m::Mesh)
+function unique(m::Mesh)
   vts = vertices(m)
   fcs = faces(m)
     uvts = unique(vts)
@@ -298,7 +298,7 @@ end
 immutable MeshMulFunctor{T} <: Base.Func{2}
     matrix::Matrix4x4{T}
 end
-Base.call{T}(m::MeshMulFunctor{T}, vert) = Vector3{T}(m.matrix*Vector4{T}(vert..., 1))
+call{T}(m::MeshMulFunctor{T}, vert) = Vector3{T}(m.matrix*Vector4{T}(vert..., 1))
 function *{T}(m::Matrix4x4{T}, mesh::Mesh)
     msh = deepcopy(mesh)
     map!(MeshMulFunctor(m), msh.vertices)

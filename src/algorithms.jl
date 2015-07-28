@@ -24,8 +24,8 @@ function minper(v0::Vector3, v1::Vector3)
             min(v0[3], v1[3]))
 end
 
-Base.minimum{T, NDIM}(x::Array{Vector3{T},NDIM}) = reduce(minper, x)
-Base.maximum{T, NDIM}(x::Array{Vector3{T},NDIM}) = reduce(maxper, x)
+minimum{T, NDIM}(x::Array{Vector3{T},NDIM}) = reduce(minper, x)
+maximum{T, NDIM}(x::Array{Vector3{T},NDIM}) = reduce(maxper, x)
 
     
 AABB(min_x, min_y, min_z, max_x, max_y, max_z) = AABB(Vector3(min_x, min_y, min_z), Vector3(max_x, max_y, max_z))
@@ -33,10 +33,11 @@ AABB(min_x, min_y, min_z, max_x, max_y, max_z) = AABB(Vector3(min_x, min_y, min_
 AABB{T}(r::Rectangle{T}) = AABB(Vector3(r.x, r.y, zero(T)), Vector3(xwidth(r), yheight(r), zero(T)))
 call{T}(::Type{AABB{T}}, aabb::AABB) = AABB(Vector3{T}(aabb.min), Vector3{T}(aabb.max))
 
-*{T}(m::Matrix4x4{T}, bb::AABB{T}) = AABB(Vector3{T}(m*Vector4{T}(bb.min..., one(T))), Vector3{T}(m*Vector4{T}(bb.max..., one(T))))
+
+#(*){T}(m::Matrix4x4{T}, bb::AABB{T}) = nothing
 
 
-function Base.convert{T}(::Type{AABB}, geometry::Array{Point3{T}}) 
+function convert{T}(::Type{AABB}, geometry::Array{Point3{T}}) 
     vmin = Point3(typemax(T))
     vmax = Point3(typemin(T))
     @inbounds for i=1:length(geometry)
@@ -45,7 +46,7 @@ function Base.convert{T}(::Type{AABB}, geometry::Array{Point3{T}})
     end
     AABB(Vector3{T}(vmin), Vector3{T}(vmax))
 end
-function Base.convert{T}(::Type{AABB}, geometry::Array{Point2{T}}) 
+function convert{T}(::Type{AABB}, geometry::Array{Point2{T}}) 
     vmin = Point2(typemax(T))
     vmax = Point2(typemin(T))
     @inbounds for i=1:length(geometry)
@@ -58,4 +59,5 @@ end
 area(a::Rectangle)      = a.w*a.h
 xwidth(a::Rectangle)    = a.w + a.x
 yheight(a::Rectangle)   = a.h + a.y
-Base.isless(a::Rectangle, b::Rectangle) = isless(area(a), area(b))
+isless(a::Rectangle, b::Rectangle) = isless(area(a), area(b))
+Rectangle{T}(val::Vector2{T}) = Rectangle{T}(0, 0, val...)

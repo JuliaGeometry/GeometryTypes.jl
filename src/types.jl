@@ -1,7 +1,7 @@
 # generate immutable types
-@gen_fixed_size_vector("Vector", 	[:x,:y,:z,:w],              1:4, false)
-@gen_fixed_size_vector("Point",  	[:x,:y,:z,:w], 				1:4, false)
-@gen_fixed_size_vector("Normal",  	[:x,:y,:z,:w], 				1:4, false)
+@gen_fixed_size_vector("Vector",  [:x,:y,:z,:w],              1:4, false)
+@gen_fixed_size_vector("Point",   [:x,:y,:z,:w], 				1:4, false)
+@gen_fixed_size_vector("Normal",  [:x,:y,:z,:w], 				1:4, false)
 
 
 

@@ -10,6 +10,9 @@ import Base.merge
 import Base.convert
 import Base.getindex
 import Base.show
+import Base.setindex!
+import Base.unique
+import Base.merge
 import Base.call
 
 export row

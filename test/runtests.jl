@@ -1,7 +1,7 @@
 using GeometryTypes, FixedSizeArrays
 using Base.Test
 
-include("test_hyperrectangles.jl")
+#include("test_hyperrectangles.jl")
 
 typealias Vec2d Vector2{Float64}
 typealias Vec3d Vector3{Float64}
