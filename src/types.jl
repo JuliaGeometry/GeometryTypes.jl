@@ -13,9 +13,12 @@ end
 immutable Face{N, T, IndexOffset} <: FixedVector{N, T}
     _::NTuple{N, T}
 end
+for name in [:Vec, :Point, :Normal, :TextureCoordinate, :Face ]
+    eval(quote
+        call{N, T}(::Type{$name{N, T}}, a::Real) = $name(ntuple(FixedSizeArrays.ConstFunctor(a), Val{N}))
+        call(::Type{$name}, a::AbstractVector) = $name(ntuple(FixedSizeArrays.IndexFunctor(a), Val{length(a)}))
+    end)
 
-immutable Mat{Row, Column, T} <: FixedMatrix{Row, Column, T}
-    _::NTuple{Row, NTuple{Column, T}}
 end
 
 #Axis Aligned Bounding Box

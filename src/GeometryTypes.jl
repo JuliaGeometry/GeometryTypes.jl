@@ -1,6 +1,6 @@
 module GeometryTypes
 
-#using FixedSizeArrays
+using FixedSizeArrays
 using Requires
 using ColorTypes
 using Compat
@@ -35,6 +35,10 @@ include("types.jl")
 
 export HyperRectangle
 
+export Vec
+export Point
+export TextureCoordinate
+export Normal
 export Face
 
 # Some primitives
