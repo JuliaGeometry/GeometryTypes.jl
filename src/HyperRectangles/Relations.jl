@@ -1,7 +1,3 @@
-module Relations
-
-using ..HyperRectangles
-
 export before, meets, overlaps, starts, during, finishes
 
 # http://en.wikipedia.org/wiki/Allen%27s_interval_algebra
@@ -13,9 +9,8 @@ function before{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
     true
 end
 
-function meets{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
+@inline meets{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N}) = 
     b1.max == b2.min
-end
 
 function overlaps{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
     for i = 1:N
@@ -53,4 +48,3 @@ function finishes{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N}
     end
 end
 
-end # module

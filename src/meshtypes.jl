@@ -7,13 +7,13 @@ abstract Mesh
 # This type is also heavily linked to GLVisualize, which means if you can transform another meshtype to this type
 # chances are high that GLVisualize can display them.
 immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: Mesh
-  vertices            ::Vector{VertT}
-  faces               ::Vector{FaceT}
-  normals             ::Vector{NormalT}
-  texturecoordinates  ::Vector{TexCoordT}
-  color               ::ColorT
-  attributes          ::AttribT
-  attribute_id        ::Vector{AttribIDT}
+    vertices            ::Vector{VertT}
+    faces               ::Vector{FaceT}
+    normals             ::Vector{NormalT}
+    texturecoordinates  ::Vector{TexCoordT}
+    color               ::ColorT
+    attributes          ::AttribT
+    attribute_id        ::Vector{AttribIDT}
 end
 
 # Creates a mesh from a file
@@ -40,33 +40,41 @@ all_attributes{M <: HMesh}(m::M)       = Dict{Symbol, Any}(map(field -> (field =
 #Some Aliases
 typealias HMesh HomogenousMesh
 
-typealias PlainMesh{VT, FT} HMesh{Point3{VT}, FT, Void, Void,  Void, Void, Void}
-typealias GLPlainMesh PlainMesh{Float32, GLTriangle} 
+typealias Triangle{T} Face{3, T, 0}
+typealias GLFace{Dim} Face{Dim, Cuint, -1} #offset is relative to julia, so -1 is 0-indexed
+typealias GLTriangle  Face{3, Cuint, -1}
+typealias GLQuad      Face{4, Cuint, -1}
 
-typealias Mesh2D{VT, FT} HMesh{Point2{VT}, FT, Void, Void,  Void, Void, Void}
-typealias GLMesh2D Mesh2D{Float32, GLTriangle} 
+typealias UV{T} TextureCoordinate{2, T}
+typealias UVW{T} TextureCoordinate{3, T}
 
-typealias UVMesh{VT, FT, UVT} HMesh{Point3{VT}, FT, Void, UV{UVT},  Void, Void, Void}
-typealias GLUVMesh UVMesh{Float32, GLTriangle, Float32} 
+typealias PlainMesh{VT, FT} HMesh{Point{3, VT}, FT, Void, Void, Void, Void, Void}
+typealias GLPlainMesh PlainMesh{Float32, GLTriangle}
 
-typealias UVWMesh{VT, FT, UVT} HMesh{Point3{VT}, FT, Void, UVW{UVT}, Void, Void, Void}
-typealias GLUVWMesh UVWMesh{Float32, GLTriangle, Float32} 
+typealias Mesh2D{VT, FT} HMesh{Point{2, VT}, FT, Void, Void, Void, Void, Void}
+typealias GLMesh2D Mesh2D{Float32, GLTriangle}
 
-typealias NormalMesh{VT, FT, NT} HMesh{Point3{VT}, FT, Normal3{NT}, Void,  Void, Void, Void}
-typealias GLNormalMesh NormalMesh{Float32, GLTriangle, Float32} 
+typealias UVMesh{VT, FT, UVT} HMesh{Point{3, VT}, FT, Void, UV{UVT}, Void, Void, Void}
+typealias GLUVMesh UVMesh{Float32, GLTriangle, Float32}
 
-typealias UVMesh2D{VT, FT, UVT} HMesh{Point2{VT}, FT, Void, UV{UVT},  Void, Void, Void}
-typealias GLUVMesh2D UVMesh2D{Float32, GLTriangle, Float32} 
+typealias UVWMesh{VT, FT, UVT} HMesh{Point{3, VT}, FT, Void, UVW{UVT}, Void, Void, Void}
+typealias GLUVWMesh UVWMesh{Float32, GLTriangle, Float32}
 
-typealias NormalColorMesh{VT, FT, NT, CT} HMesh{Point3{VT}, FT, Normal3{NT}, Void,  CT, Void, Void}
-typealias GLNormalColorMesh NormalColorMesh{Float32, GLTriangle, Float32, RGBA{Float32}} 
+typealias NormalMesh{VT, FT, NT} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, Void, Void}
+typealias GLNormalMesh NormalMesh{Float32, GLTriangle, Float32}
+
+typealias UVMesh2D{VT, FT, UVT} HMesh{Point{2, VT}, FT, Void, UV{UVT}, Void, Void, Void}
+typealias GLUVMesh2D UVMesh2D{Float32, GLTriangle, Float32}
+
+typealias NormalColorMesh{VT, FT, NT, CT} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, CT, Void, Void}
+typealias GLNormalColorMesh NormalColorMesh{Float32, GLTriangle, Float32, RGBA{Float32}}
 
 
-typealias NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} HMesh{Point3{VT}, FT, Normal3{NT}, Void,  Void, AT, A_ID_T}
-typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBAU8}, Float32} 
+typealias NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, AT, A_ID_T}
+typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBAU8}, Float32}
 
-typealias NormalUVWMesh{VT, FT, NT, UVT} HMesh{Point3{VT}, FT, Normal3{NT}, UVW{UVT},  Void, Void, Void}
-typealias GLNormalUVWMesh NormalUVWMesh{Float32, GLTriangle, Float32, Float32} 
+typealias NormalUVWMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UVW{UVT}, Void, Void, Void}
+typealias GLNormalUVWMesh NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
 
 # Needed to not get into an stack overflow
 convert{HM1 <: HMesh}(::Type{HM1}, mesh::HM1) = mesh
@@ -77,20 +85,20 @@ convert{HM1 <: HMesh}(::Type{HM1}, mesh::HM1) = mesh
 # This way, we can make sure, that you can convert most of the meshes from one type to the other
 # with minimal code.
 function convert{HM1 <: HMesh}(::Type{HM1}, any::Union(Mesh, GeometryPrimitive))
-  result = Dict{Symbol, Any}()
-  for (field, target_type) in zip(fieldnames(HM1), HM1.parameters)
-    if target_type != Void
-      result[field] = any[target_type]
+    result = Dict{Symbol, Any}()
+    for (field, target_type) in zip(fieldnames(HM1), HM1.parameters)
+        if target_type != Void
+            result[field] = any[target_type]
+        end
     end
-  end
-  HM1(result)
+    HM1(result)
 end
 
 
 #Should be: 
 #function call{M <: HMesh, VT <: Point, FT <: Face}(::Type{M}, vertices::Vector{VT}, faces::Vector{FT})
 # Haven't gotten around to implement the types correctly with abstract types in FixedSizeArrays
-function call{M <: HMesh, VT, FT <: Face}(::Type{M}, vertices::Vector{Point3{VT}}, faces::Vector{FT})
+function call{M <: HMesh, VT, FT <: Face}(::Type{M}, vertices::Vector{Point{3, VT}}, faces::Vector{FT})
     msh = PlainMesh{VT, FT}(vertices=vertices, faces=faces)
     convert(M, msh)
 end
@@ -172,29 +180,29 @@ end
 # Define getindex for your own meshtype, to easily convert it to Homogenous attributes
 
 #Gets the normal attribute to a mesh
-function getindex{VT}(mesh::HMesh, T::Type{Point3{VT}})
+function getindex{VT}(mesh::HMesh, T::Type{Point{3, VT}})
     vts = mesh.vertices
     eltype(vts) == T       && return vts
-    eltype(vts) <: Point3   && return map(T, vts)
+    eltype(vts) <: Point   && return map(T, vts)
 end
 
 # gets the wanted face type
-function getindex{FT, Offset}(mesh::HMesh, T::Type{Face3{FT, Offset}})
+function getindex{FT, Offset}(mesh::HMesh, T::Type{Face{3, FT, Offset}})
   fs = mesh.faces
   eltype(fs) == T       && return fs
   eltype(fs) <: Face3   && return map(T, fs)
   if isa(fs, Face4)
-    convert(Vector{Face3{FT, Offset}}, fs)
+    convert(Vector{Face{3, FT, Offset}}, fs)
   end
   error("can't get the wanted attribute $(T) from mesh:")
 end
 
 #Gets the normal attribute to a mesh
-function getindex{NT}(mesh::HMesh, T::Type{Normal3{NT}})
-  n = mesh.normals
-  eltype(n) == T             && return n
-  eltype(n) <: Normal3       && return map(T, n)
-  n == Nothing[]             && return normals(mesh.vertices, mesh.faces, T)
+function getindex{NT}(mesh::HMesh, T::Type{Normal{3, NT}})
+    n = mesh.normals
+    eltype(n) == T       && return n
+    eltype(n) <: Normal3 && return map(T, n)
+    n == Nothing[]       && return normals(mesh.vertices, mesh.faces, T)
 end
 
 #Gets the uv attribute to a mesh, or creates it, or converts it
@@ -208,10 +216,10 @@ end
 
 #Gets the uv attribute to a mesh
 function getindex{UVWT}(mesh::HMesh, ::Type{UVW{UVWT}})
-  uvw = mesh.texturecoordinates
-  typeof(uvw) == UVW{UVT}     && return uvw
-  (isa(uvw, UV) || isa(uv, UVW))  && return map(UVW{UVWT}, uvw)
-  uvw == nothing          && return zeros(UVW{UVWT}, length(mesh.vertices))
+    uvw = mesh.texturecoordinates
+    typeof(uvw) == UVW{UVT}     && return uvw
+    (isa(uvw, UV) || isa(uv, UVW))  && return map(UVW{UVWT}, uvw)
+    uvw == nothing          && return zeros(UVW{UVWT}, length(mesh.vertices))
 end
 const DefaultColor = RGBA(0.2, 0.2, 0.2, 1.0)
 
@@ -225,15 +233,13 @@ end
 
 #Gets the color attribute from a mesh
 function getindex{T <: Color}(mesh::HMesh, ::Type{T})
-  c = mesh.color
-  typeof(c) == T    && return c
-  c == nothing      && return DefaultColor
-  convert(T, c)
+    c = mesh.color
+    typeof(c) == T    && return c
+    c == nothing      && return DefaultColor
+    convert(T, c)
 end
 
-
 merge{M <: Mesh}(m::Vector{M}) = merge(m...)
-
 
 #Merges an arbitrary mesh. This function probably doesn't work for all types of meshes
 function merge{M <: Mesh}(m1::M, meshes::M...)
@@ -279,8 +285,8 @@ end
 
 
 function unique(m::Mesh)
-  vts = vertices(m)
-  fcs = faces(m)
+    vts = vertices(m)
+    fcs = faces(m)
     uvts = unique(vts)
     for i = 1:length(fcs)
         #repoint indices to unique vertices
@@ -296,10 +302,10 @@ end
 # Fast but slightly ugly way to implement mesh multiplication
 # This should probably go into FixedSizeArrays.jl, Vector{FSA} * FSA
 immutable MeshMulFunctor{T} <: Base.Func{2}
-    matrix::Matrix4x4{T}
+    matrix::Mat{4,4,T}
 end
-call{T}(m::MeshMulFunctor{T}, vert) = Vector3{T}(m.matrix*Vector4{T}(vert..., 1))
-function *{T}(m::Matrix4x4{T}, mesh::Mesh)
+call{T}(m::MeshMulFunctor{T}, vert) = Vec{3, T}(m.matrix*Vec{4, T}(vert..., 1))
+function *{T}(m::Mat{4,4,T}, mesh::Mesh)
     msh = deepcopy(mesh)
     map!(MeshMulFunctor(m), msh.vertices)
     msh
