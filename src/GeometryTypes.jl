@@ -31,6 +31,7 @@ export row
 export column
 export normalize
 
+
 include("types.jl")
 
 export HyperRectangle
@@ -40,6 +41,7 @@ export Point
 export TextureCoordinate
 export Normal
 export Face
+export Mat
 
 # Some primitives
 export GeometryPrimitive
