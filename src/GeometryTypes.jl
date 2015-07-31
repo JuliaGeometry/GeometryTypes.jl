@@ -73,6 +73,9 @@ include("HyperRectangles/HyperRectangles.jl")
 include("meshtypes.jl")
 include("primitives.jl")
 
+export UV
+export UVW
+
 export Mesh
 export HomogenousMesh
 export HMesh
