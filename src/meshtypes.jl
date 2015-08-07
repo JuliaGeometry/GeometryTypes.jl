@@ -165,22 +165,23 @@ function call{HM <: HMesh, ConstAttrib}(::Type{HM}, x::Tuple{Any, ConstAttrib})
     any, const_attribute = x
     add_attribute(HM(any), const_attribute)
 end
-
+#=
 function show{M <: HMesh}(io::IO, ::Type{M})
-  print(io, "HomogenousMesh{")
-  for (key,val) in attributes(M)
-    print(io, key, ": ", eltype(val), ", ")
-  end
-  println(io, "}")
+    print(io, "HomogenousMesh{")
+    for (key,val) in attributes(M)
+        print(io, key, ": ", eltype(val), ", ")
+    end
+    println(io, "}")
 end
-function show{M <: HMesh}(io::IO, m::M)
-  println(io, "HomogenousMesh(")
-  for (key,val) in attributes(m)
-    print(io, "    ", key, ": ", length(val), "x", eltype(val), ", ")
-  end
-  println(io, ")")
-end
+=#
 
+function show{M <: HMesh}(io::IO, m::M)
+    println(io, "HomogenousMesh(")
+    for (key,val) in attributes(m)
+        print(io, "    ", key, ": ", length(val), "x", eltype(val), ", ")
+    end
+    println(io, ")")
+end
 # Getindex methods, for converted indexing into the mesh
 # Define getindex for your own meshtype, to easily convert it to Homogenous attributes
 
@@ -193,29 +194,29 @@ end
 
 # gets the wanted face type
 function getindex{FT, Offset}(mesh::HMesh, T::Type{Face{3, FT, Offset}})
-  fs = mesh.faces
-  eltype(fs) == T       && return fs
-  eltype(fs) <: Face3   && return map(T, fs)
-  if isa(fs, Face4)
-    convert(Vector{Face{3, FT, Offset}}, fs)
-  end
-  error("can't get the wanted attribute $(T) from mesh:")
+    fs = mesh.faces
+    eltype(fs) == T       && return fs
+    eltype(fs) <: Face3   && return map(T, fs)
+    if isa(fs, Face4)
+        convert(Vector{Face{3, FT, Offset}}, fs)
+    end
+    error("can't get the wanted attribute $(T) from mesh:")
 end
 
 #Gets the normal attribute to a mesh
 function getindex{NT}(mesh::HMesh, T::Type{Normal{3, NT}})
     n = mesh.normals
     eltype(n) == T       && return n
-    eltype(n) <: Normal3 && return map(T, n)
+    eltype(n) <: Normal{3} && return map(T, n)
     n == Nothing[]       && return normals(mesh.vertices, mesh.faces, T)
 end
 
 #Gets the uv attribute to a mesh, or creates it, or converts it
 function getindex{UVT}(mesh::HMesh, ::Type{UV{UVT}})
-  uv = mesh.texturecoordinates
-  eltype(uv) == UV{UVT}           && return uv
-  (eltype(uv) <: UV || eltype(uv) <: UVW) && return map(UV{UVT}, uv)
-  eltype(uv) == Nothing           && return zeros(UV{UVT}, length(mesh.vertices))
+    uv = mesh.texturecoordinates
+    eltype(uv) == UV{UVT}           && return uv
+    (eltype(uv) <: UV || eltype(uv) <: UVW) && return map(UV{UVT}, uv)
+    eltype(uv) == Nothing           && return zeros(UV{UVT}, length(mesh.vertices))
 end
 
 
@@ -298,7 +299,7 @@ function unique(m::Mesh)
         v1 = findfirst(uvts, vts[fcs[i].v1])
         v2 = findfirst(uvts, vts[fcs[i].v2])
         v3 = findfirst(uvts, vts[fcs[i].v3])
-        fcs[i] = Face{Int}(v1,v2,v3)
+        fcs[i] = Face{3, Int}(v1,v2,v3)
     end
     m.vertices[:] = uvts
 end

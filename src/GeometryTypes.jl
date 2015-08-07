@@ -5,20 +5,25 @@ using Requires
 using ColorTypes
 using Compat
 
-import Base: *
+import Base: ==, *
+
 import Base: merge
 import Base: convert
+import Base: call
+
 import Base: getindex
-import Base: show
 import Base: setindex!
+
+import Base: show
 import Base: unique
 import Base: merge
-import Base: call
 import Base: length
+
 import Base: maximum
 import Base: minimum
 import Base: isequal
-import Base: ==
+import Base: isless
+
 import Base: contains
 import Base: in
 import Base: split
@@ -30,7 +35,8 @@ import Base: intersect
 export row
 export column
 export normalize
-
+export width
+export height
 
 include("types.jl")
 
@@ -64,7 +70,8 @@ export normals
 export area
 export xwidth
 export yheight
-
+export isinside
+export isoutside
 include("faces.jl")
 
 include("HyperRectangles/HyperRectangles.jl")

@@ -1,8 +1,5 @@
 using GeometryTypes
-using GeometryTypes.HyperRectangles
-using GeometryTypes.HyperRectangles.Relations
-using GeometryTypes.HyperRectangles.Operations
-using Base.Test
+using FactCheck
 
 # test constructors and containment
 let

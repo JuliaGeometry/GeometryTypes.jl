@@ -1,9 +1,9 @@
 convert{T <: HMesh}(meshtype::Type{T}, c::AABB) = T(Cube(c.min, c.max-c.min))
 function convert{T <: HMesh}(meshtype::Type{T}, c::Cube)
     ET = Float32
-    xdir = Vector3{ET}(c.width[1],0,0)
-    ydir = Vector3{ET}(0,c.width[2],0)
-    zdir = Vector3{ET}(0,0,c.width[3])
+    xdir = Vec{3, ET}(c.width[1],0,0)
+    ydir = Vec{3, ET}(0,c.width[2],0)
+    zdir = Vec{3, ET}(0,0,c.width[3])
     quads = [
         Quad(c.origin + zdir,   xdir, ydir), # Top
         Quad(c.origin,          ydir, xdir), # Bottom
@@ -65,9 +65,9 @@ getindex{PT}(r::Rectangle, T::Type{Point{2, PT}}) = T[
 convert{T <: HMesh}(meshtype::Type{T}, c::Pyramid)                      = T(c[vertextype(T)], c[facetype(T)])
 getindex{FT, IndexOffset}(r::Pyramid, T::Type{Face{3, FT, IndexOffset}})  = reinterpret(T, collect(map(FT,(1:18)+IndexOffset)))
 function getindex{PT}(p::Pyramid, T::Type{Point{3, PT}})
-    leftup   = T(-p.width , p.width, 0) / 2f0
-    leftdown = T(-p.width, -p.width, 0) / 2f0
-    tip = T(p.middle + T(0,0,p.length))
+    leftup   = T(-p.width , p.width, PT(0)) / 2f0
+    leftdown = T(-p.width, -p.width, PT(0)) / 2f0
+    tip = T(p.middle + T(PT(0),PT(0),p.length))
     lu  = T(p.middle + leftup)
     ld  = T(p.middle + leftdown)
     ru  = T(p.middle - leftdown)

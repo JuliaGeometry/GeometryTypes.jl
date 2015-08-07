@@ -5,6 +5,45 @@ using Base.Test
 #t1 = ["1.909", "1.909", "1.909"]
 #@test Vec{3, Float64}(1.909) == Vec{3, Float64}(t1)
 #@test length(t1) == 3
+for N=2:10
+	for VT=[Point, Vec, Normal], VT2=[Normal, Vec, Point], ET=[Float32, Int, Uint, Float64], ET2=[Float64, Uint, Int, Float32]
+		rand_range = ET(1):ET(10)
+		rand_range2 = ET2(1):ET2(10)
+		#VT{N, ET}(rand(ET2, N))
+		VT{N, ET}(rand(rand_range, N)...)
+		VT{N, ET}(rand(rand_range))
+		VT{N, ET}(rand(rand_range))
+		#VT{N, ET}(rand(ET, N))
+		VT{N, ET}(rand(rand_range, N)...)
+
+		VT(rand(ET2, N))
+		VT(rand(rand_range2, N)...)
+		VT(rand(rand_range2))
+		VT(rand(rand_range2))
+		VT(rand(ET, N))
+		VT(rand(rand_range2, N)...)
+	end
+end
+for N=2:10
+	for VT=[Point, Vec, Normal], ET=[Float32, Int, Uint, Float64], ET2=[Float64, Uint, Int, Float32]
+		println(VT, ET, ET2, N)
+		rand_range = ET(1):ET(10)
+		rand_range2 = ET2(1):ET2(10)
+		#VT{N, ET}(rand(ET2, N))
+		VT{N, ET}(rand(rand_range, N)...)
+		VT{N, ET}(rand(rand_range))
+		VT{N, ET}(rand(rand_range))
+		#VT{N, ET}(rand(ET, N))
+		VT{N, ET}(rand(rand_range, N)...)
+
+		#VT(rand(ET2, N))
+		VT(rand(rand_range2, N)...)
+		VT(rand(rand_range2))
+		VT(rand(rand_range2))
+		#VT(rand(ET, N))
+		VT(rand(rand_range2, N)...)
+	end
+end
 
 typealias Vec2d Vec{2, Float64}
 typealias Vec3d Vec{3, Float64}
@@ -37,7 +76,13 @@ v2 = Vec(6.0,5.0,4.0)
 
 # division
 @test v1 ./ v1 == Vec3d(1.0,1.0,1.0)
-
+Point{3, Float32}(1.0,1.0f0,1.0)
+Point{2, Float32}(1.0)
+Point{2, Float32}(1.0, 1)
+Point{2, Float32}(1, 1)
+Point{2, Float32}(1)
+Point{2, Float32}(1f0)
+Vec3d(1.0,1.0f0,1.0)
 # scalar operations
 @test 1.0 + v1 == Vec3d(2.0,3.0,4.0)
 @test 1.0 .+ v1 == Vec3d(2.0,3.0,4.0)

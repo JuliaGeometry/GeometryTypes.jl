@@ -13,21 +13,13 @@ end
 immutable Face{N, T, IndexOffset} <: FixedVector{N, T}
     _::NTuple{N, T}
 end
-for name in [:Vec, :Point, :Normal, :TextureCoordinate, :Face ]
-    eval(quote
-        call{N, T}(::Type{$name{N, T}}, a::Real) = $name(ntuple(FixedSizeArrays.ConstFunctor(a), Val{N}))
-        call(::Type{$name}, a::AbstractVector) = $name(ntuple(FixedSizeArrays.IndexFunctor(a), Val{length(a)}))
-    end)
 
-end
-
-#Axis Aligned Bounding Box
 abstract GeometryPrimitive #abstract type for primitives
 
 
-immutable HyperRectangle{T, N} <: GeometryPrimitive
-    minimum::Vec{T, N}
-    maximum::Vec{T, N}
+immutable HyperRectangle{N, T} <: GeometryPrimitive
+    minimum::Vec{N, T}
+    maximum::Vec{N, T}
 end
 
 immutable HyperCube{N, T} <: GeometryPrimitive
@@ -41,18 +33,26 @@ immutable HyperSphere{N, T} <: GeometryPrimitive
     r::T
 end
 
-typealias Cube{T} HyperCube{3, T}
+typealias Cube{T}   HyperCube{3, T}
 typealias Circle{T} HyperSphere{2, T}
 typealias Sphere{T} HyperSphere{3, T}
 
-typealias Rectangle{T} HyperRectangle{2, T}
+typealias AbsolutRectangle{T} HyperRectangle{2, T}
 typealias AABB{T} HyperRectangle{3, T}
 
 
+immutable Rectangle{T} <: GeometryPrimitive
+    x::T
+    y::T
+    w::T
+    h::T
+end
+
+
 immutable Quad{T} <: GeometryPrimitive
-    downleft::Vec{T}
-    width   ::Vec{T}
-    height  ::Vec{T}
+    downleft::Vec{3, T}
+    width   ::Vec{3, T}
+    height  ::Vec{3, T}
 end
 
 immutable Pyramid{T} <: GeometryPrimitive
