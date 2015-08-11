@@ -40,15 +40,7 @@ all_attributes{M <: HMesh}(m::M)       = Dict{Symbol, Any}(map(field -> (field =
 #Some Aliases
 typealias HMesh HomogenousMesh
 
-typealias Triangle{T} Face{3, T, 0}
-typealias GLFace{Dim} Face{Dim, Cuint, -1} #offset is relative to julia, so -1 is 0-indexed
-typealias GLTriangle  Face{3, Cuint, -1}
-typealias GLQuad      Face{4, Cuint, -1}
 
-export Triangle
-export GLTriangle
-export GLFace
-export GLQuad
 
 typealias UV{T} TextureCoordinate{2, T}
 typealias UVW{T} TextureCoordinate{3, T}

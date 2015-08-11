@@ -33,21 +33,12 @@ immutable HyperSphere{N, T} <: GeometryPrimitive
     r::T
 end
 
-typealias Cube{T}   HyperCube{3, T}
-typealias Circle{T} HyperSphere{2, T}
-typealias Sphere{T} HyperSphere{3, T}
-
-typealias AbsolutRectangle{T} HyperRectangle{2, T}
-typealias AABB{T} HyperRectangle{3, T}
-
-
 immutable Rectangle{T} <: GeometryPrimitive
     x::T
     y::T
     w::T
     h::T
 end
-
 
 immutable Quad{T} <: GeometryPrimitive
     downleft::Vec{3, T}
@@ -60,3 +51,29 @@ immutable Pyramid{T} <: GeometryPrimitive
     length::T
     width ::T
 end
+
+immutable Particle{N, T}
+    position::Point{N, T}
+    velocity::Vec{N, T}
+end
+
+
+
+#Type aliases
+
+typealias Triangle{T} Face{3, T, 0}
+typealias GLFace{Dim} Face{Dim, Cuint, -1} #offset is relative to julia, so -1 is 0-indexed
+typealias GLTriangle  Face{3, Cuint, -1}
+typealias GLQuad      Face{4, Cuint, -1}
+
+export Triangle
+export GLTriangle
+export GLFace
+export GLQuad
+
+typealias Cube{T}   HyperCube{3, T}
+typealias Circle{T} HyperSphere{2, T}
+typealias Sphere{T} HyperSphere{3, T}
+
+typealias AbsolutRectangle{T} HyperRectangle{2, T}
+typealias AABB{T} HyperRectangle{3, T}

@@ -1,9 +1,9 @@
 convert{T <: HMesh}(meshtype::Type{T}, c::AABB) = T(Cube(c.min, c.max-c.min))
 function convert{T <: HMesh}(meshtype::Type{T}, c::Cube)
     ET = Float32
-    xdir = Vec{3, ET}(c.width[1],0,0)
-    ydir = Vec{3, ET}(0,c.width[2],0)
-    zdir = Vec{3, ET}(0,0,c.width[3])
+    xdir = Vec{3, ET}(c.width[1],0f0,0f0)
+    ydir = Vec{3, ET}(0f0,c.width[2],0f0)
+    zdir = Vec{3, ET}(0f0,0f0,c.width[3])
     quads = [
         Quad(c.origin + zdir,   xdir, ydir), # Top
         Quad(c.origin,          ydir, xdir), # Bottom
@@ -17,7 +17,7 @@ end
 
 
 function getindex{NT}(q::Quad, T::Type{Normal{3, NT}})
-    normal = normalize(cross(q.width, q.height))
+    normal = T(normalize(cross(q.width, q.height)))
     T[normal for i=1:4]
 end
 getindex{ET}(q::Quad, T::Type{Point{3, ET}}) = T[
@@ -59,8 +59,6 @@ getindex{PT}(r::Rectangle, T::Type{Point{2, PT}}) = T[
     T(r.x + r.w, r.y + r.h),
     T(r.x + r.w, r.y)
 ]
-
-
 
 convert{T <: HMesh}(meshtype::Type{T}, c::Pyramid)                      = T(c[vertextype(T)], c[facetype(T)])
 getindex{FT, IndexOffset}(r::Pyramid, T::Type{Face{3, FT, IndexOffset}})  = reinterpret(T, collect(map(FT,(1:18)+IndexOffset)))
