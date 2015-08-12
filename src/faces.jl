@@ -1,5 +1,5 @@
 # triangulate a quad. Could be written more generic
-triangulate{FT1, FT2}(::Type{Face{3, FT1}}, f::Face{4, FT2}) = 
+triangulate{FT1, FT2}(::Type{Face{3, FT1}}, f::Face{4, FT2}) =
 	(Face3{FT1}(f[1], f[2], f[3]), Face3{FT1}(f[3], f[4], f[1]))
 
 function convert{FT1, FT2}(::Type{Vector{Face{3, FT1}}}, f::Vector{Face{4, FT2}})
@@ -18,8 +18,8 @@ call{T, Offset, S <: AbstractString}(::Type{Face{4, T, Offset}}, x::Union(Vector
 getindex{T,N,FD,FT,Offset}(a::Array{T,N}, i::Face{FD, FT, Offset})                 = a[[(i-Offset)...]]
 setindex!{T,N,FD,FT,Offset}(a::Array{T,N}, b::Array{T,N}, i::Face{FD, FT, Offset}) = (a[[(i-Offset)...]] = b)
 
-convert{T, IndexOffset1}(::Type{Face{3, T, IndexOffset1}}, f::Face{3, T, IndexOffset1}) = f
-convert{T, IndexOffset1, IndexOffset2}(t::Type{Face{3, T, IndexOffset1}}, f::Face{3, T, IndexOffset2}) = t((f+IndexOffset1-IndexOffset2)...)
+call{T, IndexOffset1}(::Type{Face{3, T, IndexOffset1}}, f::Face{3, T, IndexOffset1}) = f
+call{T1, T2, IndexOffset1, IndexOffset2}(t::Type{Face{3, T1, IndexOffset1}}, f::Face{3, T2, IndexOffset2}) = t((f+IndexOffset1-IndexOffset2)...)
 
 getindex{T}(a::Array{T,2}, rect::Rectangle)                 = a[rect.x+1:rect.w, rect.y+1:rect.h]
 setindex!{T}(a::Array{T,2}, b::Array{T,2}, rect::Rectangle) = (a[rect.x+1:rect.w, rect.y+1:rect.h] = b)
