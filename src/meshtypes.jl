@@ -1,6 +1,6 @@
 abstract Mesh
 
-# all vectors must have the same length or must be empty, besides the face vector 
+# all vectors must have the same length or must be empty, besides the face vector
 # Type can be void or a value, this way we can create many combinations from this one mesh type.
 # This is not perfect, but helps to reduce a type explosion (imagine defining every attribute combination as a new type).
 # It's still experimental, but this design has been working well for me so far.
@@ -76,7 +76,7 @@ typealias GLNormalUVWMesh NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
 # Needed to not get into an stack overflow
 convert{HM1 <: HMesh}(::Type{HM1}, mesh::HM1) = mesh
 
-# Uses getindex to get all the converted attributes from the meshtype and 
+# Uses getindex to get all the converted attributes from the meshtype and
 # creates a new mesh with the desired attributes from the converted attributs
 # Getindex can be defined for any arbitrary geometric type or exotic mesh type.
 # This way, we can make sure, that you can convert most of the meshes from one type to the other
@@ -92,7 +92,7 @@ function convert{HM1 <: HMesh}(::Type{HM1}, any::Union(Mesh, GeometryPrimitive))
 end
 
 
-#Should be: 
+#Should be:
 #function call{M <: HMesh, VT <: Point, FT <: Face}(::Type{M}, vertices::Vector{VT}, faces::Vector{FT})
 # Haven't gotten around to implement the types correctly with abstract types in FixedSizeArrays
 function call{M <: HMesh, VT, FT <: Face}(::Type{M}, vertices::Vector{Point{3, VT}}, faces::Vector{FT})
@@ -255,7 +255,7 @@ function merge{M <: Mesh}(m1::M, meshes::M...)
 end
 
 # A mesh with one constant attribute can be merged as an attribute mesh. Possible attributes are FSArrays
-function merge{_1, _2, _3, _4, ConstAttrib <: Color, _5, _6}(
+function merge{_1, _2, _3, _4, ConstAttrib <: Paint, _5, _6}(
         m1::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6},
         meshes::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6}...
     )
