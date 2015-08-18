@@ -1,8 +1,11 @@
+__precompile__(true)
 module GeometryTypes
 
 using FixedSizeArrays
-using Requires
 using ColorTypes
+
+typealias RGBAU8 RGBA{U8}
+
 using Compat
 
 import Base: ==, *
