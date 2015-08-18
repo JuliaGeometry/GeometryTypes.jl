@@ -9,7 +9,7 @@ function before{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
     true
 end
 
-@inline meets{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N}) = 
+@inline meets{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N}) =
     b1.max == b2.min
 
 function overlaps{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N})
@@ -47,4 +47,3 @@ function finishes{T1, T2, N}(b1::HyperRectangle{T1,N}, b2::HyperRectangle{T2, N}
         return false
     end
 end
-
