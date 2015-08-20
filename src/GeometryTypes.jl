@@ -1,10 +1,8 @@
-__precompile__(true)
+VERSION >= v"0.4.0-dev+6521" && __precompile__(true)
 module GeometryTypes
 
 using FixedSizeArrays
 using ColorTypes
-
-typealias RGBAU8 RGBA{U8}
 
 using Compat
 

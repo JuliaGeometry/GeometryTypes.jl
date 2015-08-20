@@ -68,7 +68,7 @@ typealias GLNormalColorMesh NormalColorMesh{Float32, GLTriangle, Float32, RGBA{F
 
 
 typealias NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, AT, A_ID_T}
-typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBAU8}, Float32}
+typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBA{U8}}, Float32}
 
 typealias NormalUVWMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UVW{UVT}, Void, Void, Void}
 typealias GLNormalUVWMesh NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
@@ -255,14 +255,14 @@ function merge{M <: Mesh}(m1::M, meshes::M...)
 end
 
 # A mesh with one constant attribute can be merged as an attribute mesh. Possible attributes are FSArrays
-function merge{_1, _2, _3, _4, ConstAttrib <: Paint, _5, _6}(
+function merge{_1, _2, _3, _4, ConstAttrib <: Color, _5, _6}(
         m1::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6},
         meshes::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6}...
     )
     vertices = m1.vertices
     faces    = m1.faces
     attribs         = attributes_noVF(m1)
-    color_attrib    = [RGBAU8(m1.color)]
+    color_attrib    = RGBA{U8}[RGBA{U8}(m1.color)]
     index           = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
     delete!(attribs, :color)
     for mesh in meshes
