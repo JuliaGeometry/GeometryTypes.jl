@@ -32,7 +32,7 @@ import Base: union
 import Base: diff
 import Base: intersect
 
-
+export unit
 export row
 export column
 export normalize
@@ -96,6 +96,7 @@ export Mesh2D
 export NormalAttributeMesh
 export NormalColorMesh
 export NormalUVWMesh
+export NormalUVMesh
 
 export GLMesh2D
 export GLNormalMesh
@@ -106,6 +107,7 @@ export GLPlainMesh
 export GLNormalAttributeMesh
 export GLNormalColorMesh
 export GLNormalUVWMesh
+export GLNormalUVMesh
 
 export vertextype
 export facetype

@@ -10,7 +10,7 @@ function convert{T <: HMesh}(meshtype::Type{T}, c::Cube)
         Quad(c.origin + xdir,   ydir, zdir), # Right
         Quad(c.origin,          zdir, ydir), # Left
         Quad(c.origin,          xdir, zdir), # Back
-        Quad(c.origin + ydir,   zdir, xdir) #Front    
+        Quad(c.origin + ydir,   zdir, xdir) #Front
     ]
     merge(map(meshtype, quads))
 end
@@ -32,7 +32,7 @@ getindex{FT, IndexOffset}(q::Quad, T::Type{Face{3, FT, IndexOffset}}) = T[
 ]
 
 getindex{ET}(q::Quad, T::Type{UV{ET}}) = T[
-    T(0,0), T(0,0), T(1,1), T(1,1)
+    T(0,0), T(0,1), T(1,1), T(1,0)
 ]
 
 getindex{ET}(q::Quad, T::Type{UVW{ET}}) = T[

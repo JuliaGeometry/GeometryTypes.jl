@@ -73,6 +73,9 @@ typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32
 typealias NormalUVWMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UVW{UVT}, Void, Void, Void}
 typealias GLNormalUVWMesh NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
 
+typealias NormalUVMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UV{UVT}, Void, Void, Void}
+typealias GLNormalUVMesh NormalUVMesh{Float32, GLTriangle, Float32, Float32}
+
 # Needed to not get into an stack overflow
 convert{HM1 <: HMesh}(::Type{HM1}, mesh::HM1) = mesh
 

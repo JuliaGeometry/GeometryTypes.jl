@@ -3,7 +3,7 @@ using Compat
 VERSION < v"0.4-" && using Docile
 
 maximum(b::HyperRectangle) = b.maximum
-minumum(b::HyperRectangle) = b.minumum
+minimum(b::HyperRectangle) = b.minimum
 length{T, N}(b::HyperRectangle{T, N}) = N
 
 (==){T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) =
@@ -67,7 +67,7 @@ end
 Perform a union between two HyperRectangles.
 """
 union{T,N}(h1::HyperRectangle{N, T}, h2::HyperRectangle{N, T}) =
-    HyperRectangle{T,N}(min(h1.min, h2.min), max(h1.max, h2.max))
+    HyperRectangle{N, T}(min(minimum(h1), minimum(h2)), max(maximum(h1), maximum(h2)))
 
 """
 Perform a difference between two HyperRectangles.
@@ -80,7 +80,7 @@ diff(h1::HyperRectangle, h2::HyperRectangle) = h1
 Perform a intersection between two HyperRectangles.
 """
 intersect{T,N}(h1::HyperRectangle{N, T}, h2::HyperRectangle{N, T}) =
-    HyperRectangle{T,N}(max(h1.min, h2.min),  min(h1.max, h2.max))
+    HyperRectangle{N, T}(max(minimum(h1), minimum(h2)),  min(maximum(h1), maximum(h2)))
 
 
 if VERSION >= v"0.4.0-"
