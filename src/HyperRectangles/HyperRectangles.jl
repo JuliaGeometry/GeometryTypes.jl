@@ -1,3 +1,4 @@
+
 module HyperRectangles
 using Compat
 
@@ -23,7 +24,7 @@ Base.max(b::HyperRectangle) = b.max
 Base.min(b::HyperRectangle) = b.min
 Base.length(b::HyperRectangle) = length(b.min)
 
-function (==){T1, T2, N}(b1::HyperRectangle{T1, N}, b2::HyperRectangle{T2, N})
+function Base.(:(==)){T1, T2, N}(b1::HyperRectangle{T1, N}, b2::HyperRectangle{T2, N})
     b1.min == b2.min && b1.max == b2.max
 end
 
