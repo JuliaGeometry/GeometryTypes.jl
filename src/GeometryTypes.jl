@@ -3,6 +3,7 @@ module GeometryTypes
 
 using FixedSizeArrays
 using ColorTypes
+using FileIO
 
 using Compat
 
@@ -113,8 +114,18 @@ export vertextype
 export facetype
 export normaltype
 export texturecoordinatetype
-export colortype
 
+export colortype
+export has_vertices
+export has_faces
+export has_normals
+export has_texturecoordinates
+export has_colors
+export vertices
+export faces
+export normals
+export texturecoordinates
+export colors
 
 export attributes
 export attributes_noVF

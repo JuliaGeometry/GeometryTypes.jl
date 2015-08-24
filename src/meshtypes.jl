@@ -27,6 +27,27 @@ normaltype{_1, _2, NormalT,   _3, _4, _5, _6}(::Type{HomogenousMesh{_1, _2, Norm
 texturecoordinatetype{_1, _2, _3, TexCoordT, _4, _5, _6}(::Type{HomogenousMesh{_1, _2, _3, TexCoordT, _4, _5, _6}}) = TexCoordT
 colortype{_1, _2, _3, _4, ColorT,    _5, _6}(::Type{HomogenousMesh{_1, _2, _3, _4, ColorT,    _5, _6}})             = ColorT
 
+vertextype(mesh::HomogenousMesh) = vertextype(typeof(mesh))
+facetype(mesh::HomogenousMesh) = facetype(typeof(mesh))
+normaltype(mesh::HomogenousMesh) = normaltype(typeof(mesh))
+texturecoordinatetype(mesh::HomogenousMesh) = texturecoordinatetype(typeof(mesh))
+colortype(mesh::HomogenousMesh) = colortype(typeof(mesh))
+
+has_vertices(msh) = vertextype(msh) != Void
+has_faces(msh) = facetype(msh) != Void
+has_normals(msh) = normaltype(msh) != Void
+has_texturecoordinates(msh) = texturecoordinatetype(msh) != Void
+has_colors(msh) = colortype(msh) != Void
+
+
+
+vertices(msh) = msh.vertices
+faces(msh) = msh.faces
+normals(msh) = msh.normals
+texturecoordinates(msh) = msh.texturecoordinates
+colors(msh) = msh.color
+
+
 # Bad, bad name! But it's a little tricky to filter out faces and verts from the attributes, after get_attribute
 attributes_noVF(m::Mesh) = filter((key,val) -> (val != nothing && val != Void[]), Dict{Symbol, Any}(map(field->(field => m.(field)), fieldnames(typeof(m))[3:end])))
 #Gets all non Void attributes from a mesh in form of a Dict fieldname => value
@@ -114,6 +135,7 @@ function homogenousmesh(attribs::Dict{Symbol, Any})
     end
     HomogenousMesh(newfields...)
 end
+call{M <: HMesh}(::Type{M}, file::AbstractString) = load(file, M)
 
 # Creates a mesh from keyword arguments, which have to match the field types of the given concrete mesh
 call{M <: HMesh}(::Type{M}; kw_args...) = M(Dict{Symbol, Any}(kw_args))
@@ -258,15 +280,15 @@ function merge{M <: Mesh}(m1::M, meshes::M...)
 end
 
 # A mesh with one constant attribute can be merged as an attribute mesh. Possible attributes are FSArrays
-function merge{_1, _2, _3, _4, ConstAttrib <: Color, _5, _6}(
+function merge{_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}(
         m1::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6},
         meshes::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6}...
     )
     vertices = m1.vertices
     faces    = m1.faces
-    attribs         = attributes_noVF(m1)
-    color_attrib    = RGBA{U8}[RGBA{U8}(m1.color)]
-    index           = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
+    attribs      = attributes_noVF(m1)
+    color_attrib = RGBA{U8}[RGBA{U8}(m1.color)]
+    index        = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
     delete!(attribs, :color)
     for mesh in meshes
         append!(faces, mesh.faces + length(vertices))
