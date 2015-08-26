@@ -1,3 +1,4 @@
+
 language: julia
 os:
   - linux
@@ -7,6 +8,6 @@ julia:
 notifications:
   email: false
 script:
-- julia -e 'Pkg.clone("https://github.com/JuliaIO/FileIO.jl.git"); Pkg.checkout("FixedSizeArrays")'
+- julia -e 'Pkg.clone("https://github.com/JuliaIO/FileIO.jl.git"); Pkg.add("FixedSizeArrays"); Pkg.checkout("FixedSizeArrays")'
 after_success:
 - julia -e 'cd(Pkg.dir("GeometryTypes")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
