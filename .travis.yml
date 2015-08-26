@@ -9,5 +9,6 @@ notifications:
   email: false
 script:
 - julia -e 'Pkg.clone("https://github.com/JuliaIO/FileIO.jl.git"); Pkg.add("FixedSizeArrays"); Pkg.checkout("FixedSizeArrays")'
+- julia --check-bounds=yes --color=yes -e "Pkg.test(\"${JL_PKG}\", coverage=true)"
 after_success:
 - julia -e 'cd(Pkg.dir("GeometryTypes")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
