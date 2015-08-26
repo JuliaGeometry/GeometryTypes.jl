@@ -1,4 +1,4 @@
-convert{T <: HMesh}(meshtype::Type{T}, c::AABB) = T(Cube(c.min, c.max-c.min))
+convert{T <: HMesh}(meshtype::Type{T}, c::AABB) = T(Cube{Float32}(minimum(c), maximum(c)-minimum(c)))
 function convert{T <: HMesh}(meshtype::Type{T}, c::Cube)
     ET = Float32
     xdir = Vec{3, ET}(c.width[1],0f0,0f0)
