@@ -1,4 +1,6 @@
-facts("Hyper Rectangles") do
+context("Hyper Rectangles") do
+
+    
 context("constructors and containment") do
     a = HyperRectangle{4, Float64}(Vec(Inf,Inf,Inf,Inf),Vec(-Inf,-Inf,-Inf,-Inf))
 
@@ -36,8 +38,7 @@ context("Testing split function") do
     @fact d2.minimum[3] --> 3.5
 end
 
-#fact points function
-let
+context("fact points function") do
     a = HyperRectangle(Vec(0,0),Vec(1,1))
     pt_expa = Vector[Vec(0,0), Vec(0,1), Vec(1,0), Vec(1,1)]
     @fact points(a) --> pt_expa

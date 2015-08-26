@@ -303,7 +303,7 @@ function merge{_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}(
     attribs[:faces]         = faces
     attribs[:attributes]    = color_attrib
     attribs[:attribute_id]  = index
-    return HMesh{_1, _2, _3, _4, Void, _5, _6}(attribs)
+    return HMesh{_1, _2, _3, _4, Void, typeof(color_attrib), eltype(index)}(attribs)
 end
 
 
