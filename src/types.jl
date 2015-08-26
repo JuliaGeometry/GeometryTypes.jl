@@ -1,9 +1,4 @@
-immutable Vec{N, T} <: FixedVector{N, T}
-    _::NTuple{N, T}
-end
-immutable Point{N, T} <: FixedVector{N, T}
-    _::NTuple{N, T}
-end
+
 immutable Normal{N, T} <: FixedVector{N, T}
     _::NTuple{N, T}
 end
