@@ -39,6 +39,7 @@ export column
 export normalize
 export width
 export height
+export setindex
 
 include("types.jl")
 
@@ -77,7 +78,7 @@ export isoutside
 include("faces.jl")
 
 include("HyperRectangles/HyperRectangles.jl")
-
+export split_
 
 include("meshtypes.jl")
 include("primitives.jl")
