@@ -5,6 +5,7 @@ VERSION < v"0.4-" && using Docile
 maximum(b::HyperRectangle) = b.maximum
 minimum(b::HyperRectangle) = b.minimum
 length{T, N}(b::HyperRectangle{N, T}) = N
+width(b::HyperRectangle) = maximum(b) - minimum(b)
 
 (==){T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) =
     b1.minimum == b2.minimum && b1.maximum == b2.maximum

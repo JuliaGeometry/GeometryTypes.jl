@@ -12,6 +12,7 @@ context("constructors and containment") do
     a = update(a, Vec(5,6,7,8))
 
     b = HyperRectangle{4, Float64}(Vec(1.0,2.0,3.0,4.0),Vec(5.0,6.0,7.0,8.0))
+    @fact width(b) --> Vec(4., 4., 4., 4.)
     @fact a --> b
     @fact isequal(a,b) --> true
 
