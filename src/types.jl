@@ -69,5 +69,5 @@ typealias Cube{T}   HyperCube{3, T}
 typealias Circle{T} HyperSphere{2, T}
 typealias Sphere{T} HyperSphere{3, T}
 
-typealias AbsolutRectangle{T} HyperRectangle{2, T}
+typealias AbsoluteRectangle{T} HyperRectangle{2, T}
 typealias AABB{T} HyperRectangle{3, T}

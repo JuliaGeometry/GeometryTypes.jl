@@ -28,9 +28,9 @@ call{T}(::Type{AABB}, min::Vec{3, T}, max::Vec{3, T}) = AABB{T}(min, max)
 function convert{N, T, T2}(::Type{HyperRectangle{N, T}}, geometry::Array{Point{N, T2}}) 
     vmin = Point{N, T2}(typemax(T2))
     vmax = Point{N, T2}(typemin(T2))
-    @inbounds for i=1:length(geometry)
-         vmin = min(geometry[i], vmin)
-         vmax = max(geometry[i], vmax)
+    for p in geometry
+         vmin = min(p, vmin)
+         vmax = max(p, vmax)
     end
     HyperRectangle{N, T}(vmin, vmax)
 end

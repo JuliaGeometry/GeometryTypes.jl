@@ -62,6 +62,7 @@ export Sphere
 export Rectangle                # Simple rectangle object
 export Quad
 export AABB                		# bounding slab (Axis Aligned Bounding Box)
+export AbsoluteRectangle
 
 export Pyramid
 
@@ -77,7 +78,7 @@ export isinside
 export isoutside
 include("faces.jl")
 
-include("HyperRectangles/HyperRectangles.jl")
+include("HyperRectangles.jl")
 export split_
 
 include("meshtypes.jl")
@@ -86,7 +87,7 @@ include("primitives.jl")
 export UV
 export UVW
 
-export Mesh
+export AbstractMesh
 export HomogenousMesh
 export HMesh
 export NormalMesh

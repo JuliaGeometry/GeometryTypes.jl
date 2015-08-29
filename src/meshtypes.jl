@@ -1,4 +1,4 @@
-abstract Mesh
+abstract AbstractMesh
 
 # all vectors must have the same length or must be empty, besides the face vector
 # Type can be void or a value, this way we can create many combinations from this one mesh type.
@@ -6,7 +6,7 @@ abstract Mesh
 # It's still experimental, but this design has been working well for me so far.
 # This type is also heavily linked to GLVisualize, which means if you can transform another meshtype to this type
 # chances are high that GLVisualize can display them.
-immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: Mesh
+immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: AbstractMesh
     vertices            ::Vector{VertT}
     faces               ::Vector{FaceT}
     normals             ::Vector{NormalT}
@@ -49,9 +49,9 @@ colors(msh) = msh.color
 
 
 # Bad, bad name! But it's a little tricky to filter out faces and verts from the attributes, after get_attribute
-attributes_noVF(m::Mesh) = filter((key,val) -> (val != nothing && val != Void[]), Dict{Symbol, Any}(map(field->(field => m.(field)), fieldnames(typeof(m))[3:end])))
+attributes_noVF(m::AbstractMesh) = filter((key,val) -> (val != nothing && val != Void[]), Dict{Symbol, Any}(map(field->(field => m.(field)), fieldnames(typeof(m))[3:end])))
 #Gets all non Void attributes from a mesh in form of a Dict fieldname => value
-attributes(m::Mesh) = filter((key,val) -> (val != nothing && val != Void[]), all_attributes(m))
+attributes(m::AbstractMesh) = filter((key,val) -> (val != nothing && val != Void[]), all_attributes(m))
 #Gets all non Void attributes types from a mesh type fieldname => ValueType
 attributes{M <: HMesh}(m::Type{M}) = filter((key,val) -> (val != Void && val != Vector{Void}), all_attributes(M))
 
@@ -105,7 +105,7 @@ convert{HM1 <: HMesh}(::Type{HM1}, mesh::HM1) = mesh
 # Getindex can be defined for any arbitrary geometric type or exotic mesh type.
 # This way, we can make sure, that you can convert most of the meshes from one type to the other
 # with minimal code.
-function convert{HM1 <: HMesh}(::Type{HM1}, any::Union(Mesh, GeometryPrimitive))
+function convert{HM1 <: HMesh}(::Type{HM1}, any::Union(AbstractMesh, GeometryPrimitive))
     result = Dict{Symbol, Any}()
     for (field, target_type) in zip(fieldnames(HM1), HM1.parameters)
         if target_type != Void
@@ -152,7 +152,7 @@ function call{M <: HMesh}(::Type{M}, attribs::Dict{Symbol, Any})
 end
 
 #Creates a new mesh from an old one, with changed attributes given by the keyword arguments
-function call{M <: HMesh}(::Type{M}, mesh::Mesh, attributes::Dict{Symbol, Any})
+function call{M <: HMesh}(::Type{M}, mesh::AbstractMesh, attributes::Dict{Symbol, Any})
     newfields = map(fieldnames(HomogenousMesh)) do field
         get(attributes, field, mesh.(field))
     end
@@ -160,7 +160,7 @@ function call{M <: HMesh}(::Type{M}, mesh::Mesh, attributes::Dict{Symbol, Any})
 end
 
 #Creates a new mesh from an old one, with a new constant attribute (like a color)
-function call{HM <: HMesh, ConstAttrib}(::Type{HM}, mesh::Mesh, constattrib::ConstAttrib)
+function call{HM <: HMesh, ConstAttrib}(::Type{HM}, mesh::AbstractMesh, constattrib::ConstAttrib)
     result = Dict{Symbol, Any}()
     for (field, target_type) in zip(fieldnames(HM), HM.parameters)
         if target_type <: ConstAttrib
@@ -171,7 +171,7 @@ function call{HM <: HMesh, ConstAttrib}(::Type{HM}, mesh::Mesh, constattrib::Con
     end
     HM(result)
 end
-function add_attribute(m::Mesh, attribute)
+function add_attribute(m::AbstractMesh, attribute)
     attribs = attributes(m) # get all attribute values as a Dict fieldname => value
     attribs[:color] = attribute # color will probably be renamed to attribute. not sure yet...
     homogenousmesh(attribs)
@@ -262,10 +262,10 @@ function getindex{T <: Color}(mesh::HMesh, ::Type{T})
     convert(T, c)
 end
 
-merge{M <: Mesh}(m::Vector{M}) = merge(m...)
+merge{M <: AbstractMesh}(m::Vector{M}) = merge(m...)
 
 #Merges an arbitrary mesh. This function probably doesn't work for all types of meshes
-function merge{M <: Mesh}(m1::M, meshes::M...)
+function merge{M <: AbstractMesh}(m1::M, meshes::M...)
     v = m1.vertices
     f = m1.faces
     attribs = attributes_noVF(m1)
@@ -307,7 +307,7 @@ function merge{_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}(
 end
 
 
-function unique(m::Mesh)
+function unique(m::AbstractMesh)
     vts = vertices(m)
     fcs = faces(m)
     uvts = unique(vts)
@@ -328,7 +328,7 @@ immutable MeshMulFunctor{T} <: Base.Func{2}
     matrix::Mat{4,4,T}
 end
 call{T}(m::MeshMulFunctor{T}, vert) = Vec{3, T}(m.matrix*Vec{4, T}(vert..., 1))
-function *{T}(m::Mat{4,4,T}, mesh::Mesh)
+function *{T}(m::Mat{4,4,T}, mesh::AbstractMesh)
     msh = deepcopy(mesh)
     map!(MeshMulFunctor(m), msh.vertices)
     msh

@@ -87,7 +87,7 @@ spherical{T}(theta::T, phi::T) = Point{3, T}(
     cos(theta)
 )
 
-function call{MT <: Mesh}(::Type{MT}, s::Sphere, facets=16)
+function call{MT <: AbstractMesh}(::Type{MT}, s::Sphere, facets=16)
     PT, FT    = vertextype(MT), facetype(MT)
     FTE       = eltype(FT)
     PTE       = eltype(PT)
