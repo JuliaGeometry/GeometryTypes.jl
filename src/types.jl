@@ -1,68 +1,32 @@
-# generate immutable types
-@gen_fixed_size_vector("Vector", 	[:x,:y,:z,:w],              1:4, false)
-@gen_fixed_size_vector("Point",  	[:x,:y,:z,:w], 				1:4, false)
-@gen_fixed_size_vector("Normal",  	[:x,:y,:z,:w], 				1:4, false)
-
-
-
-# generate mutable variant (will be MVector, MPoint, etc...)
-@gen_fixed_size_vector("Vector",    [:x,:y,:z,:w],              1:4, true)
-@gen_fixed_size_vector("Point",     [:x,:y,:z,:w],              1:4, true)
-@gen_fixed_size_vector("Normal",    [:x,:y,:z,:w],              1:4, true)
-@gen_fixed_size_vector("UV",        [:u,:v],                    2:2, true)
-@gen_fixed_size_vector("UVW",       [:u,:v,:w],                 3:3, true)
-
-#generating matrixes (Matrix1x1, Matrix1x2, etc...)
-gen_fixed_size_matrix(1:4, 1:4, false)
-gen_fixed_size_matrix(1:4, 1:4, true)
-
-abstract Face{Dim, T, IndexOffset} <: FixedVector{T, Dim}
-
-immutable Face3{T, IndexOffset} <: Face{3, T, IndexOffset}
-    a::T
-    b::T
-    c::T
+immutable Normal{N, T} <: FixedVector{N, T}
+    _::NTuple{N, T}
 end
-immutable Face4{T, IndexOffset} <: Face{4, T, IndexOffset}
-    a::T
-    b::T
-    c::T
-    d::T
+immutable TextureCoordinate{N, T} <: FixedVector{N, T}
+    _::NTuple{N, T}
 end
-typealias Triangle{T} Face3{T, 0}
-typealias GLFace{Dim} Face{Dim, Cuint, -1} #offset is relative to julia, so -1 is 0-indexed
-typealias GLTriangle  Face3{Cuint, -1}
-typealias GLQuad      Face4{Cuint, -1}
-
-immutable UV{T} <: FixedVector{T, 2}
-    u::T
-    v::T
-end
-immutable UVW{T} <: FixedVector{T, 3}
-    u::T
-    v::T
-    w::T
-end
-#Axis Aligned Bounding Box
-
-immutable AABB{T}
-  min::Vector3{T}
-  max::Vector3{T}
+immutable Face{N, T, IndexOffset} <: FixedVector{N, T}
+    _::NTuple{N, T}
 end
 
 abstract GeometryPrimitive #abstract type for primitives
-immutable Cube{T} <: GeometryPrimitive
-  origin::Vector3{T}
-  width::Vector3{T}
+
+
+immutable HyperRectangle{N, T} <: GeometryPrimitive
+    minimum::Vec{N, T}
+    maximum::Vec{N, T}
 end
-immutable Circle{T} <: GeometryPrimitive
-    center::Point2{T}
+
+immutable HyperCube{N, T} <: GeometryPrimitive
+    origin::Vec{N, T}
+    width::Vec{N, T}
+end
+
+
+immutable HyperSphere{N, T} <: GeometryPrimitive
+    center::Point{N, T}
     r::T
 end
-immutable Sphere{T} <: GeometryPrimitive
-    center::Point3{T}
-    r::T
-end
+
 immutable Rectangle{T} <: GeometryPrimitive
     x::T
     y::T
@@ -71,33 +35,39 @@ immutable Rectangle{T} <: GeometryPrimitive
 end
 
 immutable Quad{T} <: GeometryPrimitive
-  downleft::Vector3{T}
-  width::Vector3{T}
-  height::Vector3{T}
+    downleft::Vec{3, T}
+    width   ::Vec{3, T}
+    height  ::Vec{3, T}
 end
 
 immutable Pyramid{T} <: GeometryPrimitive
-  middle::Point3{T}
-  length::T
-  width::T
+    middle::Point{3, T}
+    length::T
+    width ::T
 end
 
-type MCube{T} <: GeometryPrimitive
-  min::MVector3{T}
-  max::MVector3{T}
+immutable Particle{N, T}
+    position::Point{N, T}
+    velocity::Vec{N, T}
 end
 
-type MCircle{T} <: GeometryPrimitive
-    center::MPoint2{T}
-    r::T
-end
-type MSphere{T} <: GeometryPrimitive
-    center::MPoint3{T}
-    r::T
-end
-type MRectangle{T} <: GeometryPrimitive
-    x::T
-    y::T
-    w::T
-    h::T
-end
+
+
+#Type aliases
+
+typealias Triangle{T} Face{3, T, 0}
+typealias GLFace{Dim} Face{Dim, Cuint, -1} #offset is relative to julia, so -1 is 0-indexed
+typealias GLTriangle  Face{3, Cuint, -1}
+typealias GLQuad      Face{4, Cuint, -1}
+
+export Triangle
+export GLTriangle
+export GLFace
+export GLQuad
+
+typealias Cube{T}   HyperCube{3, T}
+typealias Circle{T} HyperSphere{2, T}
+typealias Sphere{T} HyperSphere{3, T}
+
+typealias AbsoluteRectangle{T} HyperRectangle{2, T}
+typealias AABB{T} HyperRectangle{3, T}

@@ -1,68 +1,56 @@
+VERSION >= v"0.4.0-dev+6521" && __precompile__(true)
 module GeometryTypes
 
 using FixedSizeArrays
+using ColorTypes
+using FileIO
 
-import Base: *
+using Compat
 
+import Base: ==, *
 
+import Base: merge
+import Base: convert
+import Base: call
+
+import Base: getindex
+import Base: setindex!
+
+import Base: show
+import Base: unique
+import Base: merge
+import Base: length
+
+import Base: maximum
+import Base: minimum
+import Base: isequal
+import Base: isless
+
+import Base: contains
+import Base: in
+import Base: split
+import Base: union
+import Base: diff
+import Base: intersect
+
+export unit
 export row
 export column
 export normalize
+export width
+export height
+export setindex
 
 include("types.jl")
 
-# Immutable Vector type
-export Vector1
-export Vector2
-export Vector3
-export Vector4
+export HyperRectangle
 
-#Mutable Vector type
-export MVector1
-export MVector2
-export MVector3
-export MVector4
-
-# Immutable Point type
-export Point1
-export Point2
-export Point3
-export Point4
-
-#Mutable Point type
-export MPoint1
-export MPoint2
-export MPoint3
-export MPoint4
-
-# Immutable Normal type
-export Normal1
-export Normal2
-export Normal3
-export Normal4
-
-#Mutable Normal type
-export MNormal1
-export MNormal2
-export MNormal3
-export MNormal4
-
-#Texture Coordinate Types
-export UV
-export UVW
-
-export MUV
-export MUVW
-
-#Face Types
+export Vec
+export Point
+export TextureCoordinate
+export Normal
 export Face
-export Face3
-export Face4
-export Triangle
-
-export GLFace
-export GLTriangle
-export GLQuad
+export Mat
 
 # Some primitives
 export GeometryPrimitive
@@ -74,56 +62,11 @@ export Sphere
 export Rectangle                # Simple rectangle object
 export Quad
 export AABB                		# bounding slab (Axis Aligned Bounding Box)
+export AbsoluteRectangle
 
 export Pyramid
 
-
-export MCube
-export MCircle
-export MSphere
-export MRectangle
-
-
-export Matrix1x1
-export Matrix1x2
-export Matrix1x3
-export Matrix1x4
-
-export Matrix2x1
-export Matrix2x2
-export Matrix2x3
-export Matrix2x4
-
-export Matrix3x1
-export Matrix3x2
-export Matrix3x3
-export Matrix3x4
-
-export Matrix4x1
-export Matrix4x2
-export Matrix4x3
-export Matrix4x4
-
-#Mutable Matrices
-export MMatrix1x1
-export MMatrix1x2
-export MMatrix1x3
-export MMatrix1x4
-
-export MMatrix2x1
-export MMatrix2x2
-export MMatrix2x3
-export MMatrix2x4
-
-export MMatrix3x1
-export MMatrix3x2
-export MMatrix3x3
-export MMatrix3x4
-
-export MMatrix4x1
-export MMatrix4x2
-export MMatrix4x3
-export MMatrix4x4
+export Mat
 
 
 include("algorithms.jl")
@@ -131,10 +74,64 @@ export normals
 export area
 export xwidth
 export yheight
-
+export isinside
+export isoutside
 include("faces.jl")
 
-include("HyperRectangles/HyperRectangles.jl")
+include("HyperRectangles.jl")
+export split_
+
+include("meshtypes.jl")
+include("primitives.jl")
+
+export UV
+export UVW
+
+export AbstractMesh
+export HomogenousMesh
+export HMesh
+export NormalMesh
+export UVWMesh
+export UVMesh2D
+export UVMesh
+export PlainMesh
+export Mesh2D
+export NormalAttributeMesh
+export NormalColorMesh
+export NormalUVWMesh
+export NormalUVMesh
+
+export GLMesh2D
+export GLNormalMesh
+export GLUVWMesh
+export GLUVMesh2D
+export GLUVMesh
+export GLPlainMesh
+export GLNormalAttributeMesh
+export GLNormalColorMesh
+export GLNormalUVWMesh
+export GLNormalUVMesh
+
+export vertextype
+export facetype
+export normaltype
+export texturecoordinatetype
+
+export colortype
+export has_vertices
+export has_faces
+export has_normals
+export has_texturecoordinates
+export has_colors
+export vertices
+export faces
+export normals
+export texturecoordinates
+export colors
+
+export attributes
+export attributes_noVF
+
+export normals
 
 end # module
-
