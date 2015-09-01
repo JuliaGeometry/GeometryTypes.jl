@@ -135,7 +135,6 @@ function homogenousmesh(attribs::Dict{Symbol, Any})
     end
     HomogenousMesh(newfields...)
 end
-call{M <: HMesh}(::Type{M}, file::AbstractString) = load(file, M)
 
 # Creates a mesh from keyword arguments, which have to match the field types of the given concrete mesh
 call{M <: HMesh}(::Type{M}; kw_args...) = M(Dict{Symbol, Any}(kw_args))
