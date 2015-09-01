@@ -118,11 +118,11 @@ export normaltype
 export texturecoordinatetype
 
 export colortype
-export has_vertices
-export has_faces
-export has_normals
-export has_texturecoordinates
-export has_colors
+export hasvertices
+export hasfaces
+export hasnormals
+export hastexturecoordinates
+export hascolors
 export vertices
 export faces
 export normals
