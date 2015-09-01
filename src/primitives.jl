@@ -87,10 +87,10 @@ spherical{T}(theta::T, phi::T) = Point{3, T}(
     cos(theta)
 )
 
-function call{MT <: AbstractMesh}(::Type{MT}, s::Sphere, facets=16)
-    PT, FT    = vertextype(MT), facetype(MT)
-    FTE       = eltype(FT)
-    PTE       = eltype(PT)
+function call{MT <: AbstractMesh}(::Type{MT}, s::Sphere, facets=12)
+    PT, FT = vertextype(MT), facetype(MT)
+    FTE    = eltype(FT)
+    PTE    = eltype(PT)
 
     vertices      = Array(PT, facets*facets+1)
     vertices[end] = PT(0, 0, -1) #Create a vertex for last triangle fan

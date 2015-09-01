@@ -33,11 +33,11 @@ normaltype(mesh::HomogenousMesh) = normaltype(typeof(mesh))
 texturecoordinatetype(mesh::HomogenousMesh) = texturecoordinatetype(typeof(mesh))
 colortype(mesh::HomogenousMesh) = colortype(typeof(mesh))
 
-has_vertices(msh) = vertextype(msh) != Void
-has_faces(msh) = facetype(msh) != Void
-has_normals(msh) = normaltype(msh) != Void
-has_texturecoordinates(msh) = texturecoordinatetype(msh) != Void
-has_colors(msh) = colortype(msh) != Void
+hasvertices(msh) = vertextype(msh) != Void
+hasfaces(msh) = facetype(msh) != Void
+hasnormals(msh) = normaltype(msh) != Void
+hastexturecoordinates(msh) = texturecoordinatetype(msh) != Void
+hascolors(msh) = colortype(msh) != Void
 
 
 
@@ -211,10 +211,10 @@ end
 
 # gets the wanted face type
 function getindex{FT, Offset}(mesh::HMesh, T::Type{Face{3, FT, Offset}})
-    fs = mesh.faces
+    fs = faces(mesh)
     eltype(fs) == T       && return fs
-    eltype(fs) <: Face3   && return map(T, fs)
-    if isa(fs, Face4)
+    eltype(fs) <: Face{3} && return map(T, fs)
+    if eltype(fs) <:  Face{4}
         convert(Vector{Face{3, FT, Offset}}, fs)
     end
     error("can't get the wanted attribute $(T) from mesh:")
@@ -284,21 +284,22 @@ function merge{_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}(
         m1::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6},
         meshes::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6}...
     )
-    vertices = m1.vertices
-    faces    = m1.faces
+    vertices     = copy(m1.vertices)
+    faces        = copy(m1.faces)
     attribs      = attributes_noVF(m1)
     color_attrib = RGBA{U8}[RGBA{U8}(m1.color)]
     index        = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
-    delete!(attribs, :color)
     for mesh in meshes
         append!(faces, mesh.faces + length(vertices))
         append!(vertices, mesh.vertices)
         attribsb = attributes_noVF(mesh)
-        delete!(attribsb, :color)
-        map(append!, values(attribs), values(attribsb))
+        for (k,v) in attribsb
+            k != :color && append!(attribs[k], v)
+        end
         push!(color_attrib, mesh.color)
         append!(index, Float32[length(color_attrib)-1 for i=1:length(mesh.vertices)])
     end
+    delete!(attribs, :color)
     attribs[:vertices]      = vertices
     attribs[:faces]         = faces
     attribs[:attributes]    = color_attrib
@@ -333,3 +334,13 @@ function *{T}(m::Mat{4,4,T}, mesh::AbstractMesh)
     map!(MeshMulFunctor(m), msh.vertices)
     msh
 end
+
+
+==(a::AbstractMesh, b::AbstractMesh) = false
+function =={M <: AbstractMesh}(a::M, b::M)
+    for ((ka, va), (kb, vb)) in zip(all_attributes(a), all_attributes(b))
+        va != vb && return false
+    end
+    true
+end
+
