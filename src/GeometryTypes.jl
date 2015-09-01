@@ -133,4 +133,8 @@ export attributes_noVF
 
 export normals
 
+include("distancefields.jl")
+
+export SignedDistanceField
+
 end # module
