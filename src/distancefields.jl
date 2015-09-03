@@ -18,9 +18,13 @@ end
 Construct a `SignedDistanceField` by sampling a function over the `bounds`
 at the specified `resolution`. Note that the sampling grid must be regular,
 so a new HyperRectangle will be generated for the SignedDistanceField that
-may have larger maximum bounds than the input HyperRectangle.
+may have larger maximum bounds than the input HyperRectangle. The default
+Field type is Float64, but this can be changed with the `fieldT` argument.
 """
-function SignedDistanceField{T}(f::Function, bounds::HyperRectangle{3,T}, resolution=0.1)
+function SignedDistanceField{T}(f::Function,
+                                bounds::HyperRectangle{3,T},
+                                resolution=0.1,
+                                fieldT=Float64)
     x_min, y_min, z_min = minimum(bounds)
     x_max, y_max, z_max = maximum(bounds)
 
@@ -30,7 +34,7 @@ function SignedDistanceField{T}(f::Function, bounds::HyperRectangle{3,T}, resolu
     ny = ceil(Int, y_rng/resolution)
     nz = ceil(Int, z_rng/resolution)
 
-    vol = Array{Float64}(nx+1, ny+1, nz+1)
+    vol = Array{fieldT}(nx+1, ny+1, nz+1)
 
     nb_max = Vec(x_min + resolution*nx,
                  y_min + resolution*ny,
@@ -40,13 +44,16 @@ function SignedDistanceField{T}(f::Function, bounds::HyperRectangle{3,T}, resolu
         x = x_min + resolution*i
         y = y_min + resolution*j
         z = z_min + resolution*k
-        @inbounds vol[i+1,j+1,k+1] = f(Vec(x,y,z))
+        @inbounds vol[i+1,j+1,k+1] = f(Vec{3,fieldT}(x,y,z))
     end
 
-    SignedDistanceField{3,T,Float64}(HyperRectangle(minimum(bounds), nb_max), vol)
+    SignedDistanceField{3,T,fieldT}(HyperRectangle(minimum(bounds), nb_max), vol)
 end
 
-function SignedDistanceField{T}(f::Function, bounds::HyperRectangle{2,T}, resolution=0.1)
+function SignedDistanceField{T}(f::Function,
+                                bounds::HyperRectangle{2,T},
+                                resolution=0.1,
+                                fieldT=Float64)
     x_min, y_min = minimum(bounds)
     x_max, y_max = maximum(bounds)
 
@@ -55,7 +62,7 @@ function SignedDistanceField{T}(f::Function, bounds::HyperRectangle{2,T}, resolu
     nx = ceil(Int, x_rng/resolution)
     ny = ceil(Int, y_rng/resolution)
 
-    vol = Array{Float64}(nx+1, ny+1)
+    vol = Array{fieldT}(nx+1, ny+1)
 
     nb_max = Vec(x_min + resolution*nx,
                  y_min + resolution*ny)
@@ -63,8 +70,8 @@ function SignedDistanceField{T}(f::Function, bounds::HyperRectangle{2,T}, resolu
     for i = 0:nx, j = 0:ny
         x = x_min + resolution*i
         y = y_min + resolution*j
-        @inbounds vol[i+1,j+1] = f(Vec(x,y))
+        @inbounds vol[i+1,j+1] = f(Vec{2,fieldT}(x,y))
     end
 
-    SignedDistanceField{2,T,Float64}(HyperRectangle(minimum(bounds), nb_max), vol)
+    SignedDistanceField{2,T,fieldT}(HyperRectangle(minimum(bounds), nb_max), vol)
 end
