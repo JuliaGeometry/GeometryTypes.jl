@@ -8,45 +8,48 @@ immutable Face{N, T, IndexOffset} <: FixedVector{N, T}
     _::NTuple{N, T}
 end
 
-abstract GeometryPrimitive #abstract type for primitives
 
+"""
+Abstract to categorize geometry primitives of dimensionality `N`.
+"""
+abstract GeometryPrimitive{N}
 
-immutable HyperRectangle{N, T} <: GeometryPrimitive
+immutable HyperRectangle{N, T} <: GeometryPrimitive{N}
     minimum::Vec{N, T}
     maximum::Vec{N, T}
 end
 
-immutable HyperCube{N, T} <: GeometryPrimitive
+immutable HyperCube{N, T} <: GeometryPrimitive{N}
     origin::Vec{N, T}
     width::Vec{N, T}
 end
 
 
-immutable HyperSphere{N, T} <: GeometryPrimitive
+immutable HyperSphere{N, T} <: GeometryPrimitive{N}
     center::Point{N, T}
     r::T
 end
 
-immutable Rectangle{T} <: GeometryPrimitive
+immutable Rectangle{T} <: GeometryPrimitive{2}
     x::T
     y::T
     w::T
     h::T
 end
 
-immutable Quad{T} <: GeometryPrimitive
+immutable Quad{T} <: GeometryPrimitive{3}
     downleft::Vec{3, T}
     width   ::Vec{3, T}
     height  ::Vec{3, T}
 end
 
-immutable Pyramid{T} <: GeometryPrimitive
+immutable Pyramid{T} <: GeometryPrimitive{3}
     middle::Point{3, T}
     length::T
     width ::T
 end
 
-immutable Particle{N, T}
+immutable Particle{N, T} <: GeometryPrimitive{N}
     position::Point{N, T}
     velocity::Vec{N, T}
 end
@@ -71,3 +74,4 @@ typealias Sphere{T} HyperSphere{3, T}
 
 typealias AbsoluteRectangle{T} HyperRectangle{2, T}
 typealias AABB{T} HyperRectangle{3, T}
+
