@@ -306,22 +306,6 @@ function merge{_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}(
     return HMesh{_1, _2, _3, _4, Void, typeof(color_attrib), eltype(index)}(attribs)
 end
 
-
-function unique(m::AbstractMesh)
-    vts = vertices(m)
-    fcs = faces(m)
-    uvts = unique(vts)
-    for i = 1:length(fcs)
-        #repoint indices to unique vertices
-        v1 = findfirst(uvts, vts[fcs[i].v1])
-        v2 = findfirst(uvts, vts[fcs[i].v2])
-        v3 = findfirst(uvts, vts[fcs[i].v3])
-        fcs[i] = Face{3, Int}(v1,v2,v3)
-    end
-    m.vertices[:] = uvts
-end
-
-
 # Fast but slightly ugly way to implement mesh multiplication
 # This should probably go into FixedSizeArrays.jl, Vector{FSA} * FSA
 immutable MeshMulFunctor{T} <: Base.Func{2}
