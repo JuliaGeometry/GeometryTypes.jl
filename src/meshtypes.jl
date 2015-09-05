@@ -1,4 +1,4 @@
-abstract AbstractMesh
+abstract AbstractMesh{VertT, FaceT}
 
 # all vectors must have the same length or must be empty, besides the face vector
 # Type can be void or a value, this way we can create many combinations from this one mesh type.
@@ -6,7 +6,7 @@ abstract AbstractMesh
 # It's still experimental, but this design has been working well for me so far.
 # This type is also heavily linked to GLVisualize, which means if you can transform another meshtype to this type
 # chances are high that GLVisualize can display them.
-immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: AbstractMesh
+immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: AbstractMesh{VertT, FaceT}
     vertices            ::Vector{VertT}
     faces               ::Vector{FaceT}
     normals             ::Vector{NormalT}
