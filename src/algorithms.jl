@@ -17,10 +17,10 @@ end
     
 call{T}(::Type{AABB{T}}, min_x, min_y, min_z, max_x, max_y, max_z) = AABB(Vec{3, T}(min_x, min_y, min_z), Vec{3, T}(max_x, max_y, max_z))
 
-call{T}(::Type{AABB{T}}, r::Rectangle) = AABB(Vec{3, T}(T(r.x), T(r.y), zero(T)), Vec{3, T}(T(xwidth(r)), T(yheight(r)), zero(T)))
-call{T}(::Type{AABB{T}}, aabb::AABB)      = AABB(Vec{3, T}(aabb.min), Vec{3, T}(aabb.max))
+call{T}(::Type{AABB{T}}, r::Rectangle) = AABB{Float32}(Vec{3, T}(T(r.x), T(r.y), zero(T)), Vec{3, T}(T(xwidth(r)), T(yheight(r)), zero(T)))
+call{T}(::Type{AABB{T}}, aabb::AABB)   = AABB{Float32}(Vec{3, T}(aabb.minimum), Vec{3, T}(aabb.maximum))
 call{T}(::Type{AABB}, min::Vec{3, T}, max::Vec{3, T}) = AABB{T}(min, max)
-
+*{T}(m::Mat{4,4,T}, bb::AABB{T}) = AABB{Float32}(Vec{3, T}(m*Vec(bb.minimum, one(T))), Vec{3, T}(m*Vec(bb.maximum, one(T))))
 
 #(*){T}(m::Matrix4x4{T}, bb::AABB{T}) = nothing
 
