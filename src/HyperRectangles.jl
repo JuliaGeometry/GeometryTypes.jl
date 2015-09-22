@@ -29,7 +29,7 @@ end
 Check if a point is contained in a HyperRectangle. This will return true if
 the point is on a face of the HyperRectangle.
 """
-function contains{T, N}(b1::HyperRectangle{N, T}, pt::Union(FixedVector, AbstractVector))
+function contains{T, N}(b1::HyperRectangle{N, T}, pt::Union{FixedVector, AbstractVector})
     for i = 1:N
         pt[i] <= b1.maximum[i] && pt[i] >= b1.minimum[i] || return false
     end
@@ -47,7 +47,7 @@ in(b1::HyperRectangle, b2::HyperRectangle) = contains(b2, b1)
 Check if a point is contained in a HyperRectangle. This will return true if
 the point is on a face of the HyperRectangle.
 """
-in(pt::Union(FixedVector, AbstractVector), b1::HyperRectangle) = contains(b1, pt)
+in(pt::Union{FixedVector, AbstractVector}, b1::HyperRectangle) = contains(b1, pt)
 
 """
 Splits an HyperRectangle into two new ones along an axis at a given axis value

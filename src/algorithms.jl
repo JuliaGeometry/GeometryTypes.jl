@@ -48,6 +48,9 @@ width(a::Rectangle)  = a.w
 yheight(a::Rectangle) = a.h + a.y
 height(a::Rectangle) = a.h
 area(a::Rectangle) = a.w*a.h
+maximum{T}(a::Rectangle{T}) = Point{2, T}(xwidth(a), yheight(a))
+minimum{T}(a::Rectangle{T}) = Point{2, T}(a.x, a.y)
+
 isless(a::Rectangle, b::Rectangle) = isless(area(a), area(b))
 
 call{T}(::Type{Rectangle}, val::Vec{2, T}) = Rectangle{T}(0, 0, val...)
