@@ -39,7 +39,7 @@ points{T}(rect::HyperRectangle{2, T}) = Vec{2, T}[
 
 
 # Total minimum maximum distance functions
-@inline function min_euclideansq{N, T}(rect::HyperRectangle{N, T}, p::Union(Vec{N, T}, HyperRectangle{N, T}))
+@inline function min_euclideansq{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}})
     minimum_dist = T(0.0)
     for dim in 1:length(p)
         d = min_dist_dim(rect, p, dim)
@@ -47,10 +47,10 @@ points{T}(rect::HyperRectangle{2, T}) = Vec{2, T}[
     end
     return minimum_dist
 end
-min_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union(Vec{N, T}, HyperRectangle{N, T})) = sqrt(min_euclideansq(rect, p))
+min_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}}) = sqrt(min_euclideansq(rect, p))
 
 
-@inline function max_euclideansq{N, T}(rect::HyperRectangle{N, T}, p::Union(Vec{N, T}, HyperRectangle{N, T}))
+@inline function max_euclideansq{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}})
     maximum_dist = T(0.0)
     for dim in 1:length(p)
         d = max_dist_dim(rect, p, dim)
@@ -58,24 +58,24 @@ min_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union(Vec{N, T}, HyperRectang
     end
     return maximum_dist
 end
-max_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union(Vec{N, T}, HyperRectangle{N, T})) = sqrt(max_euclideansq(rect, p))
+max_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}}) = sqrt(max_euclideansq(rect, p))
 
 
 # Functions that return both minimum and maximum for convenience
-@inline function minmax_dist_dim{N, T}(rect::HyperRectangle{N, T}, p::Union(Vec{N, T}, HyperRectangle{N, T}), dim::Int)
+@inline function minmax_dist_dim{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}}, dim::Int)
     minimum_d = min_dist_dim(rect, p, dim)
     maximum_d = max_dist_dim(rect, p, dim)
     return minimum_d, maximum_d
 end
 
 
-@inline function minmax_euclideansq{N, T}(rect::HyperRectangle{N, T}, p::Union(Vec{N, T}, HyperRectangle{N, T}))
+@inline function minmax_euclideansq{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}})
     minimum_dist = min_euclideansq(rect, p)
     maximum_dist = max_euclideansq(rect, p)
     return minimum_dist, maximum_dist
 end
 
-function minmax_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union(Vec{N, T}, HyperRectangle{N, T}))
+function minmax_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}})
     minimumsq, maximumsq = minmax_euclideansq(rect, p)
     return sqrt(minimumsq), sqrt(maximumsq)
 end

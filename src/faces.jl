@@ -16,8 +16,8 @@ function convert{FT1, FT2, N, Offset1, Offset2}(::Type{Vector{Face{3, FT1, Offse
 end
 =#
 # This needs to be defined here, but should ultimately done by fixedsizearrays. Right now it would lead to ambiguities though.
-#call{T, Offset, S <: AbstractString}(::Type{Face{3, T, Offset}}, x::Union(Vector{S}, Tuple{S})) = Face3{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]))
-#call{T, Offset, S <: AbstractString}(::Type{Face{4, T, Offset}}, x::Union(Vector{S}, Tuple{S})) = Face4{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]), parse(T, x[4]))
+#call{T, Offset, S <: AbstractString}(::Type{Face{3, T, Offset}}, x::Union{Vector{S}, Tuple{S}}) = Face3{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]))
+#call{T, Offset, S <: AbstractString}(::Type{Face{4, T, Offset}}, x::Union{Vector{S}, Tuple{S}}) = Face4{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]), parse(T, x[4]))
 
 getindex{T,N,FD,FT,Offset}(a::Array{T,N}, i::Face{FD, FT, Offset})                 = a[[(i-Offset)...]]
 setindex!{T,N,FD,FT,Offset}(a::Array{T,N}, b::Array{T,N}, i::Face{FD, FT, Offset}) = (a[[(i-Offset)...]] = b)

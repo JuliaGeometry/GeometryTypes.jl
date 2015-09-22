@@ -105,7 +105,7 @@ convert{HM1 <: HMesh}(::Type{HM1}, mesh::HM1) = mesh
 # Getindex can be defined for any arbitrary geometric type or exotic mesh type.
 # This way, we can make sure, that you can convert most of the meshes from one type to the other
 # with minimal code.
-function convert{HM1 <: HMesh}(::Type{HM1}, any::Union(AbstractMesh, GeometryPrimitive))
+function convert{HM1 <: HMesh}(::Type{HM1}, any::Union{AbstractMesh, GeometryPrimitive})
     result = Dict{Symbol, Any}()
     for (field, target_type) in zip(fieldnames(HM1), HM1.parameters)
         if target_type != Void
@@ -123,7 +123,7 @@ function call{M <: HMesh, VT, FT <: Face}(::Type{M}, vertices::Vector{Point{3, V
     msh = PlainMesh{VT, FT}(vertices=vertices, faces=faces)
     convert(M, msh)
 end
-get_default(x::Union(Type, TypeVar)) = nothing
+get_default(x::Union{Type, TypeVar}) = nothing
 get_default{X <: Array}(x::Type{X}) = Void[]
 
 # generic constructor for abstract HomogenousMesh, infering the types from the keywords (which have to match the field names)
@@ -224,7 +224,7 @@ function getindex{NT}(mesh::HMesh, T::Type{Normal{3, NT}})
     n = mesh.normals
     eltype(n) == T       && return n
     eltype(n) <: Normal{3} && return map(T, n)
-    n == Nothing[]       && return normals(mesh.vertices, mesh.faces, T)
+    n == Void[]       && return normals(mesh.vertices, mesh.faces, T)
 end
 
 #Gets the uv attribute to a mesh, or creates it, or converts it
@@ -232,7 +232,7 @@ function getindex{UVT}(mesh::HMesh, ::Type{UV{UVT}})
     uv = mesh.texturecoordinates
     eltype(uv) == UV{UVT}           && return uv
     (eltype(uv) <: UV || eltype(uv) <: UVW) && return map(UV{UVT}, uv)
-    eltype(uv) == Nothing           && return zeros(UV{UVT}, length(mesh.vertices))
+    eltype(uv) == Void           && return zeros(UV{UVT}, length(mesh.vertices))
 end
 
 
