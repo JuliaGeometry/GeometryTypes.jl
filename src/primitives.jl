@@ -28,7 +28,7 @@ getindex{ET}(q::Quad, T::Type{Point{3, ET}}) = T[
 ]
 
 getindex{FT, IndexOffset}(q::Quad, T::Type{Face{3, FT, IndexOffset}}) = T[
-    T(1,2,3)+IndexOffset, T(3,4,1)+IndexOffset
+    Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
 ]
 
 getindex{ET}(q::Quad, T::Type{UV{ET}}) = T[
@@ -50,7 +50,7 @@ getindex{UVT}(r::Rectangle, T::Type{UV{UVT}}) = T[
 ]
 
 getindex{FT, IndexOffset}(r::Rectangle, T::Type{Face{3, FT, IndexOffset}}) = T[
-    T(1,2,3)+IndexOffset, T(3,4,1)+IndexOffset
+    Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
 ]
 
 getindex{PT}(r::Rectangle, T::Type{Point{2, PT}}) = T[
