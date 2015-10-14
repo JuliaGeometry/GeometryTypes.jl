@@ -9,12 +9,12 @@ context("SignedDistanceField") do
 
     # functional
     s2 = SignedDistanceField(HyperRectangle(Vec(0,0,0.),Vec(1,1,1.))) do v
-        sqrt(sum(v*v)) - 1 # sphere
+        sqrt(sum(v.*v)) - 1 # sphere
     end
     @fact size(s2) --> (11, 11, 11)
     # functional
     s2 = SignedDistanceField(HyperRectangle(Vec(0,0.),Vec(1,1.))) do v
-        sqrt(sum(v*v)) - 1 # circle
+        sqrt(sum(v.*v)) - 1 # circle
     end
     @fact size(s2) --> (11, 11)
 end
