@@ -21,17 +21,13 @@ end
 # Its nice, as you can simply do something like GLNormalMesh(file"mesh.obj")
 
 typealias HMesh HomogenousMesh
-vertextype{_VertT,    _1, _2, _3, _4, _5, _6}(::Type{HomogenousMesh{_VertT,    _1, _2, _3, _4, _5, _6}})            = _VertT
-facetype{_1, FaceT,     _2, _3, _4, _5, _6}(::Type{HomogenousMesh{_1, FaceT,     _2, _3, _4, _5, _6}})              = FaceT
-normaltype{_1, _2, NormalT,   _3, _4, _5, _6}(::Type{HomogenousMesh{_1, _2, NormalT,   _3, _4, _5, _6}})            = NormalT
-texturecoordinatetype{_1, _2, _3, TexCoordT, _4, _5, _6}(::Type{HomogenousMesh{_1, _2, _3, TexCoordT, _4, _5, _6}}) = TexCoordT
-colortype{_1, _2, _3, _4, ColorT,    _5, _6}(::Type{HomogenousMesh{_1, _2, _3, _4, ColorT,    _5, _6}})             = ColorT
-
-vertextype(mesh::HomogenousMesh) = vertextype(typeof(mesh))
-facetype(mesh::HomogenousMesh) = facetype(typeof(mesh))
-normaltype(mesh::HomogenousMesh) = normaltype(typeof(mesh))
-texturecoordinatetype(mesh::HomogenousMesh) = texturecoordinatetype(typeof(mesh))
-colortype(mesh::HomogenousMesh) = colortype(typeof(mesh))
+for s in enumerate((:vertextype, :facetype, :normaltype,
+                       :texturecoordinatetype, :colortype))
+    @eval begin
+        $(s[2]){T<:HomogenousMesh}(t::Type{T}) = t.parameters[$(s[1])]
+        $(s[2])(mesh::HomogenousMesh) = $(s[2])(typeof(mesh))
+    end
+end
 
 hasvertices(msh) = vertextype(msh) != Void
 hasfaces(msh) = facetype(msh) != Void
