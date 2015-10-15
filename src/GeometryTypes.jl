@@ -43,6 +43,7 @@ export setindex
 include("types.jl")
 
 export HyperRectangle
+export HyperSphere
 
 export Vec
 export Point
@@ -60,10 +61,11 @@ export Circle                   # Simple circle object
 export Sphere
 export Rectangle                # Simple rectangle object
 export Quad
-export AABB                		# bounding slab (Axis Aligned Bounding Box)
+export AABB                 # bounding slab (Axis Aligned Bounding Box)
 export AbsoluteRectangle
 
 export Pyramid
+export Particle
 
 export Mat
 

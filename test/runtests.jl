@@ -7,6 +7,7 @@ facts("GeometryTypes") do
     include("test_hyperrectangles.jl")
     include("meshtypes.jl")
     include("distancefields.jl")
+    include("primitives.jl")
 end
 
 FactCheck.exitstatus()
