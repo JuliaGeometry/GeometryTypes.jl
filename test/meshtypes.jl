@@ -27,7 +27,10 @@ context("Merging Mesh") do
 end
 
 context("Primitives") do
-    #@show HomogenousMesh(Sphere(Point(0,0,0), 1))
+    # issue #16
+    #m = HomogenousMesh{Point{3,Float64},Face{3,Int,0}}(Sphere(Point(0,0,0), 1))
+    #@fact length(vertices(m)) --> 145
+    #@fact length(faces(m)) --> 288
 end
 
 end
