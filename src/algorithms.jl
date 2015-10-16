@@ -47,19 +47,7 @@ area(a::Rectangle) = a.w*a.h
 maximum{T}(a::Rectangle{T}) = Point{2, T}(xwidth(a), yheight(a))
 minimum{T}(a::Rectangle{T}) = Point{2, T}(a.x, a.y)
 
-isless(a::Rectangle, b::Rectangle) = isless(area(a), area(b))
-
 call{T}(::Type{Rectangle}, val::Vec{2, T}) = Rectangle{T}(0, 0, val...)
-
-function isinside(rect::Rectangle, x::Real, y::Real)
-    rect.x <= x && rect.y <= y && rect.x + rect.w >= x && rect.y + rect.h >= y 
-end
-
-function isinside(circle::Circle, x::Real, y::Real)
-    xD = abs(circle.x - x) - circle.r 
-    yD = abs(circle.y - y) - circle.r
-    xD <= 0 && yD <= 0
-end
 
 
 

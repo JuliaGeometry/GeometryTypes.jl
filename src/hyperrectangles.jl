@@ -3,12 +3,6 @@ minimum(b::HyperRectangle) = b.minimum
 length{T, N}(b::HyperRectangle{N, T}) = N
 width(b::HyperRectangle) = maximum(b) - minimum(b)
 
-(==){T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) =
-    b1.minimum == b2.minimum && b1.maximum == b2.maximum
-
-
-isequal(b1::HyperRectangle, b2::HyperRectangle) = b1 == b2
-
 """
 Check if HyperRectangles are contained in each other. This does not use
 strict inequality, so HyperRectangles may share faces and this will still

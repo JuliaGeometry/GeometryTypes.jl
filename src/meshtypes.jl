@@ -1,26 +1,3 @@
-abstract AbstractMesh{VertT, FaceT}
-
-# all vectors must have the same length or must be empty, besides the face vector
-# Type can be void or a value, this way we can create many combinations from this one mesh type.
-# This is not perfect, but helps to reduce a type explosion (imagine defining every attribute combination as a new type).
-# It's still experimental, but this design has been working well for me so far.
-# This type is also heavily linked to GLVisualize, which means if you can transform another meshtype to this type
-# chances are high that GLVisualize can display them.
-immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: AbstractMesh{VertT, FaceT}
-    vertices            ::Vector{VertT}
-    faces               ::Vector{FaceT}
-    normals             ::Vector{NormalT}
-    texturecoordinates  ::Vector{TexCoordT}
-    color               ::ColorT
-    attributes          ::AttribT
-    attribute_id        ::Vector{AttribIDT}
-end
-
-# Creates a mesh from a file
-# This function should really be defined in FileIO, but can't as it's ambigous with every damn constructor...
-# Its nice, as you can simply do something like GLNormalMesh(file"mesh.obj")
-
-typealias HMesh HomogenousMesh
 for s in enumerate((:vertextype, :facetype, :normaltype,
                        :texturecoordinatetype, :colortype))
     @eval begin
@@ -52,46 +29,7 @@ attributes(m::AbstractMesh) = filter((key,val) -> (val != nothing && val != Void
 attributes{M <: HMesh}(m::Type{M}) = filter((key,val) -> (val != Void && val != Vector{Void}), all_attributes(M))
 
 all_attributes{M <: HMesh}(m::Type{M}) = Dict{Symbol, Any}(map(field -> (field => fieldtype(M, field)), fieldnames(M)))
-all_attributes{M <: HMesh}(m::M)       = Dict{Symbol, Any}(map(field -> (field => getfield(m, field)),  fieldnames(M)))
-
-#Some Aliases
-typealias HMesh HomogenousMesh
-
-
-
-typealias UV{T} TextureCoordinate{2, T}
-typealias UVW{T} TextureCoordinate{3, T}
-
-typealias PlainMesh{VT, FT} HMesh{Point{3, VT}, FT, Void, Void, Void, Void, Void}
-typealias GLPlainMesh PlainMesh{Float32, GLTriangle}
-
-typealias Mesh2D{VT, FT} HMesh{Point{2, VT}, FT, Void, Void, Void, Void, Void}
-typealias GLMesh2D Mesh2D{Float32, GLTriangle}
-
-typealias UVMesh{VT, FT, UVT} HMesh{Point{3, VT}, FT, Void, UV{UVT}, Void, Void, Void}
-typealias GLUVMesh UVMesh{Float32, GLTriangle, Float32}
-
-typealias UVWMesh{VT, FT, UVT} HMesh{Point{3, VT}, FT, Void, UVW{UVT}, Void, Void, Void}
-typealias GLUVWMesh UVWMesh{Float32, GLTriangle, Float32}
-
-typealias NormalMesh{VT, FT, NT} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, Void, Void}
-typealias GLNormalMesh NormalMesh{Float32, GLTriangle, Float32}
-
-typealias UVMesh2D{VT, FT, UVT} HMesh{Point{2, VT}, FT, Void, UV{UVT}, Void, Void, Void}
-typealias GLUVMesh2D UVMesh2D{Float32, GLTriangle, Float32}
-
-typealias NormalColorMesh{VT, FT, NT, CT} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, CT, Void, Void}
-typealias GLNormalColorMesh NormalColorMesh{Float32, GLTriangle, Float32, RGBA{Float32}}
-
-
-typealias NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, AT, A_ID_T}
-typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBA{U8}}, Float32}
-
-typealias NormalUVWMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UVW{UVT}, Void, Void, Void}
-typealias GLNormalUVWMesh NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
-
-typealias NormalUVMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UV{UVT}, Void, Void, Void}
-typealias GLNormalUVMesh NormalUVMesh{Float32, GLTriangle, Float32, Float32}
+all_attributes{M <: HMesh}(m::M) = Dict{Symbol, Any}(map(field -> (field => getfield(m, field)),  fieldnames(M)))
 
 # Needed to not get into an stack overflow
 convert{HM1 <: HMesh}(::Type{HM1}, mesh::HM1) = mesh
@@ -295,14 +233,5 @@ function *{T}(m::Mat{4,4,T}, mesh::AbstractMesh)
     msh = deepcopy(mesh)
     map!(MeshMulFunctor(m), msh.vertices)
     msh
-end
-
-
-==(a::AbstractMesh, b::AbstractMesh) = false
-function =={M <: AbstractMesh}(a::M, b::M)
-    for ((ka, va), (kb, vb)) in zip(all_attributes(a), all_attributes(b))
-        va != vb && return false
-    end
-    true
 end
 

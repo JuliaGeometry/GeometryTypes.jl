@@ -48,11 +48,9 @@ context("fact points function") do
     @fact points(b) --> pt_expb
 end
 
-if VERSION >= v"0.4.0-"
-    context("fact empty constructor on 0.4") do
-        a = HyperRectangle{4, Float64}()
-        @fact a --> HyperRectangle{4, Float64}(Vec(-Inf,-Inf,-Inf,-Inf), Vec(Inf,Inf,Inf,Inf))
-    end
+context("fact empty constructor on 0.4") do
+    a = HyperRectangle{4, Float64}()
+    @fact a --> HyperRectangle{4, Float64}(Vec(-Inf,-Inf,-Inf,-Inf), Vec(Inf,Inf,Inf,Inf))
 end
 
 context("Test distance functions") do
