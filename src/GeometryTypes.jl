@@ -29,6 +29,7 @@ import Base: ==,
 
 
 include("types.jl")
+include("simplices.jl")
 include("algorithms.jl")
 include("faces.jl")
 include("hyperrectangles.jl")
@@ -44,6 +45,7 @@ include("display.jl")
 export AABB,
        AbsoluteRectangle,
        AbstractMesh,
+       AbstractSimplex,
        Circle,
        Cube,
        Face,
@@ -80,6 +82,7 @@ export AABB,
        Quad,
        Rectangle,
        SignedDistanceField,
+       Simplex,
        Sphere,
        TextureCoordinate,
        Triangle,

@@ -8,6 +8,29 @@ Abstract to categorize geometry primitives of dimensionality `N`.
 abstract GeometryPrimitive{N}
 
 
+"""
+Abstract to classify Simplices. The convention for N starts at 1, which means
+a Simplex has 1 point. A 2-simplex has 2 points, and so forth. This convention
+is not the same as most mathematical texts.
+"""
+abstract AbstractSimplex{N,T} <: FixedVector{N,T}
+
+
+"""
+A Simplex is the minimal convex set cointaining `N` specified points.
+
+* A 0-simplex is a point.
+* A 1-simplex is a line segment.
+* A 2-simplex is a triangle.
+* A 3-simplex is a tetrahedron.
+
+It applies to infinite dimensions. The sturucture of this type is designed
+to allow embedding in higher-order spaces by parameterizing on `T`.
+"""
+immutable Simplex{N,T} <: AbstractSimplex{N,T}
+    _::NTuple{N,T}
+end
+
 immutable Normal{N, T} <: FixedVector{N, T}
     _::NTuple{N, T}
 end
