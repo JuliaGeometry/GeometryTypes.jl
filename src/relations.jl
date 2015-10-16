@@ -63,6 +63,44 @@ function isinside(circle::Circle, x::Real, y::Real)
 end
 
 
+"""
+Check if HyperRectangles are contained in each other. This does not use
+strict inequality, so HyperRectangles may share faces and this will still
+return true.
+"""
+function contains{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
+    for i = 1:N
+        b2.maximum[i] <= b1.maximum[i] && b2.minimum[i] >= b1.minimum[i] || return false
+    end
+    true
+end
+
+"""
+Check if a point is contained in a HyperRectangle. This will return true if
+the point is on a face of the HyperRectangle.
+"""
+function contains{T, N}(b1::HyperRectangle{N, T}, pt::Union{FixedVector, AbstractVector})
+    for i = 1:N
+        pt[i] <= b1.maximum[i] && pt[i] >= b1.minimum[i] || return false
+    end
+    true
+end
+
+"""
+Check if HyperRectangles are contained in each other. This does not use
+strict inequality, so HyperRectangles may share faces and this will still
+return true.
+"""
+in(b1::HyperRectangle, b2::HyperRectangle) = contains(b2, b1)
+
+"""
+Check if a point is contained in a HyperRectangle. This will return true if
+the point is on a face of the HyperRectangle.
+"""
+in(pt::Union{FixedVector, AbstractVector}, b1::HyperRectangle) = contains(b1, pt)
+
+
+
 #
 # Equality
 #
