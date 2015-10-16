@@ -119,15 +119,3 @@ function call{MT <: AbstractMesh}(::Type{MT}, s::Sphere, facets=12)
     end
     MT(vertices, indexes)
 end
-
-
-function gencircle(r, x, y, amount)
-    slice = (2*pi) / amount
-    result = GLfloat[x,y]
-    for i = 0:amount-1
-        angle = slice * i
-        push!(result, Float32(x + r * cos(angle)), Float32(y + r * sin(angle)))
-    end
-    push!(result, Float32(x + r * cos(0)), Float32(y + r * sin(0)))
-    return result
-end
