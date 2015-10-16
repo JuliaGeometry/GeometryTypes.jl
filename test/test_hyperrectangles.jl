@@ -31,7 +31,7 @@ end
 # Testing split function
 context("Testing split function") do
     d = HyperRectangle{4, Float64}(Vec(1.0,2.0,3.0,4.0),Vec(2.0,3.0,4.0,5.0))
-    d1, d2 = split_(d, 3, 3.5)
+    d1, d2 = split(d, 3, 3.5)
 
     @fact d1.maximum[3] --> 3.5
     @fact d1.minimum[3] --> 3.0

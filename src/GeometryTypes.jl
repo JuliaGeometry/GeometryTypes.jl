@@ -37,6 +37,7 @@ include("Operations.jl")
 include("meshtypes.jl")
 include("primitives.jl")
 include("distancefields.jl")
+include("setops.jl")
 include("display.jl")
 
 export AABB,
@@ -63,7 +64,6 @@ export AABB,
        HomogenousMesh,
        HyperRectangle,
        HyperSphere,
-       Mat,
        Mat,
        Mesh2D,
        Normal,
@@ -119,14 +119,11 @@ export AABB,
        minmax_euclideansq,
        normalize,
        normals,
-       normals,
-       normals,
        normaltype,
        overlaps,
        points,
        row,
        setindex,
-       split_,
        starts,
        texturecoordinates,
        texturecoordinatetype,

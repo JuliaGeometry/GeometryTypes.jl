@@ -1,5 +1,4 @@
 # triangulate a quad. Could be written more generic
-export triangulate
 triangulate{FT1, FT2, Offset1, Offset2}(::Type{Face{3, FT1, Offset1}}, f::Face{4, FT2, Offset2}) =
     (Face{3, FT1, Offset1}(Face{3, FT2, Offset2}(f[1:3])), Face{3, FT1, Offset1}(Face{3, FT2, Offset2}(f[(3, 4, 1)])))
 

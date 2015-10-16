@@ -48,30 +48,15 @@ in(pt::Union{FixedVector, AbstractVector}, b1::HyperRectangle) = contains(b1, pt
 """
 Splits an HyperRectangle into two new ones along an axis at a given axis value
 """
-function split_{N, T}(b::HyperRectangle{N, T}, axis::Int, value::T) # <: Real nece
+split{N}(b::HyperRectangle{N, Bool}, a::Int, v::Bool) = split(b,a,v)
+split{N,T<:Integer}(b::HyperRectangle{N, T}, a::Int, v::T) = split(b,a,v)
+function split{N, T}(b::HyperRectangle{N, T}, axis::Int, value::T)
     b1max = setindex(b.maximum, value, axis)
     b2min = setindex(b.minimum, value, axis)
 
     return HyperRectangle{N, T}(b.minimum, b1max),
            HyperRectangle{N, T}(b2min, b.maximum)
 end
-"""
-Perform a union between two HyperRectangles.
-"""
-union{T,N}(h1::HyperRectangle{N, T}, h2::HyperRectangle{N, T}) =
-    HyperRectangle{N, T}(min(minimum(h1), minimum(h2)), max(maximum(h1), maximum(h2)))
-
-"""
-Perform a difference between two HyperRectangles.
-"""
-diff(h1::HyperRectangle, h2::HyperRectangle) = h1
-
-
-"""
-Perform a intersection between two HyperRectangles.
-"""
-intersect{T,N}(h1::HyperRectangle{N, T}, h2::HyperRectangle{N, T}) =
-    HyperRectangle{N, T}(max(minimum(h1), minimum(h2)),  min(maximum(h1), maximum(h2)))
 
 
 call{T,N}(::Type{HyperRectangle{N, T}}) =

@@ -1,5 +1,3 @@
-export before, meets, overlaps, starts, during, finishes
-
 # http://en.wikipedia.org/wiki/Allen%27s_interval_algebra
 
 function before{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
