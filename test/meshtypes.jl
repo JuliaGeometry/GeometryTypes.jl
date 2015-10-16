@@ -26,6 +26,18 @@ context("Merging Mesh") do
     @fact triangulate(GLTriangle, Face{4, Int, 0}(1,2,3,4)) --> (Face{3,UInt32,-1}((0x00000000,0x00000001,0x00000002)), Face{3,UInt32,-1}((0x00000002,0x00000003,0x00000000)))
 end
 
+context("Show") do
+    baselen = 0.4f0
+    dirlen = 2f0
+    m = GLNormalMesh(Cube{Float32}(Vec3f0(baselen),
+                     Vec3f0(dirlen, baselen, baselen)))
+    io = IOBuffer()
+    show(io,m)
+    seekstart(io)
+    s =  "HomogenousMesh(\n    normals: 24xGeometryTypes.Normal{3,Float32},     vertices: 24xFixedSizeArrays.Point{3,Float32},     faces: 12xGeometryTypes.Face{3,UInt32,-1}, )\n"
+    @fact readall(io) --> s
+end
+
 context("Primitives") do
     # issue #16
     #m = HomogenousMesh{Point{3,Float64},Face{3,Int,0}}(Sphere(Point(0,0,0), 1))
