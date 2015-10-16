@@ -20,12 +20,6 @@ function getindex{NT}(q::Quad, T::Type{Normal{3, NT}})
     normal = T(normalize(cross(q.width, q.height)))
     T[normal for i=1:4]
 end
-getindex{ET}(q::Quad, T::Type{Point{3, ET}}) = T[
-    q.downleft,
-    q.downleft + q.height,
-    q.downleft + q.width + q.height,
-    q.downleft + q.width
-]
 
 getindex{FT, IndexOffset}(q::Quad, T::Type{Face{3, FT, IndexOffset}}) = T[
     Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
@@ -53,32 +47,8 @@ getindex{FT, IndexOffset}(r::Rectangle, T::Type{Face{3, FT, IndexOffset}}) = T[
     Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
 ]
 
-getindex{PT}(r::Rectangle, T::Type{Point{2, PT}}) = T[
-    T(r.x, r.y),
-    T(r.x, r.y + r.h),
-    T(r.x + r.w, r.y + r.h),
-    T(r.x + r.w, r.y)
-]
-
 convert{T <: HMesh}(meshtype::Type{T}, c::Pyramid)                      = T(c[vertextype(T)], c[facetype(T)])
 getindex{FT, IndexOffset}(r::Pyramid, T::Type{Face{3, FT, IndexOffset}})  = reinterpret(T, collect(map(FT,(1:18)+IndexOffset)))
-function getindex{PT}(p::Pyramid, T::Type{Point{3, PT}})
-    leftup   = T(-p.width , p.width, PT(0)) / 2f0
-    leftdown = T(-p.width, -p.width, PT(0)) / 2f0
-    tip = T(p.middle + T(PT(0),PT(0),p.length))
-    lu  = T(p.middle + leftup)
-    ld  = T(p.middle + leftdown)
-    ru  = T(p.middle - leftdown)
-    rd  = T(p.middle - leftup)
-    T[
-        tip, rd, ru,
-        tip, ru, lu,
-        tip, lu, ld,
-        tip, ld, rd,
-        rd,  ru, lu,
-        lu,  ld, rd
-    ]
-end
 
 
 spherical{T}(theta::T, phi::T) = Point{3, T}(

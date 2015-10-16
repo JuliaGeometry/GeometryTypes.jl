@@ -38,6 +38,7 @@ include("meshtypes.jl")
 include("primitives.jl")
 include("distancefields.jl")
 include("setops.jl")
+include("points.jl")
 include("display.jl")
 
 export AABB,

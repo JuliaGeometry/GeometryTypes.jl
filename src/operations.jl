@@ -2,24 +2,6 @@ update{N, T, T2}(b::HyperRectangle{N, T}, v::Vec{N, T2}) = update(b, Vec{N, T}(v
 update{N, T}(b::HyperRectangle{N, T}, v::Vec{N, T}) = 
     HyperRectangle{N, T}(min(b.minimum, v), max(b.maximum, v))
 
-points{T}(rect::HyperRectangle{3, T}) = Vec{3, T}[rect.minimum,
-    Vec{3, T}(rect.minimum[1],rect.minimum[2],rect.maximum[3]),
-    Vec{3, T}(rect.minimum[1],rect.maximum[2],rect.minimum[3]),
-    Vec{3, T}(rect.minimum[1],rect.maximum[2],rect.maximum[3]),
-    Vec{3, T}(rect.maximum[1],rect.minimum[2],rect.minimum[3]),
-    Vec{3, T}(rect.maximum[1],rect.minimum[2],rect.maximum[3]),
-    Vec{3, T}(rect.maximum[1],rect.maximum[2],rect.minimum[3]),
-    rect.maximum
-]
-
-points{T}(rect::HyperRectangle{2, T}) = Vec{2, T}[
-    rect.minimum,
-    Vec{2, T}(rect.minimum[1], rect.maximum[2]),
-    Vec{2, T}(rect.maximum[1], rect.minimum[2]),
-    rect.maximum
-]
-
-
 # Min maximum distance functions between hrectangle and point for a given dimension
 @inline min_dist_dim{N, T}(rect::HyperRectangle{N, T}, p::Vec{N, T}, dim::Int) = 
     max(zero(T), max(rect.minimum[dim] - p[dim], p[dim] - rect.maximum[dim]))
