@@ -177,23 +177,6 @@ function call{HM <: HMesh, ConstAttrib}(::Type{HM}, x::Tuple{Any, ConstAttrib})
     any, const_attribute = x
     add_attribute(HM(any), const_attribute)
 end
-#=
-function show{M <: HMesh}(io::IO, ::Type{M})
-    print(io, "HomogenousMesh{")
-    for (key,val) in attributes(M)
-        print(io, key, ": ", eltype(val), ", ")
-    end
-    println(io, "}")
-end
-=#
-
-function show{M <: HMesh}(io::IO, m::M)
-    println(io, "HomogenousMesh(")
-    for (key,val) in attributes(m)
-        print(io, "    ", key, ": ", length(val), "x", eltype(val), ", ")
-    end
-    println(io, ")")
-end
 # Getindex methods, for converted indexing into the mesh
 # Define getindex for your own meshtype, to easily convert it to Homogenous attributes
 

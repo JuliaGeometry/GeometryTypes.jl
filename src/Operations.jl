@@ -1,7 +1,3 @@
-
-export update, points, min_dist_dim, max_dist_dim,  minmax_dist_dim, min_euclideansq,
-       max_euclideansq, minmax_euclideansq,  min_euclidean,  max_euclidean,  minmax_euclidean
-
 update{N, T, T2}(b::HyperRectangle{N, T}, v::Vec{N, T2}) = update(b, Vec{N, T}(v))
 update{N, T}(b::HyperRectangle{N, T}, v::Vec{N, T}) = 
     HyperRectangle{N, T}(min(b.minimum, v), max(b.maximum, v))

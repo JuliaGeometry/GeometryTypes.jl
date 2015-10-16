@@ -1,7 +1,3 @@
-using Compat
-
-VERSION < v"0.4-" && using Docile
-
 maximum(b::HyperRectangle) = b.maximum
 minimum(b::HyperRectangle) = b.minimum
 length{T, N}(b::HyperRectangle{N, T}) = N
@@ -71,7 +67,6 @@ Perform a difference between two HyperRectangles.
 diff(h1::HyperRectangle, h2::HyperRectangle) = h1
 
 
-
 """
 Perform a intersection between two HyperRectangles.
 """
@@ -79,11 +74,5 @@ intersect{T,N}(h1::HyperRectangle{N, T}, h2::HyperRectangle{N, T}) =
     HyperRectangle{N, T}(max(minimum(h1), minimum(h2)),  min(maximum(h1), maximum(h2)))
 
 
-if VERSION >= v"0.4.0-"
-    call{T,N}(::Type{HyperRectangle{N, T}}) =
-        HyperRectangle{N, T}(Vec{N,T}(typemin(T)), Vec{N,T}(typemax(T)))
-end
-
-# submodules
-include("Relations.jl")
-include("Operations.jl")
+call{T,N}(::Type{HyperRectangle{N, T}}) =
+    HyperRectangle{N, T}(Vec{N,T}(typemin(T)), Vec{N,T}(typemax(T)))

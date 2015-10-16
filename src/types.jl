@@ -8,7 +8,9 @@ immutable Face{N, T, IndexOffset} <: FixedVector{N, T}
     _::NTuple{N, T}
 end
 
-
+abstract AbstractDistanceField
+abstract AbstractUnsignedDistanceField <: AbstractDistanceField
+abstract AbstractSignedDistanceField <: AbstractDistanceField
 """
 Abstract to categorize geometry primitives of dimensionality `N`.
 """
@@ -54,6 +56,15 @@ immutable Particle{N, T} <: GeometryPrimitive{N}
     velocity::Vec{N, T}
 end
 
+"""
+A DistanceField of dimensionality `N`, is parameterized by the Space and
+Field types.
+"""
+type SignedDistanceField{N,SpaceT,FieldT} <: AbstractSignedDistanceField
+    bounds::HyperRectangle{N,SpaceT}
+    data::Array{FieldT,N}
+end
+
 
 
 #Type aliases
@@ -62,11 +73,6 @@ typealias Triangle{T} Face{3, T, 0}
 typealias GLFace{Dim} Face{Dim, Cuint, -1} #offset is relative to julia, so -1 is 0-indexed
 typealias GLTriangle  Face{3, Cuint, -1}
 typealias GLQuad      Face{4, Cuint, -1}
-
-export Triangle
-export GLTriangle
-export GLFace
-export GLQuad
 
 typealias Cube{T}   HyperCube{3, T}
 typealias Circle{T} HyperSphere{2, T}

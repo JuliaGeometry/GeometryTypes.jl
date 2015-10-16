@@ -1,17 +1,3 @@
-abstract AbstractDistanceField
-abstract AbstractUnsignedDistanceField <: AbstractDistanceField
-abstract AbstractSignedDistanceField <: AbstractDistanceField
-
-
-"""
-A DistanceField of dimensionality `N`, is parameterized by the Space and
-Field types.
-"""
-type SignedDistanceField{N,SpaceT,FieldT} <: AbstractSignedDistanceField
-    bounds::HyperRectangle{N,SpaceT}
-    data::Array{FieldT,N}
-end
-
 @inline Base.size(s::SignedDistanceField) = size(s.data)
 
 """
