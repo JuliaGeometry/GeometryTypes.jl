@@ -2,7 +2,8 @@
 
 """
 Construct a `SignedDistanceField` by sampling a function over the `bounds`
-at the specified `resolution`. Note that the sampling grid must be regular,
+at the specified `resolution` (default = 0.1). Note that the sampling grid
+must be regular,
 so a new HyperRectangle will be generated for the SignedDistanceField that
 may have larger maximum bounds than the input HyperRectangle. The default
 Field type is Float64, but this can be changed with the `fieldT` argument.

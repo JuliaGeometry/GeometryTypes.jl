@@ -17,12 +17,17 @@ abstract AbstractSimplex{N,T} <: FixedVector{N,T}
 
 
 """
-A Simplex is the minimal convex set cointaining `N` specified points.
+A `Simplex` is a generalization of an N-dimensional tetrahedra and can be thought
+of as a minimal convex set containing the specified points.
 
 * A 0-simplex is a point.
 * A 1-simplex is a line segment.
 * A 2-simplex is a triangle.
 * A 3-simplex is a tetrahedron.
+
+Note that this datatype is offset by one compared to the traditional
+mathematical terminology. So a one-simplex is represented as `Simplex{2,T}`.
+This is for a simpler implementation.
 
 It applies to infinite dimensions. The sturucture of this type is designed
 to allow embedding in higher-order spaces by parameterizing on `T`.
@@ -37,10 +42,26 @@ end
 immutable TextureCoordinate{N, T} <: FixedVector{N, T}
     _::NTuple{N, T}
 end
+
+"""
+A Face is typically used when constructing subtypes of `AbstractMesh` where
+the `Face` should not reproduce the vertices, but rather index into them.
+Face is parameterized by:
+
+* `N` - The number of vertices in the face.
+* `T` - The type of the indices in the face, a subtype of Integer.
+* `O` - The offset relative to Julia arrays. This helps reduce copying when
+communicating with 0-indexed systems such ad OpenGL.
+"""
 immutable Face{N, T, IndexOffset} <: FixedVector{N, T}
     _::NTuple{N, T}
 end
 
+"""
+A `HyperRectangle` is a generalization of a rectangle into N-dimensions.
+Formally it is the cartesian product of intervals, which is represented by the
+`minimum` and `maximum` fields, whose indices correspond to each of the `N` axes.
+"""
 immutable HyperRectangle{N, T} <: GeometryPrimitive{N}
     minimum::Vec{N, T}
     maximum::Vec{N, T}
@@ -51,6 +72,10 @@ immutable HyperCube{N, T} <: GeometryPrimitive{N}
     width::Vec{N, T}
 end
 
+"""
+A `HyperSphere` is a generalization of a sphere into N-dimensions.
+A `center` and radius, `r`, must be specified.
+"""
 immutable HyperSphere{N, T} <: GeometryPrimitive{N}
     center::Point{N, T}
     r::T
@@ -81,8 +106,18 @@ immutable Particle{N, T} <: GeometryPrimitive{N}
 end
 
 """
-A DistanceField of dimensionality `N`, is parameterized by the Space and
-Field types.
+A `SignedDistanceField` is a uniform sampling of an implicit function.
+The `bounds` field corresponds to the sampling space intervals on each axis.
+The `data` field represents the value at each point whose exact location
+can be rationalized from `bounds`.
+The type is parameterized by:
+
+* `N` - The dimensionality of the sampling space.
+* `SpaceT` - the type of the space where we will uniformly sample.
+* `FieldT` - the type resulting from evaluation of the implicit function.
+
+Note that decoupling the space and field types is useful since geometry can
+be formulated with integers and distances can be measured with floating points.
 """
 type SignedDistanceField{N,SpaceT,FieldT} <: AbstractSignedDistanceField
     bounds::HyperRectangle{N,SpaceT}
@@ -90,15 +125,13 @@ type SignedDistanceField{N,SpaceT,FieldT} <: AbstractSignedDistanceField
 end
 
 """
+The `HomogenousMesh` type describes a polygonal mesh that is useful for
+computation on the CPU or on the GPU.
 All vectors must have the same length or must be empty, besides the face vector
 Type can be void or a value, this way we can create many combinations from this
 one mesh type.
 This is not perfect, but helps to reduce a type explosion (imagine defining
 every attribute combination as a new type).
-It's still experimental, but this design has been working well for me so far.
-This type is also heavily linked to GLVisualize, which means if you can
-transform another meshtype to this type
-chances are high that GLVisualize can display them.
 """
 immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: AbstractMesh{VertT, FaceT}
     vertices            ::Vector{VertT}
@@ -110,14 +143,11 @@ immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, Attr
     attribute_id        ::Vector{AttribIDT}
 end
 
-# Creates a mesh from a file
-# This function should really be defined in FileIO, but can't as it's ambigous with every damn constructor...
-# Its nice, as you can simply do something like GLNormalMesh(file"mesh.obj")
-
-typealias HMesh HomogenousMesh
-
 #Type aliases
 
+"""
+An alias for a one-simplex, corresponding to LineSegment{T} -> Simplex{2,T}.
+"""
 typealias LineSegment{T} Simplex{2,T}
 
 typealias Triangle{T} Face{3, T, 0}
@@ -126,10 +156,17 @@ typealias GLTriangle  Face{3, Cuint, -1}
 typealias GLQuad      Face{4, Cuint, -1}
 
 typealias Cube{T}   HyperCube{3, T}
+
+"""
+An alias for a HyperSphere of dimension 2. i.e. Circle{T} -> HyperSphere{2, T}
+"""
 typealias Circle{T} HyperSphere{2, T}
+call(::Type{Circle}, x...) = HyperSphere(x...)
+"""
+An alias for a HyperSphere of dimension 3. i.e. Sphere{T} -> HyperSphere{3, T}
+"""
 typealias Sphere{T} HyperSphere{3, T}
 call(::Type{Sphere}, x...) = HyperSphere(x...)
-call(::Type{Circle}, x...) = HyperSphere(x...)
 
 typealias AbsoluteRectangle{T} HyperRectangle{2, T}
 typealias AABB{T} HyperRectangle{3, T}
