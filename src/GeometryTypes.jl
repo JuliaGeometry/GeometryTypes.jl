@@ -41,6 +41,7 @@ include("distancefields.jl")
 include("setops.jl")
 include("points.jl")
 include("display.jl")
+include("slice.jl")
 
 export AABB,
        AbsoluteRectangle,

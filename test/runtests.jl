@@ -8,6 +8,7 @@ facts("GeometryTypes") do
     include("meshtypes.jl")
     include("distancefields.jl")
     include("primitives.jl")
+    include("slice.jl")
 end
 
 FactCheck.exitstatus()
