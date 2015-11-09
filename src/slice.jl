@@ -1,8 +1,14 @@
 # TODO Return type channges based on pair value
+"""
+Slice an AbstractMesh at the specified Z axis values.
+Returns a Vector of Vectors
+containing LineSegments generated at the specified heights.
+"""
 function Base.slice{VT<:Point{3,Float64},FT<:Face{3,Int,0}}(mesh::AbstractMesh{VT,FT}, heights::Vector{Float64}, pair=true; eps=0.00001, autoeps=true)
 
     height_ct = length(heights)
-    slices = [@compat Tuple{Point{2,Float64}, Point{2,Float64}}[] for i = 1:height_ct]
+    # intialize the LineSegment arrays
+    slices = [LineSegment{Point{2,Float64}}[] for i = 1:height_ct]
 
     for face in mesh.faces
         v1 = mesh.vertices[face[1]]
@@ -48,7 +54,7 @@ function Base.slice{VT<:Point{3,Float64},FT<:Face{3,Int,0}}(mesh::AbstractMesh{V
                 finish = Point{2,Float64}(p1[1] + (p3[1] - p1[1]) * (height - p1[3]) / (p3[3] - p1[3]),
                 p1[2] + (p3[2] - p1[2]) * (height - p1[3]) / (p3[3] - p1[3]))
 
-                push!(slices[i], (start, finish))
+                push!(slices[i], LineSegment(start, finish))
             end
         end
     end
@@ -57,7 +63,7 @@ function Base.slice{VT<:Point{3,Float64},FT<:Face{3,Int,0}}(mesh::AbstractMesh{V
         return slices
     end
 
-    paired_slices = [Vector{Tuple{Point{2,Float64}, Point{2,Float64}}}[] for i = 1:height_ct]
+    paired_slices = [Vector{LineSegment{Point{2,Float64}}}[] for i = 1:height_ct]
 
     for slice_num = 1:height_ct
         lines = slices[slice_num]
@@ -65,7 +71,7 @@ function Base.slice{VT<:Point{3,Float64},FT<:Face{3,Int,0}}(mesh::AbstractMesh{V
         if line_ct == 0
             continue
         end
-        polys = Vector{Tuple{Point{2,Float64}, Point{2,Float64}}}[]
+        polys = Vector{LineSegment{Point{2,Float64}}}[]
         paired = fill(false, line_ct)
         start = 1
         seg = 1
@@ -79,7 +85,7 @@ function Base.slice{VT<:Point{3,Float64},FT<:Face{3,Int,0}}(mesh::AbstractMesh{V
 
         @inbounds while true
             #Start new polygon with seg
-            poly = @compat Tuple{Point{2,Float64}, Point{2,Float64}}[]
+            poly = LineSegment{Point{2,Float64}}[]
             push!(poly, lines[seg])
 
             #Pair slice until we get to start point

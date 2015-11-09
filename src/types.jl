@@ -118,6 +118,8 @@ typealias HMesh HomogenousMesh
 
 #Type aliases
 
+typealias LineSegment{T} Simplex{2,T}
+
 typealias Triangle{T} Face{3, T, 0}
 typealias GLFace{Dim} Face{Dim, Cuint, -1} #offset is relative to julia, so -1 is 0-indexed
 typealias GLTriangle  Face{3, Cuint, -1}
