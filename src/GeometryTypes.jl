@@ -41,6 +41,7 @@ include("distancefields.jl")
 include("setops.jl")
 include("points.jl")
 include("display.jl")
+include("slice.jl")
 
 export AABB,
        AbsoluteRectangle,
@@ -67,6 +68,7 @@ export AABB,
        HomogenousMesh,
        HyperRectangle,
        HyperSphere,
+       LineSegment,
        Mat,
        Mesh2D,
        Normal,
