@@ -23,7 +23,9 @@ context("Merging Mesh") do
     @fact hasfaces(axis) --> true
     @fact hasnormals(axis) --> true
     @fact hascolors(axis) --> false
-    @fact triangulate(GLTriangle, Face{4, Int, 0}(1,2,3,4)) --> (Face{3,UInt32,-1}((0x00000000,0x00000001,0x00000002)), Face{3,UInt32,-1}((0x00000002,0x00000003,0x00000000)))
+    @fact triangulate(GLTriangle, Face{4, Int, 0}(1,2,3,4)) --> (Face{3,UInt32,-1}(0,1,2), Face{3,UInt32,-1}(0,2,3))
+    @fact triangulate(Face{3,Int,-1}, Face{4, Int, -1}(1,2,3,4)) --> (Face{3,Int,-1}(1,2,3),Face{3,Int,-1}(1,3,4))
+    @fact triangulate(Face{3,Int,2}, Face{4, Int, 1}(1,2,3,4)) --> (Face{3,Int,2}(2,3,4),Face{3,Int,2}(2,4,5))
 end
 
 context("Show") do

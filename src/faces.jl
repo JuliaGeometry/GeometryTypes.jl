@@ -1,22 +1,16 @@
-# triangulate a quad. Could be written more generic
-triangulate{FT1, FT2, Offset1, Offset2}(::Type{Face{3, FT1, Offset1}}, f::Face{4, FT2, Offset2}) =
-    (Face{3, FT1, Offset1}(Face{3, FT2, Offset2}(f[1:3])), Face{3, FT1, Offset1}(Face{3, FT2, Offset2}(f[(3, 4, 1)])))
+"""
+Triangulate an N-Face into a tuple of triangular faces.
+"""
+@generated function triangulate{N, FT1, FT2, O1, O2}(::Type{Face{3, FT1, O1}},
+                                       f::Face{N, FT2, O2})
+    @assert 3 <= N # other wise degenerate
 
-#=
-# need to spend more time on this generic conversion algorithm
-function convert{FT1, FT2, N, Offset1, Offset2}(::Type{Vector{Face{3, FT1, Offset1}}}, f::Vector{Face{N, FT2, Offset2}})
-    fsn = fill(Face{3, FT1, Offset1}, N-2)
-    for i=1:2:length(fsn)
-        a, b 	 = triangulate(Face{3, FT1, Offset1}, fs[div(i,2)])
-        fsn[i] 	 = a
-        fsn[i+1] = b
-    end
-    return fsn
+    v = Expr(:tuple)
+    append!(v.args, [:(Face{3,$FT1,$O1}(f[1]+$(-O2+O1),
+                                        f[$(i-1)]+$(-O2+O1),
+                                        f[$(i)]+$(-O2+O1))) for i = 3:N])
+    v
 end
-=#
-# This needs to be defined here, but should ultimately done by fixedsizearrays. Right now it would lead to ambiguities though.
-#call{T, Offset, S <: AbstractString}(::Type{Face{3, T, Offset}}, x::Union{Vector{S}, Tuple{S}}) = Face3{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]))
-#call{T, Offset, S <: AbstractString}(::Type{Face{4, T, Offset}}, x::Union{Vector{S}, Tuple{S}}) = Face4{T, Offset}(parse(T, x[1]), parse(T, x[2]), parse(T, x[3]), parse(T, x[4]))
 
 function getindex{T,N,FD,FT,Offset}(a::Array{T,N}, i::Face{FD, FT, Offset})
     a[[(map(Int,i)-Offset)...]]
