@@ -26,6 +26,10 @@ context("Merging Mesh") do
     @fact triangulate(GLTriangle, Face{4, Int, 0}(1,2,3,4)) --> (Face{3,UInt32,-1}(0,1,2), Face{3,UInt32,-1}(0,2,3))
     @fact triangulate(Face{3,Int,-1}, Face{4, Int, -1}(1,2,3,4)) --> (Face{3,Int,-1}(1,2,3),Face{3,Int,-1}(1,3,4))
     @fact triangulate(Face{3,Int,2}, Face{4, Int, 1}(1,2,3,4)) --> (Face{3,Int,2}(2,3,4),Face{3,Int,2}(2,4,5))
+    @fact Tuple{Face{2,Int,0}}(Face{4, Int, 0}(1,2,3,4)) --> (Face{2,Int,0}(1,2),
+                                                              Face{2,Int,0}(2,3),
+                                                              Face{2,Int,0}(3,4),
+                                                              Face{2,Int,0}(4,1))
 end
 
 context("Show") do
