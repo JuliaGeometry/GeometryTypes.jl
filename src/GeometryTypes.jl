@@ -43,6 +43,7 @@ include("display.jl")
 include("slice.jl")
 include("decompose.jl")
 include("deprecated.jl")
+include("orientation.jl")
 
 export AABB,
        AbsoluteRectangle,
@@ -114,6 +115,7 @@ export AABB,
        hastexturecoordinates,
        hasvertices,
        height,
+       isclosed,
        isinside,
        isoutside,
        max_dist_dim,

@@ -23,4 +23,12 @@ context("PureSimplicialComplex") do
     @fact length(p.simplices[1]) --> 4
     @fact length(p.simplices[2]) --> 12
     @fact length(p.simplices[3]) --> 4
+    @fact isclosed(p) --> true
+    p2 = PureSimplicialComplex{3,Point{2,Int}}()
+    push!(p2, Simplex(Point(0,0), Point(0,1), Point(1,0)))
+    push!(p2, Simplex(Point(1,0), Point(1,0), Point(1,1)))
+    @fact isclosed(p2) --> false
+    @fact length(p2.simplices[1]) --> 4
+    @fact length(p2.simplices[2]) --> 6
+    @fact length(p2.simplices[3]) --> 2
 end
