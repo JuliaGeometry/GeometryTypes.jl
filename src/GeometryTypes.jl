@@ -42,6 +42,8 @@ include("setops.jl")
 include("points.jl")
 include("display.jl")
 include("slice.jl")
+include("decompose.jl")
+include("deprecated.jl")
 
 export AABB,
        AbsoluteRectangle,
@@ -49,6 +51,7 @@ export AABB,
        AbstractSimplex,
        Circle,
        Cube,
+       decompose,
        Face,
        GLFace,
        GLMesh2D,

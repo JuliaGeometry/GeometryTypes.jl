@@ -1,17 +1,3 @@
-"""
-Triangulate an N-Face into a tuple of triangular faces.
-"""
-@generated function triangulate{N, FT1, FT2, O1, O2}(::Type{Face{3, FT1, O1}},
-                                       f::Face{N, FT2, O2})
-    @assert 3 <= N # other wise degenerate
-
-    v = Expr(:tuple)
-    append!(v.args, [:(Face{3,$FT1,$O1}(f[1]+$(-O2+O1),
-                                        f[$(i-1)]+$(-O2+O1),
-                                        f[$(i)]+$(-O2+O1))) for i = 3:N])
-    v
-end
-
 function getindex{T,N,FD,FT,Offset}(a::Array{T,N}, i::Face{FD, FT, Offset})
     a[[(map(Int,i)-Offset)...]]
 end
