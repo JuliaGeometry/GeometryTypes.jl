@@ -2,9 +2,7 @@ import Base.@deprecate
 
 @deprecate triangulate{F<:Face}(t::Type{F}, f::Face) decompose(t, f)
 
-@deprecate call{T}(t::Type{Vector{Point{3,T}}}, r::HyperRectangle{3, T}) decompose(t, r)
-@deprecate call{T}(t::Type{Vector{Point{2,T}}}, r::HyperRectangle{2, T}) decompose(t, r)
-
+@deprecate call{N,T}(t::Type{Vector{Point{N,T}}}, r::HyperRectangle{N, T}) decompose(t, r)
 
 # TODO
 # These are very tightly coupled to HomogenousMesh.
