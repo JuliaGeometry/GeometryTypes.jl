@@ -29,6 +29,7 @@ import Base: ==,
 
 include("types.jl")
 include("simplices.jl")
+include("push.jl")
 include("algorithms.jl")
 include("faces.jl")
 include("hyperrectangles.jl")
@@ -81,6 +82,7 @@ export AABB,
        Particle,
        PlainMesh,
        Point,
+       PureSimplicialComplex,
        Pyramid,
        Quad,
        Rectangle,

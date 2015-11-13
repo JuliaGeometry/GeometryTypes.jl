@@ -11,3 +11,16 @@ context("Simplex") do
     s = Simplex(Point(1,2), Point(2,3))
     @fact s --> Simplex{2,Point{2,Int64}}((Point{2,Int64}((1,2)),Point{2,Int64}((2,3))))
 end
+
+context("PureSimplicialComplex") do
+    p = PureSimplicialComplex{3,Symbol}()
+    # symbolically construct a tetrahedra
+    push!(p, Simplex(:x1, :x2, :x3))
+    push!(p, Simplex(:x3, :x2, :x4))
+    push!(p, Simplex(:x1, :x4, :x2))
+    push!(p, Simplex(:x1, :x3, :x4))
+    @fact length(p.simplices) --> 3
+    @fact length(p.simplices[1]) --> 4
+    @fact length(p.simplices[2]) --> 12
+    @fact length(p.simplices[3]) --> 4
+end
