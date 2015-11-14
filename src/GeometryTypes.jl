@@ -3,7 +3,6 @@ module GeometryTypes
 
 using FixedSizeArrays
 using ColorTypes
-using Compat
 
 import Base: ==,
              *,
