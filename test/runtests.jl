@@ -8,7 +8,6 @@ facts("GeometryTypes") do
     include("meshtypes.jl")
     include("distancefields.jl")
     include("primitives.jl")
-    include("slice.jl")
     include("decompose.jl")
 end
 
