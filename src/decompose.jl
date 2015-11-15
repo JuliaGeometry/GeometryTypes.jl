@@ -28,6 +28,54 @@ Extract all line segments in a Face.
     v
 end
 
+"""
+Decompose an N-Simplex into a tuple of Simplex{3}
+"""
+@generated function decompose{N, T1, T2}(::Type{Simplex{3, T1}},
+                                       f::Simplex{N, T2})
+    @assert 3 <= N # other wise degenerate
+
+    v = Expr(:tuple)
+    append!(v.args, [:(Simplex{3,$T1}(f[1],
+                                        f[$(i-1)],
+                                        f[$i])) for i = 3:N])
+    v
+end
+
+# less strict version of above that preserves types
+decompose{N, T}(::Type{Simplex{3}}, f::Simplex{N, T}) = decompose(Simplex{3,T}, f)
+
+"""
+Decompose an N-Simplex into tuple of Simplex{2}
+"""
+@generated function decompose{N, T1, T2}(::Type{Simplex{2, T1}},
+                                       f::Simplex{N, T2})
+    @assert 2 <= N # other wise degenerate
+
+    v = Expr(:tuple)
+    append!(v.args, [:(Simplex{2,$T1}(f[$(i)],
+                                        f[$(i+1)])) for i = 1:N-1])
+    # connect vertices N and 1
+    push!(v.args, :(Simplex{2,$T1}(f[$(N)],
+                                     f[$(1)])))
+    v
+end
+
+# less strict version of above that preserves types
+decompose{N, T}(::Type{Simplex{2}}, f::Simplex{N, T}) = decompose(Simplex{2,T}, f)
+
+"""
+Decompose an N-Simplex into a tuple of Simplex{1}
+"""
+@generated function decompose{N, T1, T2}(::Type{Simplex{1, T1}},
+                                       f::Simplex{N, T2})
+    v = Expr(:tuple)
+    append!(v.args, [:(Simplex{1,$T1}(f[$i])) for i = 1:N])
+    v
+end
+# less strict version of above
+decompose{N, T}(::Type{Simplex{1}}, f::Simplex{N, T}) = decompose(Simplex{1,T}, f)
+
 function decompose{T}(::Type{Point{3,T}}, rect::HyperRectangle{3, T})
        (Point{3, T}(rect.minimum[1],rect.minimum[2],rect.minimum[3]),
         Point{3, T}(rect.minimum[1],rect.minimum[2],rect.maximum[3]),
