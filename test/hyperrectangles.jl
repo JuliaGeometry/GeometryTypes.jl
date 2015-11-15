@@ -39,14 +39,7 @@ context("Testing split function") do
     @fact d2.minimum[3] --> 3.5
 end
 
-context("fact points function") do
-    a = HyperRectangle(Vec(0,0),Vec(1,1))
-    pt_expa = (Point(0,0), Point(0,1), Point(1,0), Point(1,1))
-    @fact decompose(Point{2,Int},a) --> pt_expa
-    b = HyperRectangle(Vec(0,0,0),Vec(1,1,1))
-    pt_expb = (Point(0,0,0),Point(0,0,1),Point(0,1,0),Point(0,1,1),Point(1,0,0),Point(1,0,1),Point(1,1,0),Point(1,1,1))
-    @fact decompose(Point{3,Int}, b) --> pt_expb
-end
+
 
 context("fact empty constructor on 0.4") do
     a = HyperRectangle{4, Float64}()
