@@ -8,18 +8,34 @@ abstract type AbstractSignedDistanceField <: AbstractDistanceField end
 Abstract to categorize geometry primitives of dimensionality `N` and
 the numeric element type `T`.
 """
+<<<<<<< HEAD
 abstract type AbstractGeometry{N, T} end
 abstract type AbstractMesh{VertT, FaceT}  end # <: AbstractGeometry
 abstract type GeometryPrimitive{N, T} <: AbstractGeometry{N, T} end
 
+=======
+abstract GeometryPrimitive{N, T}
+"""
+An `AbstractMesh` helps classify [Polygonal Meshes](https://en.wikipedia.org/wiki/Polygon_mesh)
+These are distinct from polytopes, since these try to be as congruent
+as possible with data strucutres and file formats for 3D visualisation.
+"""
+abstract AbstractMesh{VertT, FaceT} <: GeometryPrimitive
+>>>>>>> initial sketch of Polytope/Polygon/Polyhedron type
 
 """
-Abstract to classify Simplices. The convention for N starts at 1, which means
+`AbstractSimplex` helps classify Simplices on dimension and vertex type.
+The convention for N starts at 1, which means
 a Simplex has 1 point. A 2-simplex has 2 points, and so forth. This convention
 is not the same as most mathematical texts.
 """
 abstract type AbstractSimplex{S, T} <: StaticVector{S, T} end
 
+"""
+An `AbstractPolytope` categorizes geometric objects with flat sides.
+For example, a `Polygon` is a polytope realizable in 2 dimensions, so `N` = 2.
+"""
+abstract AbstractPolytope{N,T} <: GeometryPrimitive{N,T}
 
 """
 A `Simplex` is a generalization of an N-dimensional tetrahedra and can be thought
@@ -173,6 +189,7 @@ struct HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribI
     attribute_id        ::Vector{AttribIDT}
 end
 
+<<<<<<< HEAD
 function HomogenousMesh(
         vertices::AbstractVector{VertT},
         faces::AbstractVector{FaceT},
@@ -238,3 +255,14 @@ const AbstractConvexHull = Union{
     Simplex, FlexibleConvexHull, FlexibleSimplex,
     HyperCube, HyperRectangle
 } # should we parametrize ACH by the type of points T?
+=======
+
+"""
+A `Polytope` is an `N` dimensional object with elements `T` of the same type.
+For example typealias `Polygon` and `Polyhedron` exist for dimensions 2 and
+3 respectively.
+"""
+type Polytope{N,T} <: AbstractPolytope{N,T}
+    elements::Vector{T}
+end
+>>>>>>> initial sketch of Polytope/Polygon/Polyhedron type

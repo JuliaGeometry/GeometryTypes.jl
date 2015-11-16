@@ -340,6 +340,7 @@ function decompose(::Type{T}, mesh::AbstractMesh) where T <: Colorant
     convert(T, c)
 end
 
+<<<<<<< HEAD
 
 
 function decompose(PT::Type{Point{3, T}}, s::Circle, n=64) where T
@@ -425,4 +426,16 @@ function decompose(::Type{FT}, c::Cylinder{3}, facets = 30) where FT <: Face
     indexes[index] = (1, index + 1, index)
     indexes[index + 1] = (2, index + 1, 1)
     return indexes
+=======
+function decompose{T1,T2}(::Type{Simplex{2,T1}}, p::Polyhedron{Simplex{3,T2}})
+    edges = Array(Simplex{2,T1}, length(p.elements)*3)
+    @inbounds for i = eachindex(p.elements)
+        elt = p.elements[i]
+        se = decompose(Simplex{2,T1}, elt)
+        edges[3*(i-1)+1] = se[1]
+        edges[3*(i-1)+2] = se[2]
+        edges[3*(i-1)+3] = se[3]
+    end
+    edges
+>>>>>>> initial sketch of Polytope/Polygon/Polyhedron type
 end

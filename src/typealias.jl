@@ -54,8 +54,43 @@ const AbsoluteRectangle{T} = HyperRectangle{2, T}
 """
 AABB, or Axis Aligned Bounding Box, is an alias for a 3D `HyperRectangle`.
 """
+<<<<<<< HEAD
 const AABB{T} = HyperRectangle{3, T}
 AABB(m...) = HyperRectangle(m...)
+=======
+typealias AABB{T} HyperRectangle{3, T}
+call(::Type{AABB}, m...) =
+    HyperRectangle(m...)
+
+"""
+A `Polygon` is a `Polytope` realizable with only two dimensions.
+Generally this will be composed of `Points` or `LineSegment`s.
+"""
+typealias Polygon{T} Polytope{2,T}
+
+"""
+A `Polyhedron` is a `Polytope` realizable with only three dimensions.
+Generally this will be composed of `Face`s or two-simplices (`Simplex{3}`).
+"""
+typealias Polyhedron{T} Polytope{2,T}
+
+typealias HMesh HomogenousMesh
+
+typealias UV{T} TextureCoordinate{2, T}
+typealias UVW{T} TextureCoordinate{3, T}
+
+typealias PlainMesh{VT, FT} HMesh{Point{3, VT}, FT, Void, Void, Void, Void, Void}
+typealias GLPlainMesh PlainMesh{Float32, GLTriangle}
+
+typealias Mesh2D{VT, FT} HMesh{Point{2, VT}, FT, Void, Void, Void, Void, Void}
+typealias GLMesh2D Mesh2D{Float32, GLTriangle}
+
+typealias UVMesh{VT, FT, UVT} HMesh{Point{3, VT}, FT, Void, UV{UVT}, Void, Void, Void}
+typealias GLUVMesh UVMesh{Float32, GLTriangle, Float32}
+
+typealias UVWMesh{VT, FT, UVT} HMesh{Point{3, VT}, FT, Void, UVW{UVT}, Void, Void, Void}
+typealias GLUVWMesh UVWMesh{Float32, GLTriangle, Float32}
+>>>>>>> initial sketch of Polytope/Polygon/Polyhedron type
 
 const HMesh = HomogenousMesh
 

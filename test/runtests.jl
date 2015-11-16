@@ -16,6 +16,7 @@ end
     include("meshes.jl")
     include("distancefields.jl")
     include("primitives.jl")
+    include("polytopes.jl")
     include("decompose.jl")
     include("simplerectangle.jl")
     include("hypersphere.jl")
