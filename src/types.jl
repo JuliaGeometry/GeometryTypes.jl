@@ -81,12 +81,16 @@ immutable HyperSphere{N, T} <: GeometryPrimitive{N}
     r::T
 end
 
-immutable Rectangle{T} <: GeometryPrimitive{2}
+immutable SimpleRectangle{T} <: GeometryPrimitive{2}
     x::T
     y::T
     w::T
     h::T
 end
+
+# TODO remove before 0.2.0 tag
+const Rectangle = SimpleRectangle
+
 
 immutable Quad{T} <: GeometryPrimitive{3}
     downleft::Vec{3, T}
