@@ -76,22 +76,25 @@ end
 # less strict version of above
 decompose{N, T}(::Type{Simplex{1}}, f::Simplex{N, T}) = decompose(Simplex{1,T}, f)
 
-function decompose{T}(::Type{Point{3,T}}, rect::HyperRectangle{3, T})
-       (Point{3, T}(rect.minimum[1],rect.minimum[2],rect.minimum[3]),
-        Point{3, T}(rect.minimum[1],rect.minimum[2],rect.maximum[3]),
-        Point{3, T}(rect.minimum[1],rect.maximum[2],rect.minimum[3]),
-        Point{3, T}(rect.minimum[1],rect.maximum[2],rect.maximum[3]),
-        Point{3, T}(rect.maximum[1],rect.minimum[2],rect.minimum[3]),
-        Point{3, T}(rect.maximum[1],rect.minimum[2],rect.maximum[3]),
-        Point{3, T}(rect.maximum[1],rect.maximum[2],rect.minimum[3]),
-        Point{3, T}(rect.maximum[1],rect.maximum[2],rect.maximum[3]))
-end
-
-function decompose{T}(::Type{Point{2,T}}, rect::HyperRectangle{2, T})
-       (Point{2,T}(rect.minimum[1], rect.minimum[2]),
-        Point{2, T}(rect.minimum[1], rect.maximum[2]),
-        Point{2, T}(rect.maximum[1], rect.minimum[2]),
-        Point{2,T}(rect.maximum[1], rect.maximum[2]))
+"""
+Get decompose a `HyperRectangle` into points.
+"""
+@generated function decompose{N,T1<:FixedVector,T2}(::Type{T1},
+                                 rect::HyperRectangle{N, T2})
+    # The general strategy is that since there are a deterministic number of
+    # points, we can generate all points by looking at the binary increments.
+    v = Expr(:tuple)
+    for i = 0:(2^N-1)
+        ex = Expr(:call, T1)
+        for j = 0:(N-1)
+            n = 2^j
+            # the macro hygeine is a little wonky here but this
+            # translates to rect.(Int((i&n)/n+1))[Int(j+1)]
+            push!(ex.args, Expr(:ref,Expr(:.,:rect,Int((i&n)/n+1)),Int(j+1)))
+        end
+        push!(v.args, ex)
+    end
+    v
 end
 
 function decompose{PT}(T::Type{Point{2, PT}},r::Rectangle)
