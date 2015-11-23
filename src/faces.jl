@@ -15,5 +15,5 @@ call{T, T2, IndexOffset1, N}(::Type{Face{N, T, IndexOffset1}}, f::Face{N, T2, In
 call{T1, T2, IndexOffset1, IndexOffset2, N}(t::Type{Face{N, T1, IndexOffset1}}, f::Face{N, T2, IndexOffset2}) = t((map(Int,f)+IndexOffset1-IndexOffset2)...)
 
 
-getindex{T}(a::Array{T,2}, rect::Rectangle)                 = a[rect.x+1:rect.w, rect.y+1:rect.h]
-setindex!{T}(a::Array{T,2}, b::Array{T,2}, rect::Rectangle) = (a[rect.x+1:rect.w, rect.y+1:rect.h] = b)
+getindex{T}(a::Array{T,2}, rect::SimpleRectangle)                 = a[rect.x+1:rect.w, rect.y+1:rect.h]
+setindex!{T}(a::Array{T,2}, b::Array{T,2}, rect::SimpleRectangle) = (a[rect.x+1:rect.w, rect.y+1:rect.h] = b)

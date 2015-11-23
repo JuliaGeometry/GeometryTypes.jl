@@ -97,7 +97,7 @@ Get decompose a `HyperRectangle` into points.
     v
 end
 
-function decompose{PT}(T::Type{Point{2, PT}},r::Rectangle)
+function decompose{PT}(T::Type{Point{2, PT}},r::SimpleRectangle)
    T[T(r.x, r.y),
     T(r.x, r.y + r.h),
     T(r.x + r.w, r.y + r.h),

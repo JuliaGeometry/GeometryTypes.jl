@@ -16,7 +16,7 @@ Perform a intersection between two HyperRectangles.
 intersect{T,N}(h1::HyperRectangle{N, T}, h2::HyperRectangle{N, T}) =
     HyperRectangle{N, T}(max(minimum(h1), minimum(h2)),  min(maximum(h1), maximum(h2)))
 
-function intersect{T}(a::Rectangle{T}, b::Rectangle{T})
+function intersect{T}(a::SimpleRectangle{T}, b::SimpleRectangle{T})
     axrange = a.x:xwidth(a)
     ayrange = a.y:yheight(a)
 
@@ -28,6 +28,6 @@ function intersect{T}(a::Rectangle{T}, b::Rectangle{T})
     (isempty(xintersect) || isempty(yintersect) ) && return Rectangle(zero(T), zero(T), zero(T), zero(T))
     x,y   = first(xintersect), first(yintersect)
     xw,yh = last(xintersect), last(yintersect)
-    Rectangle(x,y, xw-x, yh-y)
+    SimpleRectangle(x,y, xw-x, yh-y)
 end
 

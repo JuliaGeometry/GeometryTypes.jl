@@ -52,7 +52,7 @@ end
 # Containment
 #
 
-function isinside(rect::Rectangle, x::Real, y::Real)
+function isinside(rect::SimpleRectangle, x::Real, y::Real)
     rect.x <= x && rect.y <= y && rect.x + rect.w >= x && rect.y + rect.h >= y
 end
 
@@ -119,5 +119,5 @@ end
 
 isequal(b1::HyperRectangle, b2::HyperRectangle) = b1 == b2
 
-isless(a::Rectangle, b::Rectangle) = isless(area(a), area(b))
+isless(a::SimpleRectangle, b::SimpleRectangle) = isless(area(a), area(b))
 

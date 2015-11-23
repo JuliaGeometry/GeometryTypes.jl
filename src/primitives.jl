@@ -36,14 +36,14 @@ getindex{ET}(q::Quad, T::Type{UVW{ET}}) = T[
     q.downleft + q.width
 ]
 
-getindex{UVT}(r::Rectangle, T::Type{UV{UVT}}) = T[
+getindex{UVT}(r::SimpleRectangle, T::Type{UV{UVT}}) = T[
     T(0, 0),
     T(0, 1),
     T(1, 1),
     T(1, 0)
 ]
 
-getindex{FT, IndexOffset}(r::Rectangle, T::Type{Face{3, FT, IndexOffset}}) = T[
+getindex{FT, IndexOffset}(r::SimpleRectangle, T::Type{Face{3, FT, IndexOffset}}) = T[
     Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
 ]
 
