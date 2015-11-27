@@ -25,7 +25,7 @@ function intersect{T}(a::SimpleRectangle{T}, b::SimpleRectangle{T})
 
     xintersect = intersect(axrange, bxrange)
     yintersect = intersect(ayrange, byrange)
-    (isempty(xintersect) || isempty(yintersect) ) && return Rectangle(zero(T), zero(T), zero(T), zero(T))
+    (isempty(xintersect) || isempty(yintersect) ) && return SimpleRectangle(zero(T), zero(T), zero(T), zero(T))
     x,y   = first(xintersect), first(yintersect)
     xw,yh = last(xintersect), last(yintersect)
     SimpleRectangle(x,y, xw-x, yh-y)
