@@ -5,4 +5,4 @@
 
 Geometry primitives and operations building up on FixedSizeArrays.
 
-Documentation is available [here](./doc/build.jl).
+Documentation is available [here](./doc/build/).
