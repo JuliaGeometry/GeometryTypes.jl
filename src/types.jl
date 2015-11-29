@@ -1,11 +1,21 @@
 abstract AbstractDistanceField
 abstract AbstractUnsignedDistanceField <: AbstractDistanceField
 abstract AbstractSignedDistanceField <: AbstractDistanceField
-abstract AbstractMesh{VertT, FaceT}
 """
 Abstract to categorize geometry primitives of dimensionality `N`.
 """
-abstract GeometryPrimitive{N}
+abstract GeometryPrimitive{N, T}
+abstract AbstractMesh{VertT, FaceT} <: GeometryPrimitive
+
+
+eltype_or{N, T}(::Type{GeometryPrimitive{N, T}}, OR) = T
+eltype_or{T}(::Type{GeometryPrimitive{TypeVar(:N), T}}, OR) = T
+eltype_or{T<:GeometryPrimitive}(::Type{T}, OR) = OR
+
+ndim_or{N, T}(::Type{GeometryPrimitive{N, T}}, OR) = N
+ndim_or{N}(::Type{GeometryPrimitive{N, TypeVar(:T)}}, OR) = N
+ndim_or{T<:GeometryPrimitive}(::Type{T}, OR) = OR
+
 
 
 """
@@ -66,11 +76,16 @@ immutable HyperRectangle{N, T} <: GeometryPrimitive{N}
     minimum::Vec{N, T}
     maximum::Vec{N, T}
 end
+centered{N,T}(R::Type{HyperRectangle{N,T}}) = R(Vec{N,T}(-0.5), Vec{N,T}(0.5))
+centered{T<:HyperRectangle}(::Type{T}) = centered(HyperRectangle{ndim_or(T, 3), eltype_or(T, Float32)})
+
 
 immutable HyperCube{N, T} <: GeometryPrimitive{N}
     origin::Vec{N, T}
     width::Vec{N, T}
 end
+centered{N,T}(C::Type{HyperCube{N,T}}) = C(Vec{N,T}(-0.5), Vec{N,T}(1))
+centered{T<:HyperCube}(::Type{T}) = centered(HyperCube{ndim_or(T, 3), eltype_or(T, Float32)})
 
 """
 A `HyperSphere` is a generalization of a sphere into N-dimensions.
@@ -80,6 +95,8 @@ immutable HyperSphere{N, T} <: GeometryPrimitive{N}
     center::Point{N, T}
     r::T
 end
+centered{N,T}(S::Type{HyperSphere{N,T}}) = S(Vec{N,T}(0), T(1))
+centered{T<:HyperSphere}(::Type{T}) = centered(HyperSphere{ndim_or(T, 3), eltype_or(T, Float32)})
 
 immutable SimpleRectangle{T} <: GeometryPrimitive{2}
     x::T
@@ -218,4 +235,3 @@ typealias GLNormalUVWMesh NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
 
 typealias NormalUVMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UV{UVT}, Void, Void, Void}
 typealias GLNormalUVMesh NormalUVMesh{Float32, GLTriangle, Float32, Float32}
-
