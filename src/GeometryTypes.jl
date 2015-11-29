@@ -28,6 +28,7 @@ import Base: ==,
 
 
 include("types.jl")
+include("typealias.jl")
 include("simplices.jl")
 include("algorithms.jl")
 include("faces.jl")
@@ -50,6 +51,7 @@ export AABB,
        AbstractSimplex,
        AbstractDistanceField,
        Circle,
+       centered,
        Cube,
        decompose,
        Face,
