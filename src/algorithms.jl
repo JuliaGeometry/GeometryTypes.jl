@@ -12,16 +12,16 @@ function normals{VT, FT <: Face}(vertices::Vector{Point{3, VT}}, faces::Vector{F
     map(NT, normals_result)
 end
 
-call{T}(::Type{AABB{T}}, min_x, min_y, min_z, max_x, max_y, max_z) = AABB(Vec{3, T}(min_x, min_y, min_z), Vec{3, T}(max_x, max_y, max_z))
-call{T}(::Type{AABB{T}}, r::SimpleRectangle) = AABB{Float32}(Vec{3, T}(T(r.x), T(r.y), zero(T)), Vec{3, T}(T(xwidth(r)), T(yheight(r)), zero(T)))
-call{T}(::Type{AABB{T}}, aabb::AABB)   = AABB{Float32}(Vec{3, T}(aabb.minimum), Vec{3, T}(aabb.maximum))
-call{T}(::Type{AABB}, min::Vec{3, T}, max::Vec{3, T}) = AABB{T}(min, max)
+call{T}(B::Type{AABB{T}}, min_x, min_y, min_z, max_x, max_y, max_z) = AABB(Vec{3, T}(min_x, min_y, min_z), Vec{3, T}(max_x, max_y, max_z))
+call{T}(B::Type{AABB{T}}, r::SimpleRectangle) = B(Vec{3, T}(T(r.x), T(r.y), zero(T)), Vec{3, T}(T(xwidth(r)), T(yheight(r)), zero(T)))
+call{T}(B::Type{AABB{T}}, aabb::AABB)   = B(Vec{3, T}(aabb.minimum), Vec{3, T}(aabb.maximum))
+call{T}(B::Type{AABB}, min::Vec{3, T}, max::Vec{3, T}) = B(min, max)
 *{T}(m::Mat{4,4,T}, bb::AABB{T}) = AABB{Float32}(Vec{3, T}(m*Vec(bb.minimum, one(T))), Vec{3, T}(m*Vec(bb.maximum, one(T))))
 
 #(*){T}(m::Matrix4x4{T}, bb::AABB{T}) = nothing
 
 
-function convert{N, T, T2}(::Type{HyperRectangle{N, T}}, geometry::Array{Point{N, T2}}) 
+function convert{N, T, T2}(::Type{HyperRectangle{N, T}}, geometry::Array{Point{N, T2}})
     vmin = Point{N, T2}(typemax(T2))
     vmax = Point{N, T2}(typemin(T2))
     for p in geometry
@@ -30,7 +30,7 @@ function convert{N, T, T2}(::Type{HyperRectangle{N, T}}, geometry::Array{Point{N
     end
     HyperRectangle{N, T}(vmin, vmax)
 end
-function convert{T, T2}(::Type{HyperRectangle{3, T}}, geometry::Array{Point{2, T2}}) 
+function convert{T, T2}(::Type{HyperRectangle{3, T}}, geometry::Array{Point{2, T2}})
     vmin = Point{2, T2}(typemax(T2))
     vmax = Point{2, T2}(typemin(T2))
     @inbounds for i=1:length(geometry)
@@ -48,6 +48,3 @@ maximum{T}(a::SimpleRectangle{T}) = Point{2, T}(xwidth(a), yheight(a))
 minimum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
 
 call{T}(::Type{SimpleRectangle}, val::Vec{2, T}) = SimpleRectangle{T}(0, 0, val...)
-
-
-
