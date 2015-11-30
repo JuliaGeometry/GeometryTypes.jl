@@ -10,9 +10,9 @@ function Base.slice{VT<:AbstractFloat,FT<:Integer,O}(mesh::AbstractMesh{Point{3,
     slice = Simplex{2,Point{2,VT}}[]
 
     for face in mesh.faces
-        v1 = mesh.vertices[face[1]+O]
-        v2 = mesh.vertices[face[2]+O]
-        v3 = mesh.vertices[face[3]+O]
+        v1 = mesh.vertices[face[1]-O]
+        v2 = mesh.vertices[face[2]-O]
+        v3 = mesh.vertices[face[3]-O]
         zmax = max(v1[3], v2[3], v3[3])
         zmin = min(v1[3], v2[3], v3[3])
         if height > zmax
