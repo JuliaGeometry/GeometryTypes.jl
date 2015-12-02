@@ -91,7 +91,9 @@ end
 # TODO remove before 0.2.0 tag
 const Rectangle = SimpleRectangle
 
-
+"""
+A rectangle in 3D space.
+"""
 immutable Quad{T} <: GeometryPrimitive{3}
     downleft::Vec{3, T}
     width   ::Vec{3, T}
