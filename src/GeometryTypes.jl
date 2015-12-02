@@ -29,6 +29,7 @@ import Base: ==,
 
 include("types.jl")
 include("simplices.jl")
+include("push.jl")
 include("algorithms.jl")
 include("faces.jl")
 include("hyperrectangles.jl")
@@ -42,6 +43,7 @@ include("display.jl")
 include("slice.jl")
 include("decompose.jl")
 include("deprecated.jl")
+include("orientation.jl")
 
 export AABB,
        AbsoluteRectangle,
@@ -82,6 +84,7 @@ export AABB,
        Particle,
        PlainMesh,
        Point,
+       PureSimplicialComplex,
        Pyramid,
        Quad,
        Rectangle,
@@ -114,6 +117,7 @@ export AABB,
        hastexturecoordinates,
        hasvertices,
        height,
+       isclosed,
        isinside,
        isoutside,
        max_dist_dim,

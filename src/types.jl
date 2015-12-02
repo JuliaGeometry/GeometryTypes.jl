@@ -15,6 +15,15 @@ is not the same as most mathematical texts.
 """
 abstract AbstractSimplex{N,T} <: FixedVector{N,T}
 
+"""
+Abstract to classify Simplicial Complexes. `N` corresponds to the order of
+the Complex, which will be one more than the mathematical terminology
+(i.e. a two-simplicial complex corresponds to `AbstractSimplicialComplex{3}`).
+Note that this also is an abstract, so it is not an 'abstract simplicial
+complex' in the methematica sense. We use more concrete terminology for types
+such as `PureSimplicialComplex`.
+"""
+abstract AbstractSimplicialComplex{N,T} <: FixedVector{N,T}
 
 """
 A `Simplex` is a generalization of an N-dimensional tetrahedra and can be thought
@@ -34,6 +43,15 @@ to allow embedding in higher-order spaces by parameterizing on `T`.
 """
 immutable Simplex{N,T} <: AbstractSimplex{N,T}
     _::NTuple{N,T}
+end
+
+"""
+A `PureSimplicialComplex` is a composition of simplices such that it is
+finite and every facet has the same dimension. This is enforced by the
+type parameter `T`.
+"""
+immutable PureSimplicialComplex{N,T} <: AbstractSimplicialComplex{N,T}
+    simplices::NTuple{N}
 end
 
 immutable Normal{N, T} <: FixedVector{N, T}
