@@ -1,17 +1,11 @@
 """
 Given an Array, `a`, and a face, `f`, return a tuple of numbers
 interpreting the values and offset of the face as indices into `A`.
-"""
-@generated function getindex{T,N,FD,FT,Offset}(a::Array{T,N},
-                                               f::Face{FD, FT, Offset})
-    v = Expr(:tuple)
-    for i = 1:FD
-        push!(v.args, Expr(:ref, :a, :(f[$i]-Offset)))
-    end
-    Expr(:(::), v, :(NTuple{FD,T}))
-end
 
-@generated function Base.unsafe_getindex{T,N,FD,FT,Offset}(a::Array{T,N},
+Note: This is not bounds checked. It is recommended that you use
+`checkbounds` to confirm the indices are safe for loops.
+"""
+@generated function Base.getindex{T,N,FD,FT,Offset}(a::Array{T,N},
                                                f::Face{FD, FT, Offset})
     v = Expr(:tuple)
     for i = 1:FD
