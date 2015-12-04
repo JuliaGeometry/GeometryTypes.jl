@@ -4,6 +4,8 @@ interpreting the values and offset of the face as indices into `A`.
 
 Note: This is not bounds checked. It is recommended that you use
 `checkbounds` to confirm the indices are safe for loops.
+Also be aware when writing generic code that faces may be of more than
+3 vertices.
 """
 @generated function Base.getindex{T,N,FD,FT,Offset}(a::Array{T,N},
                                                f::Face{FD, FT, Offset})
