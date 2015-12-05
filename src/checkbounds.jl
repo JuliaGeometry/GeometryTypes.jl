@@ -6,7 +6,7 @@ function Base.checkbounds{VT,FT,FD,FO}(m::AbstractMesh{VT,Face{FD,FT,FO}})
     isempty(faces(m)) && return true # nothing to worry about I guess
 
     # index max and min
-    const i = 1 + FO # normalize face offset
+    const i = one(FO) + FO # normalize face offset
     s = length(vertices(m)) + FO
 
     for face in faces(m)
