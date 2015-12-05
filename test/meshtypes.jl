@@ -85,4 +85,23 @@ context("Slice") do
     @fact length(s2) --> length(exp2)
 end
 
+context("checkbounds") do
+    m1 = HomogenousMesh([Point{3,Float64}(0.0,0.0,10.0),
+                         Point{3,Float64}(0.0,10.0,10.0),
+                         Point{3,Float64}(0.0,0.0,0.0)],
+                        [Face{3,Int,0}(1,2,3)])
+    @fact checkbounds(m1) --> true
+    m2 = HomogenousMesh([Point{3,Float64}(0.0,0.0,10.0),
+                         Point{3,Float64}(0.0,10.0,10.0),
+                         Point{3,Float64}(0.0,0.0,0.0)],
+                        [Face{3,Int,-1}(1,2,3)])
+    @fact checkbounds(m2) --> false
+    # empty case
+    m3 = HomogenousMesh([Point{3,Float64}(0.0,0.0,10.0),
+                         Point{3,Float64}(0.0,10.0,10.0),
+                         Point{3,Float64}(0.0,0.0,0.0)],
+                        Face{3,Int,-1}[])
+    @fact checkbounds(m3) --> true
+end
+
 end
