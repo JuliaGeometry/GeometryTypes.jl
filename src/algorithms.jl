@@ -1,12 +1,19 @@
-#Sums up the normals over all surrounding faces of a single vertex
-function normals{VT, FT <: Face}(vertices::Vector{Point{3, VT}}, faces::Vector{FT}, NT = Normal{3, VT})
+"""
+Compute all vertex normals.
+"""
+function normals{VT,FD,FT,FO}(vertices::Vector{Point{3, VT}},
+                                 faces::Vector{Face{FD,FT,FO}},
+                                 NT = Normal{3, VT})
     normals_result = zeros(Point{3, VT}, length(vertices)) # initilize with same type as verts but with 0
     for face in faces
-        v1, v2, v3 = vertices[face]
-        a = v2 - v1
-        b = v3 - v1
+        v = vertices[face]
+        # we can get away with two edges since faces are planar.
+        a = v[2] - v[1]
+        b = v[3] - v[1]
         n = cross(a,b)
-        normals_result[face] = normals_result[face] .+ n
+        for elt in face
+            normals_result[elt-FO] = normals_result[elt-FO] + n
+        end
     end
     map!(normalize, normals_result)
     map(NT, normals_result)

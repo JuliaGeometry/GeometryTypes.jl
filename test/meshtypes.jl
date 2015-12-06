@@ -104,4 +104,40 @@ context("checkbounds") do
     @fact checkbounds(m3) --> true
 end
 
+context("vertex normals") do
+    test_mesh = HomogenousMesh(Point{3,Float64}[Point{3,Float64}(0.0,0.0,10.0),
+     Point{3,Float64}(0.0,10.0,10.0),
+     Point{3,Float64}(0.0,0.0,0.0),
+     Point{3,Float64}(0.0,10.0,0.0),
+     Point{3,Float64}(10.0,0.0,10.0),
+     Point{3,Float64}(10.0,10.0,10.0),
+     Point{3,Float64}(10.0,0.0,0.0),
+     Point{3,Float64}(10.0,10.0,0.0),
+    ],Face{3,Int,0}[
+     Face{3,Int,0}(3,7,5)
+     Face{3,Int,0}(1,3,5)
+     Face{3,Int,0}(1,2,3)
+     Face{3,Int,0}(3,2,4)
+     Face{3,Int,0}(1,5,6)
+     Face{3,Int,0}(2,1,6)
+     Face{3,Int,0}(4,8,3)
+     Face{3,Int,0}(3,8,7)
+     Face{3,Int,0}(7,8,6)
+     Face{3,Int,0}(5,7,6)
+     Face{3,Int,0}(2,6,4)
+     Face{3,Int,0}(4,6,8)]
+    )
+    ns = normals(test_mesh.vertices, test_mesh.faces)
+    @fact length(ns) --> length(test_mesh.vertices)
+    expect = [Normal(-0.408248290463863,-0.408248290463863,0.816496580927726),
+              Normal(-0.816496580927726,0.408248290463863,0.408248290463863),
+              Normal(-0.5773502691896257,-0.5773502691896257,-0.5773502691896257),
+              Normal(-0.408248290463863,0.816496580927726,-0.408248290463863),
+              Normal(0.408248290463863,-0.816496580927726,0.408248290463863),
+              Normal(0.5773502691896257,0.5773502691896257,0.5773502691896257),
+              Normal(0.816496580927726,-0.408248290463863,-0.408248290463863),
+              Normal(0.408248290463863,0.408248290463863,-0.816496580927726)]
+    @fact ns --> expect
+end
+
 end
