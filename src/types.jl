@@ -180,8 +180,8 @@ typealias AbsoluteRectangle{T} HyperRectangle{2, T}
 AABB, or Axis Aligned Bounding Box, is an alias for a 3D HyperRectangle.
 """
 typealias AABB{T} HyperRectangle{3, T}
-call(::Type{AABB}, min, max) =
-    AABB(Vec(min), Vec(max))
+call(::Type{AABB}, m...) =
+    HyperRectangle(m...)
 
 typealias HMesh HomogenousMesh
 

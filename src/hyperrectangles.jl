@@ -44,6 +44,8 @@ maximum == Vec(1,2)
     Expr(:call, :HyperRectangle, v1, v2)
 end
 
+call{A<:AABB}(::Type{A}, vals::Number...) = HyperRectangle(vals...)
+
 function HyperRectangle{T}(r::SimpleRectangle{T})
     HyperRectangle{2,T}(r)
 end

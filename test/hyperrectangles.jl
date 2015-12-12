@@ -9,6 +9,11 @@ context("constructors and containment") do
     b = HyperRectangle(0,0,1,1,1,2)
     @fact b --> HyperRectangle{3,Int}(Vec(0,0,1),Vec(1,1,2))
 
+    a = AABB(0,0,0,1,1,1)
+    b = AABB(Vec(0,0,0),Vec(1,1,1))
+    @fact a --> HyperRectangle(0,0,0,1,1,1)
+    @fact a --> b
+
     a = HyperRectangle{4, Float64}()
     @fact a --> HyperRectangle{4, Float64}(Vec(-Inf,-Inf,-Inf,-Inf), Vec(Inf,Inf,Inf,Inf))
 
