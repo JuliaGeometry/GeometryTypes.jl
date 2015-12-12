@@ -60,9 +60,53 @@ function call{N,T}(::Type{HyperRectangle{N,T}}, r::SimpleRectangle)
     end
 end
 
-# TODO fix
-function *{T}(m::Mat{4,4,T}, bb::HyperRectangle{T})
-    AABB{Float32}(Vec{3, T}(m*Vec(bb.minimum, one(T))), Vec{3, T}(m*Vec(bb.maximum, one(T))))
+"""
+Transform a `HyperRectangle` using a matrix. Maintains axis-align properties
+so a significantly larger HyperRectangle may be generated.
+"""
+function *{N1,N2,T1,T2}(m::Mat{N1,N1,T1}, h::HyperRectangle{N2,T2})
+
+    # TypeVar constants
+    T = promote_type(T1,T2)
+    D = N1 - N2
+
+    # get all points on the HyperRectangle
+    d = decompose(Vec, h)
+    pts = (Vec{N1,T}[Vec{N1,T}(pt..., [one(T) for i =1:D]...) for pt in d]...)::NTuple{N2^2,Vec{N1,T}}
+
+    # make sure our points are sized for the tranform
+    vmin = Vec{N1, T}(typemax(T))
+    vmax = Vec{N1, T}(typemin(T))
+
+    # tranform all points, tracking min and max points
+    for pt in pts
+        pn = m*pt
+        vmin = min(pn,vmin)
+        vmax = max(pn,vmax)
+    end
+    HyperRectangle{N2,T}(Vec{N2,T}(vmin), Vec{N2,T}(vmax))
+end
+
+function *{N,T1,T2}(m::Mat{N,N,T1}, h::HyperRectangle{N,T2})
+    # equal dimension case
+
+    # TypeVar constants
+    T = promote_type(T1,T2)
+
+    # get all points on the HyperRectangle
+    pts = decompose(Vec, h)
+
+    # make sure our points are sized for the tranform
+    vmin = Vec{N, T}(typemax(T))
+    vmax = Vec{N, T}(typemin(T))
+
+    # tranform all points, tracking min and max points
+    for pt in pts
+        pn = m*pt
+        vmin = min(pn,vmin)
+        vmax = max(pn,vmax)
+    end
+    HyperRectangle{N,T}(vmin, vmax)
 end
 
 function HyperRectangle{N,T}(geometry::Array{Point{N, T}})

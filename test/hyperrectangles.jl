@@ -162,4 +162,13 @@ context("from Points") do
     @fact a --> HyperRectangle(0,-1,0,4,5,0)
 end
 
+context("transforms") do
+    t = Mat((1,0,0),(0,1,0),(1,2,0))
+    h = t*HyperRectangle(0,0,1,1)
+    @fact h --> HyperRectangle(1,2,2,3)
+    t = Mat((0,1),(1,0))
+    h = t*HyperRectangle(0,0,1,2)
+    @fact h --> HyperRectangle(0,0,2,1)
+end
+
 end
