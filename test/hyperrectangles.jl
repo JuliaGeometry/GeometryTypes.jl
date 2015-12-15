@@ -2,6 +2,21 @@ context("Hyper Rectangles") do
 
     
 context("constructors and containment") do
+    # HyperRectangle(vals...)
+    a = HyperRectangle(0,0,1,1)
+    @fact a --> HyperRectangle{2,Int}(Vec(0,0),Vec(1,1))
+
+    b = HyperRectangle(0,0,1,1,1,2)
+    @fact b --> HyperRectangle{3,Int}(Vec(0,0,1),Vec(1,1,2))
+
+    a = AABB(0,0,0,1,1,1)
+    b = AABB(Vec(0,0,0),Vec(1,1,1))
+    @fact a --> HyperRectangle(0,0,0,1,1,1)
+    @fact a --> b
+
+    a = HyperRectangle{4, Float64}()
+    @fact a --> HyperRectangle{4, Float64}(Vec(-Inf,-Inf,-Inf,-Inf), Vec(Inf,Inf,Inf,Inf))
+
     a = HyperRectangle{4, Float64}(Vec(Inf,Inf,Inf,Inf),Vec(-Inf,-Inf,-Inf,-Inf))
 
     a = update(a, Vec(1,2,3,4))
@@ -35,16 +50,15 @@ context("Testing split function") do
 
     @fact d1.maximum[3] --> 3.5
     @fact d1.minimum[3] --> 3.0
-    @fact d2.maximum[3] --> 4.0 
+    @fact d2.maximum[3] --> 4.0
     @fact d2.minimum[3] --> 3.5
+
+    d = HyperRectangle(0,0,2,2)
+    d1, d2 = split(d, 1, 1)
+    @fact d1 --> HyperRectangle(0,0,1,2)
+    @fact d2 --> HyperRectangle(1,0,2,2)
 end
 
-
-
-context("fact empty constructor on 0.4") do
-    a = HyperRectangle{4, Float64}()
-    @fact a --> HyperRectangle{4, Float64}(Vec(-Inf,-Inf,-Inf,-Inf), Vec(Inf,Inf,Inf,Inf))
-end
 
 context("Test distance functions") do
     a = HyperRectangle(Vec(0.0,0.0), Vec(1.0, 1.0))
@@ -91,7 +105,7 @@ context("Test distance functions") do
     @fact min_dist_dim(a, b2, 2) --> 0
 end
 
-context("Test set boolean operations") do
+context("set operations") do
     a = HyperRectangle(Vec(0,0),Vec(1,1))
     b = HyperRectangle(Vec(1,1),Vec(2,2))
 
@@ -114,7 +128,7 @@ context("Test set boolean operations") do
 end
 
 # fact relations
-context("fact relations") do
+context("relations") do
     a = HyperRectangle(Vec(0,0),Vec(1,1))
     b = HyperRectangle(Vec(1,1),Vec(2,2))
     c = HyperRectangle(Vec(0,0),Vec(2,2))
@@ -134,13 +148,27 @@ context("fact relations") do
     @fact (overlaps(a,f) && !overlaps(f,a)) --> true
 end
 
-context("fact point membership") do
+context("point membership") do
     a = HyperRectangle{4, Float64}(Vec(1.0,2.0,3.0,4.0),Vec(5.0,6.0,7.0,8.0))
     @fact (in(Vec(4,5,6,7),a) && contains(a,Vec(4,5,6,7))) --> true
     @fact (in(Vec(5,6,7,8),a) && contains(a,Vec(5,6,7,8))) --> true
     @fact (!in(Vec(6,7,8,9),a) && !contains(a,Vec(6,7,8,9))) --> true
 end
 
+context("from Points") do
+    a = HyperRectangle([Point(1,1), Point(2,3), Point(4,5), Point(0,-1)])
+    @fact a --> HyperRectangle(0,-1,4,5)
+    a = HyperRectangle{3,Int}([Point(1,1), Point(2,3), Point(4,5), Point(0,-1)])
+    @fact a --> HyperRectangle(0,-1,0,4,5,0)
 end
 
-FactCheck.exitstatus()
+context("transforms") do
+    t = Mat((1,0,0),(0,1,0),(1,2,0))
+    h = t*HyperRectangle(0,0,1,1)
+    @fact h --> HyperRectangle(1,2,2,3)
+    t = Mat((0,1),(1,0))
+    h = t*HyperRectangle(0,0,1,2)
+    @fact h --> HyperRectangle(0,0,2,1)
+end
+
+end

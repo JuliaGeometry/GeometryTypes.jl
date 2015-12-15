@@ -10,6 +10,7 @@ facts("GeometryTypes") do
     include("distancefields.jl")
     include("primitives.jl")
     include("decompose.jl")
+    include("simplerectangle.jl")
 end
 
 FactCheck.exitstatus()
