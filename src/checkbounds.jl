@@ -1,4 +1,8 @@
 """
+```
+checkbounds{VT,FT,FD,FO}(m::AbstractMesh{VT,Face{FD,FT,FO}})
+```
+
 Check the `Face` indices to ensure they are in the bounds of the vertex
 array of the `AbstractMesh`.
 """
