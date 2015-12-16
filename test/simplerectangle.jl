@@ -25,4 +25,13 @@ context("setops") do
     @fact intersect(r1,r3) --> SimpleRectangle(1,1,1,1)
     @fact intersect(r1,r4) --> SimpleRectangle(0.5,0.5,1.5,1.5)
 end
+
+context("indexing") do
+    r = SimpleRectangle(0,0,2,2)
+    a = eye(4)
+    @fact a[r] --> eye(2)
+    a[r] = eye(2)*2
+    @fact a --> [2 0 0 0; 0 2 0 0; 0 0 1 0; 0 0 0 1]
+end
+
 end

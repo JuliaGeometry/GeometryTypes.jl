@@ -143,3 +143,12 @@ minimum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
 
 call{T}(::Type{SimpleRectangle}, val::Vec{2, T}) = SimpleRectangle{T}(0, 0, val...)
 
+
+function getindex{T}(a::Array{T,2}, rect::SimpleRectangle)
+    a[rect.x+1:rect.w, rect.y+1:rect.h]
+end
+
+function setindex!{T}(a::Array{T,2}, b::Array{T,2}, rect::SimpleRectangle)
+    a[rect.x+1:rect.w, rect.y+1:rect.h] = b
+end
+
