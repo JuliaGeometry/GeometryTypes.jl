@@ -6,7 +6,7 @@ typealias Vec3f0 Vec{3, Float32}
 facts("GeometryTypes") do
     include("hyperrectangles.jl")
     include("faces.jl")
-    include("meshtypes.jl")
+    include("meshes.jl")
     include("distancefields.jl")
     include("primitives.jl")
     include("decompose.jl")
