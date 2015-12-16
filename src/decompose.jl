@@ -105,19 +105,19 @@ function decompose{P}(T::Type{P},r::SimpleRectangle)
 end
 
 function decompose{PT}(T::Type{Point{3, PT}},p::Pyramid)
-    leftup   = T(-p.width , p.width, PT(0)) / 2f0
-    leftdown = T(-p.width, -p.width, PT(0)) / 2f0
-    tip = T(p.middle + T(PT(0),PT(0),p.length))
-    lu  = T(p.middle + leftup)
-    ld  = T(p.middle + leftdown)
-    ru  = T(p.middle - leftdown)
-    rd  = T(p.middle - leftup)
-    T[tip, rd, ru,
-        tip, ru, lu,
-        tip, lu, ld,
-        tip, ld, rd,
-        rd,  ru, lu,
-        lu,  ld, rd]
+    T[T(PT(0),PT(0),p.middle[3]+p.length*PT(0)),
+      T(p.width/2, p.width/2, PT(0)),
+      T(-p.width/2, p.width/2, PT(0)),
+      T(p.width/2, -p.width/2, PT(0)),
+      T(-p.width/2, -p.width/2, PT(0))]
+end
+
+function decompose{PT<:AbstractFloat}(T::Type{Point}, p::Pyramid{PT})
+    decompose(Point{3,PT},p)
+end
+
+function decompose{PT}(T::Type{Point}, p::Pyramid{PT})
+    decompose(Point{3,Float64},p)
 end
 
 function decompose{ET}(T::Type{Point{3, ET}}, q::Quad)

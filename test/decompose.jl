@@ -37,4 +37,14 @@ context("SimpleRectangle") do
                    Point(1,0)]
 end
 
+context("Pyramid") do
+    p = Pyramid(Point(0,0,5),5,5)
+    d = decompose(Point, p)
+    @fact d --> [Point(0,0,5),
+                 Point(2.5,2.5,0.0),
+                 Point(-2.5,2.5,0.0),
+                 Point(2.5,-2.5,0.0),
+                 Point(-2.5,-2.5,0.0)]
+end
+
 end
