@@ -28,4 +28,13 @@ context("Simplex") do
     @fact decompose(Simplex{3}, s2) --> (Simplex(:x1,:x2,:x3),Simplex(:x1,:x3,:x4))
 end
 
+context("SimpleRectangle") do
+    r = SimpleRectangle(0,0,1,1)
+    pts = decompose(Point,r)
+    @fact pts --> [Point(0,0),
+                   Point(0,1),
+                   Point(1,1),
+                   Point(1,0)]
+end
+
 end

@@ -97,11 +97,11 @@ Get decompose a `HyperRectangle` into points.
     v
 end
 
-function decompose{PT}(T::Type{Point{2, PT}},r::SimpleRectangle)
-   T[T(r.x, r.y),
-    T(r.x, r.y + r.h),
-    T(r.x + r.w, r.y + r.h),
-    T(r.x + r.w, r.y)]
+function decompose{P}(T::Type{P},r::SimpleRectangle)
+   P[P(r.x, r.y),
+    P(r.x, r.y + r.h),
+    P(r.x + r.w, r.y + r.h),
+    P(r.x + r.w, r.y)]
 end
 
 function decompose{PT}(T::Type{Point{3, PT}},p::Pyramid)
