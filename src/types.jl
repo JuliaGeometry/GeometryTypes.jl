@@ -70,11 +70,11 @@ end
 """
 A `HyperRectangle` is a generalization of a rectangle into N-dimensions.
 Formally it is the cartesian product of intervals, which is represented by the
-`minimum` and `maximum` fields, whose indices correspond to each of the `N` axes.
+`origin` and `width` fields, whose indices correspond to each of the `N` axes.
 """
 immutable HyperRectangle{N, T} <: GeometryPrimitive{N}
-    minimum::Vec{N, T}
-    maximum::Vec{N, T}
+    origin::Vec{N, T}
+    widths::Vec{N, T}
 end
 centered{N,T}(R::Type{HyperRectangle{N,T}}) = R(Vec{N,T}(-0.5), Vec{N,T}(0.5))
 centered{T<:HyperRectangle}(::Type{T}) = centered(HyperRectangle{ndim_or(T, 3), eltype_or(T, Float32)})
@@ -82,7 +82,7 @@ centered{T<:HyperRectangle}(::Type{T}) = centered(HyperRectangle{ndim_or(T, 3), 
 
 immutable HyperCube{N, T} <: GeometryPrimitive{N}
     origin::Vec{N, T}
-    width::Vec{N, T}
+    width::T
 end
 centered{N,T}(C::Type{HyperCube{N,T}}) = C(Vec{N,T}(-0.5), Vec{N,T}(1))
 centered{T<:HyperCube}(::Type{T}) = centered(HyperCube{ndim_or(T, 3), eltype_or(T, Float32)})
@@ -165,73 +165,3 @@ immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, Attr
     attributes          ::AttribT
     attribute_id        ::Vector{AttribIDT}
 end
-
-#Type aliases
-
-"""
-An alias for a one-simplex, corresponding to LineSegment{T} -> Simplex{2,T}.
-"""
-typealias LineSegment{T} Simplex{2,T}
-
-typealias Triangle{T} Face{3, T, 0}
-typealias GLFace{Dim} Face{Dim, Cuint, -1} #offset is relative to julia, so -1 is 0-indexed
-typealias GLTriangle  Face{3, Cuint, -1}
-typealias GLQuad      Face{4, Cuint, -1}
-
-typealias Cube{T}   HyperCube{3, T}
-
-"""
-An alias for a HyperSphere of dimension 2. i.e. Circle{T} -> HyperSphere{2, T}
-"""
-typealias Circle{T} HyperSphere{2, T}
-call(::Type{Circle}, x...) = HyperSphere(x...)
-"""
-An alias for a HyperSphere of dimension 3. i.e. Sphere{T} -> HyperSphere{3, T}
-"""
-typealias Sphere{T} HyperSphere{3, T}
-call(::Type{Sphere}, x...) = HyperSphere(x...)
-
-typealias AbsoluteRectangle{T} HyperRectangle{2, T}
-
-"""
-AABB, or Axis Aligned Bounding Box, is an alias for a 3D HyperRectangle.
-"""
-typealias AABB{T} HyperRectangle{3, T}
-call(::Type{AABB}, m...) =
-    HyperRectangle(m...)
-
-typealias HMesh HomogenousMesh
-
-typealias UV{T} TextureCoordinate{2, T}
-typealias UVW{T} TextureCoordinate{3, T}
-
-typealias PlainMesh{VT, FT} HMesh{Point{3, VT}, FT, Void, Void, Void, Void, Void}
-typealias GLPlainMesh PlainMesh{Float32, GLTriangle}
-
-typealias Mesh2D{VT, FT} HMesh{Point{2, VT}, FT, Void, Void, Void, Void, Void}
-typealias GLMesh2D Mesh2D{Float32, GLTriangle}
-
-typealias UVMesh{VT, FT, UVT} HMesh{Point{3, VT}, FT, Void, UV{UVT}, Void, Void, Void}
-typealias GLUVMesh UVMesh{Float32, GLTriangle, Float32}
-
-typealias UVWMesh{VT, FT, UVT} HMesh{Point{3, VT}, FT, Void, UVW{UVT}, Void, Void, Void}
-typealias GLUVWMesh UVWMesh{Float32, GLTriangle, Float32}
-
-typealias NormalMesh{VT, FT, NT} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, Void, Void}
-typealias GLNormalMesh NormalMesh{Float32, GLTriangle, Float32}
-
-typealias UVMesh2D{VT, FT, UVT} HMesh{Point{2, VT}, FT, Void, UV{UVT}, Void, Void, Void}
-typealias GLUVMesh2D UVMesh2D{Float32, GLTriangle, Float32}
-
-typealias NormalColorMesh{VT, FT, NT, CT} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, CT, Void, Void}
-typealias GLNormalColorMesh NormalColorMesh{Float32, GLTriangle, Float32, RGBA{Float32}}
-
-
-typealias NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, AT, A_ID_T}
-typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBA{U8}}, Float32}
-
-typealias NormalUVWMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UVW{UVT}, Void, Void, Void}
-typealias GLNormalUVWMesh NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
-
-typealias NormalUVMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UV{UVT}, Void, Void, Void}
-typealias GLNormalUVMesh NormalUVMesh{Float32, GLTriangle, Float32, Float32}

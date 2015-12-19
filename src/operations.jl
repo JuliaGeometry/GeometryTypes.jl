@@ -1,23 +1,36 @@
-update{N, T, T2}(b::HyperRectangle{N, T}, v::Vec{N, T2}) = update(b, Vec{N, T}(v))
-update{N, T}(b::HyperRectangle{N, T}, v::Vec{N, T}) = 
-    HyperRectangle{N, T}(min(b.minimum, v), max(b.maximum, v))
+update{N, T, T2}(b::HyperRectangle{N, T}, v::Vec{N, T2}) =
+    update(b, Vec{N, T}(v))
+function update{N, T}(b::HyperRectangle{N, T}, v::Vec{N, T})
+    m = min(minimum(b), v)
+    mm = max(maximum(b), v)-m
+    HyperRectangle{N, T}(m, mm)
+end
 
 # Min maximum distance functions between hrectangle and point for a given dimension
 @inline min_dist_dim{N, T}(rect::HyperRectangle{N, T}, p::Vec{N, T}, dim::Int) = 
-    max(zero(T), max(rect.minimum[dim] - p[dim], p[dim] - rect.maximum[dim]))
+    max(zero(T), max(minimum(rect)[dim] - p[dim], p[dim] - maximum(rect)[dim]))
 
 @inline max_dist_dim{N, T}(rect::HyperRectangle{N, T}, p::Vec{N, T}, dim::Int) =
-    max(rect.maximum[dim] - p[dim], p[dim] - rect.minimum[dim])
+    max(maximum(rect)[dim] - p[dim], p[dim] - minimum(rect)[dim])
 
-@inline min_dist_dim{N, T}(rect1::HyperRectangle{N, T}, rect2::HyperRectangle{N, T}, dim::Int) = 
-    max(zero(T), max(rect1.minimum[dim] - rect2.maximum[dim], rect2.minimum[dim] - rect1.maximum[dim]))
+@inline function min_dist_dim{N, T}(rect1::HyperRectangle{N, T},
+                                    rect2::HyperRectangle{N, T},
+                                    dim::Int)
+    max(zero(T), max(minimum(rect1)[dim] - maximum(rect2)[dim],
+                     minimum(rect2)[dim] - maximum(rect1)[dim]))
+end
 
-@inline max_dist_dim{N, T}(rect1::HyperRectangle{N, T},  rect2::HyperRectangle{N, T}, dim::Int) = 
-    max(rect1.maximum[dim] - rect2.minimum[dim],  rect2.maximum[dim] - rect1.minimum[dim])
-
+@inline function max_dist_dim{N, T}(rect1::HyperRectangle{N, T},
+                                    rect2::HyperRectangle{N, T},
+                                    dim::Int)
+    max(maximum(rect1)[dim] - minimum(rect2)[dim],
+        maximum(rect2)[dim] - minimum(rect1)[dim])
+end
 
 # Total minimum maximum distance functions
-@inline function min_euclideansq{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}})
+@inline function min_euclideansq{N, T}(rect::HyperRectangle{N, T},
+                                       p::Union{Vec{N, T},
+                                       HyperRectangle{N, T}})
     minimum_dist = T(0.0)
     for dim in 1:length(p)
         d = min_dist_dim(rect, p, dim)

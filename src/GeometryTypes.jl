@@ -33,6 +33,7 @@ include("simplices.jl")
 include("algorithms.jl")
 include("faces.jl")
 include("hyperrectangles.jl")
+include("hypersphere.jl")
 include("relations.jl")
 include("operations.jl")
 include("meshes.jl")
@@ -146,6 +147,7 @@ export AABB,
        vertextype,
        vertices,
        width,
+       widths,
        xwidth,
        yheight
 
