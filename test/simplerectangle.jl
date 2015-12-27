@@ -9,6 +9,7 @@ context("constructors") do
     @fact yheight(s) --> 6
     @fact minimum(s) --> Point(1,2)
     @fact maximum(s) --> Point(4,6)
+    @fact origin(s) --> Point(1,2)
     h = HyperRectangle(s)
     @fact typeof(h) --> HyperRectangle{2,Int}
     @fact h --> HyperRectangle(1,2,3,4)

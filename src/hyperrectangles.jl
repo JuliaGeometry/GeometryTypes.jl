@@ -136,8 +136,9 @@ function call{N1, N2, T1, T2}(t::Type{HyperRectangle{N1, T1}}, geometry::Array{P
     o = vmin
     w = vmax - vmin
     if N1 > N2
-        return HyperRectangle{N1,T1}(Vec{N1,T1}(o..., [zero(T1) for i = 1:N1-N2]...),
-                                     Vec{N1,T1}(w..., [zero(T1) for i = 1:N1-N2]...))
+        z = Vec{N1-N2,T1}(zero(T1))
+        return HyperRectangle{N1,T1}(Vec{N1,T1}(o, z...),
+                                     Vec{N1,T1}(w, z...))
     else
         return HyperRectangle{N1,T1}(Vec{N1,T1}(o),
                                      Vec{N1,T1}(w))
