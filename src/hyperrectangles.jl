@@ -62,8 +62,8 @@ end
 
 function call{N,T}(::Type{HyperRectangle{N,T}}, r::SimpleRectangle)
     if N > 2
-        return HyperRectangle(Vec{N, T}(T(r.x), T(r.y), [zero(T) for i=1:N-2]...),
-                              Vec{N, T}(T(r.w), T(r.h), [zero(T) for i=1:N-2]...))
+        return HyperRectangle(Vec{N, T}(T(r.x), T(r.y), Vec{N-2,T}(zero(T))...),
+                              Vec{N, T}(T(r.w), T(r.h), Vec{N-2,T}(zero(T))...))
     else
         return HyperRectangle(Vec{N, T}(T(r.x), T(r.y)),
                               Vec{N, T}(T(r.w), T(r.h)))
@@ -82,7 +82,7 @@ function *{N1,N2,T1,T2}(m::Mat{N1,N1,T1}, h::HyperRectangle{N2,T2})
 
     # get all points on the HyperRectangle
     d = decompose(Vec, h)
-    pts = (Vec{N1,T}[Vec{N1,T}(pt..., [one(T) for i =1:D]...) for pt in d]...)::NTuple{N2^2,Vec{N1,T}}
+    pts = (Vec{N1,T}[Vec{N1,T}(pt, Vec{D,T}(one(T))...) for pt in d]...)::NTuple{N2^2,Vec{N1,T}}
 
     # make sure our points are sized for the tranform
     vmin = Vec{N1, T}(typemax(T))
