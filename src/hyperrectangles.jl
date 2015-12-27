@@ -1,5 +1,6 @@
 maximum(b::HyperRectangle) = b.origin + b.widths
 minimum(b::HyperRectangle) = b.origin
+origin(b::HyperRectangle) = b.origin
 length{T, N}(b::HyperRectangle{N, T}) = N
 widths{N,T}(b::HyperRectangle{N,T}) = b.widths
 
@@ -151,6 +152,7 @@ area(a::SimpleRectangle) = a.w*a.h
 widths{T}(a::SimpleRectangle{T}) = Point{2,T}(a.w, a.h)
 maximum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x + widths(a)[1], a.y +widths(a)[2])
 minimum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
+origin{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
 
 call{T}(::Type{SimpleRectangle}, val::Vec{2, T}) = SimpleRectangle{T}(0, 0, val...)
 

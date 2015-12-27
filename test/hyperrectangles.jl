@@ -32,6 +32,7 @@ context("constructors and containment") do
 
     @fact maximum(a) --> Vec(5.0,6.0,7.0,8.0)
     @fact minimum(a) --> Vec(1.0,2.0,3.0,4.0)
+    @fact origin(a) --> Vec(1.0,2.0,3.0,4.0)
 
     @fact_throws MethodError HyperRectangle(Vec(1.0,2.0,3.0), Vec(1.0,2.0,3.0,4.0))
 

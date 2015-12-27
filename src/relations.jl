@@ -58,10 +58,11 @@ function isinside(rect::SimpleRectangle, x::Real, y::Real)
     rect.x <= x && rect.y <= y && rect.x + rect.w >= x && rect.y + rect.h >= y
 end
 
-function isinside(circle::Circle, x::Real, y::Real)
-    xD = abs(circle.x - x) - circle.r
-    yD = abs(circle.y - y) - circle.r
-    xD <= 0 && yD <= 0
+function isinside(c::Circle, x::Real, y::Real)
+    @inbounds ox,oy = origin(c)
+    xD = abs(ox - x)
+    yD = abs(oy - y)
+    xD <= c.r && yD <= c.r
 end
 
 
