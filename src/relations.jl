@@ -4,25 +4,26 @@
 
 function before{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
     for i = 1:N
-        b1.maximum[i] < b2.minimum[i] || return false
+        maximum(b1)[i] < minimum(b2)[i] || return false
     end
     true
 end
 
 @inline meets{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) =
-    b1.maximum == b2.minimum
+    maximum(b1) == minimum(b2)
 
 function overlaps{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
     for i = 1:N
-        b2.maximum[i] > b1.maximum[i] > b2.minimum[i] && b1.minimum[i] < b2.minimum[i] || return false
+        maximum(b2)[i] > maximum(b1)[i] > minimum(b2)[i] &&
+        minimum(b1)[i] < minimum(b2)[i] || return false
     end
     true
 end
 
 function starts{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
-    if b1.minimum == b2.minimum
+    if minimum(b1) == minimum(b2)
         for i = 1:N
-            b1.maximum[i] < b2.maximum[i] || return false
+            maximum(b1)[i] < maximum(b2)[i] || return false
         end
         return true
     else
@@ -32,15 +33,16 @@ end
 
 function during{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
     for i = 1:N
-        b1.maximum[i] < b2.maximum[i] && b1.minimum[i] > b2.minimum[i] || return false
+        maximum(b1)[i] < maximum(b2)[i] && minimum(b1)[i] > minimum(b2)[i] ||
+        return false
     end
     true
 end
 
 function finishes{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
-    if b1.maximum == b2.maximum
+    if maximum(b1) == maximum(b2)
         for i = 1:N
-            b1.minimum[i] > b2.minimum[i] || return false
+            minimum(b1)[i] > minimum(b2)[i] || return false
         end
         return true
     else
@@ -56,10 +58,11 @@ function isinside(rect::SimpleRectangle, x::Real, y::Real)
     rect.x <= x && rect.y <= y && rect.x + rect.w >= x && rect.y + rect.h >= y
 end
 
-function isinside(circle::Circle, x::Real, y::Real)
-    xD = abs(circle.x - x) - circle.r
-    yD = abs(circle.y - y) - circle.r
-    xD <= 0 && yD <= 0
+function isinside(c::Circle, x::Real, y::Real)
+    @inbounds ox,oy = origin(c)
+    xD = abs(ox - x)
+    yD = abs(oy - y)
+    xD <= c.r && yD <= c.r
 end
 
 
@@ -70,7 +73,8 @@ return true.
 """
 function contains{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
     for i = 1:N
-        b2.maximum[i] <= b1.maximum[i] && b2.minimum[i] >= b1.minimum[i] || return false
+        maximum(b2)[i] <= maximum(b1)[i] && minimum(b2)[i] >= minimum(b1)[i] ||
+        return false
     end
     true
 end
@@ -81,7 +85,7 @@ the point is on a face of the HyperRectangle.
 """
 function contains{T, N}(b1::HyperRectangle{N, T}, pt::Union{FixedVector, AbstractVector})
     for i = 1:N
-        pt[i] <= b1.maximum[i] && pt[i] >= b1.minimum[i] || return false
+        pt[i] <= maximum(b1)[i] && pt[i] >= minimum(b1)[i] || return false
     end
     true
 end
@@ -114,7 +118,7 @@ function =={M <: AbstractMesh}(a::M, b::M)
 end
 
 (==){T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) =
-    b1.minimum == b2.minimum && b1.maximum == b2.maximum
+    minimum(b1) == minimum(b2) && widths(b1) == widths(b2)
 
 
 isequal(b1::HyperRectangle, b2::HyperRectangle) = b1 == b2

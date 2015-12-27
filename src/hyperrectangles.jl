@@ -1,7 +1,8 @@
-maximum(b::HyperRectangle) = b.maximum
-minimum(b::HyperRectangle) = b.minimum
+maximum(b::HyperRectangle) = b.origin + b.widths
+minimum(b::HyperRectangle) = b.origin
+origin(b::HyperRectangle) = b.origin
 length{T, N}(b::HyperRectangle{N, T}) = N
-width(b::HyperRectangle) = maximum(b) - minimum(b)
+widths{N,T}(b::HyperRectangle{N,T}) = b.widths
 
 """
 Splits an HyperRectangle into two along an axis at a given location.
@@ -9,18 +10,28 @@ Splits an HyperRectangle into two along an axis at a given location.
 split{H<:HyperRectangle}(b::H, axis, value::Integer) = _split(b,axis,value)
 split{H<:HyperRectangle}(b::H, axis, value::Number) = _split(b,axis,value)
 function _split{H<:HyperRectangle}(b::H, axis, value)
-    b1max = setindex(b.maximum, value, axis)
-    b2min = setindex(b.minimum, value, axis)
+    bmin = minimum(b)
+    bmax = maximum(b)
+    b1max = setindex(bmax, value, axis)
+    b2min = setindex(bmin, value, axis)
 
-    return H(b.minimum, b1max),
-           H(b2min, b.maximum)
+    return H(bmin, b1max-bmin),
+           H(b2min, bmax-b2min)
 end
 
-call{T,N}(::Type{HyperRectangle{N,T}}) =
-    HyperRectangle{N, T}(Vec{N,T}(typemin(T)), Vec{N,T}(typemax(T)))
+# empty constructor such that update will always include the first point
+function call{T,N}(::Type{HyperRectangle{N,T}})
+    HyperRectangle{N, T}(Vec{N,T}(typemax(T)), Vec{N,T}(typemin(T)))
+end
 
+# conversion from other HyperRectangles
 function call{N,T1,T2}(::Type{HyperRectangle{N,T1}}, a::HyperRectangle{N,T2})
-    HyperRectangle{N,T1}(Vec{N, T1}(a.minimum), Vec{N, T1}(a.maximum))
+    HyperRectangle{N,T1}(Vec{N, T1}(minimum(a)), Vec{N, T1}(widths(a)))
+end
+
+function HyperRectangle{N,T1,T2}(v1::Vec{N,T1}, v2::Vec{N,T2})
+    T = promote_type(T1,T2)
+    HyperRectangle(Vec{N,T}(v1), Vec{N,T}(v2))
 end
 
 """
@@ -28,8 +39,8 @@ end
 HyperRectangle(vals::Number...)
 ```
 HyperRectangle constructor for indidually specified intervals.
-e.g. HyperRectangle(0,0,1,2) has minimum == Vec(0,0) and
-maximum == Vec(1,2)
+e.g. HyperRectangle(0,0,1,2) has origin == Vec(0,0) and
+width == Vec(1,2)
 """
 @generated function HyperRectangle(vals::Number...)
     # Generated so we get goodish codegen on each signature
@@ -44,19 +55,17 @@ maximum == Vec(1,2)
     Expr(:call, :HyperRectangle, v1, v2)
 end
 
-call{A<:AABB}(::Type{A}, vals::Number...) = HyperRectangle(vals...)
-
 function HyperRectangle{T}(r::SimpleRectangle{T})
     HyperRectangle{2,T}(r)
 end
 
 function call{N,T}(::Type{HyperRectangle{N,T}}, r::SimpleRectangle)
     if N > 2
-        return HyperRectangle(Vec{N, T}(T(r.x), T(r.y), [zero(T) for i=1:N-2]...),
-                              Vec{N, T}(T(xwidth(r)), T(yheight(r)), [zero(T) for i=1:N-2]...))
+        return HyperRectangle(Vec{N, T}(T(r.x), T(r.y), Vec{N-2,T}(zero(T))...),
+                              Vec{N, T}(T(r.w), T(r.h), Vec{N-2,T}(zero(T))...))
     else
         return HyperRectangle(Vec{N, T}(T(r.x), T(r.y)),
-                              Vec{N, T}(T(xwidth(r)), T(yheight(r))))
+                              Vec{N, T}(T(r.w), T(r.h)))
     end
 end
 
@@ -72,7 +81,7 @@ function *{N1,N2,T1,T2}(m::Mat{N1,N1,T1}, h::HyperRectangle{N2,T2})
 
     # get all points on the HyperRectangle
     d = decompose(Vec, h)
-    pts = (Vec{N1,T}[Vec{N1,T}(pt..., [one(T) for i =1:D]...) for pt in d]...)::NTuple{N2^2,Vec{N1,T}}
+    pts = (Vec{N1,T}[Vec{N1,T}(pt, Vec{D,T}(one(T))...) for pt in d]...)::NTuple{N2^2,Vec{N1,T}}
 
     # make sure our points are sized for the tranform
     vmin = Vec{N1, T}(typemax(T))
@@ -124,12 +133,15 @@ function call{N1, N2, T1, T2}(t::Type{HyperRectangle{N1, T1}}, geometry::Array{P
          vmin = min(p, vmin)
          vmax = max(p, vmax)
     end
+    o = vmin
+    w = vmax - vmin
     if N1 > N2
-        return HyperRectangle{N1,T1}(Vec{N1,T1}(vmin..., [zero(T1) for i = 1:N1-N2]...),
-                                     Vec{N1,T1}(vmax..., [zero(T1) for i = 1:N1-N2]...))
+        z = Vec{N1-N2,T1}(zero(T1))
+        return HyperRectangle{N1,T1}(Vec{N1,T1}(o, z...),
+                                     Vec{N1,T1}(w, z...))
     else
-        return HyperRectangle{N1,T1}(Vec{N1,T1}(vmin),
-                                     Vec{N1,T1}(vmax))
+        return HyperRectangle{N1,T1}(Vec{N1,T1}(o),
+                                     Vec{N1,T1}(w))
    end
 end
 
@@ -138,8 +150,10 @@ width(a::SimpleRectangle)  = a.w
 yheight(a::SimpleRectangle) = a.h + a.y
 height(a::SimpleRectangle) = a.h
 area(a::SimpleRectangle) = a.w*a.h
-maximum{T}(a::SimpleRectangle{T}) = Point{2, T}(xwidth(a), yheight(a))
+widths{T}(a::SimpleRectangle{T}) = Point{2,T}(a.w, a.h)
+maximum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x + widths(a)[1], a.y +widths(a)[2])
 minimum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
+origin{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
 
 call{T}(::Type{SimpleRectangle}, val::Vec{2, T}) = SimpleRectangle{T}(0, 0, val...)
 

@@ -1,9 +1,8 @@
-convert{T <: HMesh}(meshtype::Type{T}, c::AABB) = T(Cube{Float32}(minimum(c), maximum(c)-minimum(c)))
-function convert{T <: HMesh}(meshtype::Type{T}, c::Cube)
+function call{T <: HMesh,HT}(meshtype::Type{T}, c::HyperRectangle{3,HT})
     ET = Float32
-    xdir = Vec{3, ET}(c.width[1],0f0,0f0)
-    ydir = Vec{3, ET}(0f0,c.width[2],0f0)
-    zdir = Vec{3, ET}(0f0,0f0,c.width[3])
+    xdir = Vec{3, ET}(c.widths[1],0f0,0f0)
+    ydir = Vec{3, ET}(0f0,c.widths[2],0f0)
+    zdir = Vec{3, ET}(0f0,0f0,c.widths[3])
     quads = [
         Quad(c.origin + zdir,   xdir, ydir), # Top
         Quad(c.origin,          ydir, xdir), # Bottom
@@ -14,6 +13,23 @@ function convert{T <: HMesh}(meshtype::Type{T}, c::Cube)
     ]
     merge(map(meshtype, quads))
 end
+
+function call{T <: HMesh,HT}(meshtype::Type{T}, c::HyperCube{3,HT})
+    ET = Float32
+    xdir = Vec{3, ET}(c.width,0f0,0f0)
+    ydir = Vec{3, ET}(0f0,c.width,0f0)
+    zdir = Vec{3, ET}(0f0,0f0,c.width)
+    quads = [
+        Quad(c.origin + zdir,   xdir, ydir), # Top
+        Quad(c.origin,          ydir, xdir), # Bottom
+        Quad(c.origin + xdir,   ydir, zdir), # Right
+        Quad(c.origin,          zdir, ydir), # Left
+        Quad(c.origin,          xdir, zdir), # Back
+        Quad(c.origin + ydir,   zdir, xdir) #Front
+    ]
+    merge(map(meshtype, quads))
+end
+
 
 
 function getindex{NT}(q::Quad, T::Type{Normal{3, NT}})

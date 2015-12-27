@@ -4,9 +4,9 @@ context("Merging Mesh") do
     baselen = 0.4f0
     dirlen = 2f0
     a = [
-        (Cube{Float32}(Vec3f0(baselen), Vec3f0(dirlen, baselen, baselen)), RGBA(1f0,0f0,0f0,1f0)),
-        (Cube{Float32}(Vec3f0(baselen), Vec3f0(baselen, dirlen, baselen)), RGBA(0f0,1f0,0f0,1f0)),
-        (Cube{Float32}(Vec3f0(baselen), Vec3f0(baselen, baselen, dirlen)), RGBA(0f0,0f0,1f0,1f0))
+        (HyperRectangle{3,Float32}(Vec3f0(baselen), Vec3f0(dirlen, baselen, baselen)), RGBA(1f0,0f0,0f0,1f0)),
+        (HyperRectangle{3,Float32}(Vec3f0(baselen), Vec3f0(baselen, dirlen, baselen)), RGBA(0f0,1f0,0f0,1f0)),
+        (HyperRectangle{3,Float32}(Vec3f0(baselen), Vec3f0(baselen, baselen, dirlen)), RGBA(0f0,0f0,1f0,1f0))
     ]
     am = map(GLNormalMesh, a)
     axis = merge(am)
@@ -28,7 +28,7 @@ context("Merging Mesh") do
 context("Show") do
     baselen = 0.4f0
     dirlen = 2f0
-    m = GLNormalMesh(Cube{Float32}(Vec3f0(baselen),
+    m = GLNormalMesh(HyperRectangle{3,Float32}(Vec3f0(baselen),
                      Vec3f0(dirlen, baselen, baselen)))
     io = IOBuffer()
     show(io,m)

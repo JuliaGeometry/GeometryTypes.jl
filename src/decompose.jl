@@ -88,9 +88,7 @@ Get decompose a `HyperRectangle` into points.
         ex = Expr(:call, T1)
         for j = 0:(N-1)
             n = 2^j
-            # the macro hygeine is a little wonky here but this
-            # translates to rect.(Int((i&n)/n+1))[Int(j+1)]
-            push!(ex.args, Expr(:ref,Expr(:.,:rect,Int((i&n)/n+1)),Int(j+1)))
+            push!(ex.args, :(rect.origin[$(j+1)]+$((i>>j)&1)*rect.widths[$(j+1)]))
         end
         push!(v.args, ex)
     end

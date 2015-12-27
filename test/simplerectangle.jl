@@ -5,13 +5,16 @@ context("constructors") do
     @fact width(s) --> 3
     @fact height(s) --> 4
     @fact area(s) --> 12
+    @fact xwidth(s) --> 4
+    @fact yheight(s) --> 6
     @fact minimum(s) --> Point(1,2)
     @fact maximum(s) --> Point(4,6)
+    @fact origin(s) --> Point(1,2)
     h = HyperRectangle(s)
     @fact typeof(h) --> HyperRectangle{2,Int}
-    @fact h --> HyperRectangle(1,2,4,6)
+    @fact h --> HyperRectangle(1,2,3,4)
     h = HyperRectangle{3,Int}(s)
-    @fact h --> HyperRectangle(1,2,0,4,6,0)
+    @fact h --> HyperRectangle(1,2,0,3,4,0)
 
     @fact SimpleRectangle(Vec(2,3)) --> SimpleRectangle(0,0,2,3)
 end
