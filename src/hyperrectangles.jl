@@ -81,7 +81,7 @@ function *{N1,N2,T1,T2}(m::Mat{N1,N1,T1}, h::HyperRectangle{N2,T2})
 
     # get all points on the HyperRectangle
     d = decompose(Vec, h)
-    pts = (Vec{N1,T}[Vec{N1,T}(pt, Vec{D,T}(one(T))...) for pt in d]...)::NTuple{N2^2,Vec{N1,T}}
+    pts = (Vec{N1,T}[Vec{N1,T}(pt, Vec{D,T}(one(T))...) for pt in d]...)::NTuple{2^N2,Vec{N1,T}}
 
     # make sure our points are sized for the tranform
     vmin = Vec{N1, T}(typemax(T))
@@ -93,7 +93,7 @@ function *{N1,N2,T1,T2}(m::Mat{N1,N1,T1}, h::HyperRectangle{N2,T2})
         vmin = min(pn,vmin)
         vmax = max(pn,vmax)
     end
-    HyperRectangle{N2,T}(Vec{N2,T}(vmin), Vec{N2,T}(vmax))
+    HyperRectangle{N2,T}(Vec{N2,T}(vmin), Vec{N2,T}(vmax-vmin))
 end
 
 function *{N,T1,T2}(m::Mat{N,N,T1}, h::HyperRectangle{N,T2})
@@ -115,7 +115,7 @@ function *{N,T1,T2}(m::Mat{N,N,T1}, h::HyperRectangle{N,T2})
         vmin = min(pn,vmin)
         vmax = max(pn,vmax)
     end
-    HyperRectangle{N,T}(vmin, vmax)
+    HyperRectangle{N,T}(vmin, vmax-vmin)
 end
 
 function HyperRectangle{N,T}(geometry::Array{Point{N, T}})

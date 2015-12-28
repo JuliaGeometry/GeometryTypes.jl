@@ -174,7 +174,7 @@ end
 context("transforms") do
     t = Mat((1,0,0),(0,1,0),(1,2,0))
     h = t*HyperRectangle(0,0,1,1)
-    @fact h --> HyperRectangle(1,2,2,3)
+    @fact h --> HyperRectangle(1,2,1,1)
     t = Mat((0,1),(1,0))
     h = t*HyperRectangle(0,0,1,2)
     @fact h --> HyperRectangle(0,0,2,1)
