@@ -1,4 +1,5 @@
 @inline Base.size(s::SignedDistanceField) = size(s.data)
+@inline HyperRectangle(s::SignedDistanceField) = s.bounds
 
 """
 Construct a `SignedDistanceField` by sampling a function over the `bounds`
@@ -34,7 +35,8 @@ function SignedDistanceField{T}(f::Function,
         @inbounds vol[i+1,j+1,k+1] = f(Vec{3,fieldT}(x,y,z))
     end
 
-    SignedDistanceField{3,T,fieldT}(HyperRectangle(minimum(bounds), nb_max), vol)
+    nb_min = minimum(bounds)
+    SignedDistanceField{3,T,fieldT}(HyperRectangle(nb_min, nb_max-nb_min), vol)
 end
 
 function SignedDistanceField{T}(f::Function,
@@ -60,5 +62,6 @@ function SignedDistanceField{T}(f::Function,
         @inbounds vol[i+1,j+1] = f(Vec{2,fieldT}(x,y))
     end
 
-    SignedDistanceField{2,T,fieldT}(HyperRectangle(minimum(bounds), nb_max), vol)
+    nb_min = minimum(bounds)
+    SignedDistanceField{2,T,fieldT}(HyperRectangle(nb_min, nb_max-nb_min), vol)
 end
