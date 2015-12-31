@@ -17,6 +17,17 @@ context("SignedDistanceField") do
         sqrt(sum(v.*v)) - 1 # circle
     end
     @fact size(s2) --> (21, 21)
+
+    @fact HyperRectangle(s2) --> HyperRectangle(Vec(-1,-1.),Vec(2,2.))
+end
+
+context("getindex") do
+    sdf = SignedDistanceField(HyperRectangle(Vec(-1,-1.),Vec(2,2.))) do v
+        sqrt(sum(v.*v)) - 1 # circle
+    end
+
+    @fact sdf[1,1] --> sdf[21*21] # by circle symmetry
+    @fact_throws BoundsError sdf[21*21+1]
 end
 
 end

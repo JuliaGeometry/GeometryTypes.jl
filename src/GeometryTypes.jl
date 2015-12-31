@@ -22,6 +22,7 @@ import Base: ==,
              minimum,
              setindex!,
              show,
+             size,
              split,
              union,
              unique
