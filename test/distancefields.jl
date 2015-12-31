@@ -13,12 +13,14 @@ context("SignedDistanceField") do
     end
     @fact size(s2) --> (11, 11, 11)
     # functional
-    s2 = SignedDistanceField(HyperRectangle(Vec(-1,-1.),Vec(2,2.))) do v
+    s2 = SignedDistanceField(HyperRectangle(Vec(-1,-1.),Vec(2,3.))) do v
         sqrt(sum(v.*v)) - 1 # circle
     end
-    @fact size(s2) --> (21, 21)
+    @fact size(s2) --> (21, 31)
+    @fact size(s2, 1) --> 21
+    @fact size(s2, 2) --> 31
 
-    @fact HyperRectangle(s2) --> HyperRectangle(Vec(-1,-1.),Vec(2,2.))
+    @fact HyperRectangle(s2) --> HyperRectangle(Vec(-1,-1.),Vec(2,3.))
 end
 
 context("getindex") do

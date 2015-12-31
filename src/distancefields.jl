@@ -1,6 +1,11 @@
 @inline size(s::SignedDistanceField) = size(s.data)
-@inline HyperRectangle(s::SignedDistanceField) = s.bounds
+@inline size(s::SignedDistanceField, i...) = size(s.data, i...)
+@inline getindex(s::SignedDistanceField, i) = getindex(s.data,i)
+@inline getindex(s::SignedDistanceField, i, j) = getindex(s.data,i, j)
+@inline getindex(s::SignedDistanceField, i, j, k) = getindex(s.data,i, j,k)
 @inline getindex(s::SignedDistanceField, i...) = getindex(s.data,i...)
+
+@inline HyperRectangle(s::SignedDistanceField) = s.bounds
 
 """
 Construct a `SignedDistanceField` by sampling a function over the `bounds`
