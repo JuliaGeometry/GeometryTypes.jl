@@ -72,7 +72,7 @@ A `HyperRectangle` is a generalization of a rectangle into N-dimensions.
 Formally it is the cartesian product of intervals, which is represented by the
 `origin` and `width` fields, whose indices correspond to each of the `N` axes.
 """
-immutable HyperRectangle{N, T} <: GeometryPrimitive{N}
+immutable HyperRectangle{N, T} <: GeometryPrimitive{N, T}
     origin::Vec{N, T}
     widths::Vec{N, T}
 end
@@ -80,25 +80,25 @@ centered{N,T}(R::Type{HyperRectangle{N,T}}) = R(Vec{N,T}(-0.5), Vec{N,T}(0.5))
 centered{T<:HyperRectangle}(::Type{T}) = centered(HyperRectangle{ndim_or(T, 3), eltype_or(T, Float32)})
 
 
-immutable HyperCube{N, T} <: GeometryPrimitive{N}
+immutable HyperCube{N, T} <: GeometryPrimitive{N, T}
     origin::Vec{N, T}
     width::T
 end
-centered{N,T}(C::Type{HyperCube{N,T}}) = C(Vec{N,T}(-0.5), Vec{N,T}(1))
+centered{N,T}(C::Type{HyperCube{N,T}}) = C(Vec{N,T}(-0.5), T(1))
 centered{T<:HyperCube}(::Type{T}) = centered(HyperCube{ndim_or(T, 3), eltype_or(T, Float32)})
 
 """
 A `HyperSphere` is a generalization of a sphere into N-dimensions.
 A `center` and radius, `r`, must be specified.
 """
-immutable HyperSphere{N, T} <: GeometryPrimitive{N}
+immutable HyperSphere{N, T} <: GeometryPrimitive{N, T}
     center::Point{N, T}
     r::T
 end
 centered{N,T}(S::Type{HyperSphere{N,T}}) = S(Vec{N,T}(0), T(1))
 centered{T<:HyperSphere}(::Type{T}) = centered(HyperSphere{ndim_or(T, 3), eltype_or(T, Float32)})
 
-immutable SimpleRectangle{T} <: GeometryPrimitive{2}
+immutable SimpleRectangle{T} <: GeometryPrimitive{2, T}
     x::T
     y::T
     w::T
@@ -111,19 +111,19 @@ const Rectangle = SimpleRectangle
 """
 A rectangle in 3D space.
 """
-immutable Quad{T} <: GeometryPrimitive{3}
+immutable Quad{T} <: GeometryPrimitive{3, T}
     downleft::Vec{3, T}
     width   ::Vec{3, T}
     height  ::Vec{3, T}
 end
 
-immutable Pyramid{T} <: GeometryPrimitive{3}
+immutable Pyramid{T} <: GeometryPrimitive{3, T}
     middle::Point{3, T}
     length::T
     width ::T
 end
 
-immutable Particle{N, T} <: GeometryPrimitive{N}
+immutable Particle{N, T} <: GeometryPrimitive{N, T}
     position::Point{N, T}
     velocity::Vec{N, T}
 end
