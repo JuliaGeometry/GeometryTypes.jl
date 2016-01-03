@@ -1,4 +1,11 @@
 """
+Allow to call decompose with unspecified vector type and infer types from
+primitive.
+"""
+decompose{FSV <: FixedVector, N, T}(::Type{FSV}, r::GeometryPrimitive{N, T}) =
+    decompose(similar(FSV, eltype_or(FSV, T), size_or(FSV, (N,))[1]), r)
+
+"""
 Triangulate an N-Face into a tuple of triangular faces.
 """
 @generated function decompose{N, FT1, FT2, O1, O2}(::Type{Face{3, FT1, O1}},
@@ -95,8 +102,7 @@ Get decompose a `HyperRectangle` into points.
     v
 end
 
-decompose{FSV <: FixedVector, N, T}(::Type{FSV}, r::GeometryPrimitive{N, T}) =
-    decompose(similar(FSV, FixedSizeArrays.eltype_or(FSV, T), FixedSizeArrays.size_or(FSV, (N,))[1]), r)
+
 
 function decompose{PT}(P::Type{Point{2, PT}}, r::SimpleRectangle)
    P[P(r.x, r.y),
