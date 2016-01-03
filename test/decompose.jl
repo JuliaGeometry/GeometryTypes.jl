@@ -30,7 +30,7 @@ end
 
 context("SimpleRectangle") do
     r = SimpleRectangle(0,0,1,1)
-    pts = decompose(Point,r)
+    pts = decompose(Point, r)
     @fact pts --> [Point(0,0),
                    Point(0,1),
                    Point(1,1),

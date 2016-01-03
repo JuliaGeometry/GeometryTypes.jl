@@ -30,42 +30,7 @@ function call{T <: HMesh,HT}(meshtype::Type{T}, c::HyperCube{3,HT})
     merge(map(meshtype, quads))
 end
 
-
-
-function getindex{NT}(q::Quad, T::Type{Normal{3, NT}})
-    normal = T(normalize(cross(q.width, q.height)))
-    T[normal for i=1:4]
-end
-
-getindex{FT, IndexOffset}(q::Quad, T::Type{Face{3, FT, IndexOffset}}) = T[
-    Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
-]
-
-getindex{ET}(q::Quad, T::Type{UV{ET}}) = T[
-    T(0,0), T(0,1), T(1,1), T(1,0)
-]
-
-getindex{ET}(q::Quad, T::Type{UVW{ET}}) = T[
-    q.downleft,
-    q.downleft + q.height,
-    q.downleft + q.width + q.height,
-    q.downleft + q.width
-]
-
-getindex{UVT}(r::SimpleRectangle, T::Type{UV{UVT}}) = T[
-    T(0, 0),
-    T(0, 1),
-    T(1, 1),
-    T(1, 0)
-]
-
-getindex{FT, IndexOffset}(r::SimpleRectangle, T::Type{Face{3, FT, IndexOffset}}) = T[
-    Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
-]
-
-convert{T <: HMesh}(meshtype::Type{T}, c::Pyramid)                      = T(c[vertextype(T)], c[facetype(T)])
-getindex{FT, IndexOffset}(r::Pyramid, T::Type{Face{3, FT, IndexOffset}})  = reinterpret(T, collect(map(FT,(1:18)+IndexOffset)))
-
+call{T <: HMesh}(meshtype::Type{T}, c::Pyramid) = T(decompose(vertextype(T), c), decompose(facetype(T), c))
 
 spherical{T}(theta::T, phi::T) = Point{3, T}(
     sin(theta)*cos(phi),
