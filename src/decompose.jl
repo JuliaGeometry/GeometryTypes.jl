@@ -95,7 +95,7 @@ Get decompose a `HyperRectangle` into points.
         ex = Expr(:call, T1)
         for j = 0:(N-1)
             n = 2^j
-            push!(ex.args, :(rect.origin[$(j+1)]+$((i>>j)&1)*rect.widths[$(j+1)]))
+            push!(ex.args, :(origin(rect)[$(j+1)]+$((i>>j)&1)*widths(rect)[$(j+1)]))
         end
         push!(v.args, ex)
     end

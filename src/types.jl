@@ -85,6 +85,10 @@ immutable HyperCube{N, T} <: GeometryPrimitive{N, T}
 end
 centered{N,T}(C::Type{HyperCube{N,T}}) = C(Vec{N,T}(-0.5), T(1))
 centered{T<:HyperCube}(::Type{T}) = centered(HyperCube{ndims_or(T, 3), eltype_or(T, Float32)})
+origin(prim::HyperCube) = prim.origin
+widths{N,T}(prim::HyperCube{N,T}) = Vec{N,T}(prim.width)
+maximum{N,T}(prim::HyperCube{N,T}) = origin(prim)+widths(prim)
+minimum{N,T}(prim::HyperCube{N,T}) = origin(prim)
 
 """
 A `HyperSphere` is a generalization of a sphere into N-dimensions.

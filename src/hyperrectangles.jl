@@ -1,8 +1,8 @@
-maximum(b::HyperRectangle) = b.origin + widths(b)
-minimum(b::HyperRectangle) = b.origin
-origin(b::HyperRectangle) = b.origin
-length{T, N}(b::HyperRectangle{N, T}) = N
-widths{N,T}(b::HyperRectangle{N,T}) = b.widths
+origin(prim::HyperRectangle) = prim.origin
+maximum(prim::HyperRectangle) = origin(prim) + widths(prim)
+minimum(prim::HyperRectangle) = origin(prim)
+length{T, N}(prim::HyperRectangle{N, T}) = N
+widths(prim::HyperRectangle) = prim.widths
 
 """
 Splits an HyperRectangle into two along an axis at a given location.
