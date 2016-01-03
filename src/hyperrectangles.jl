@@ -1,4 +1,4 @@
-maximum(b::HyperRectangle) = b.origin + b.widths
+maximum(b::HyperRectangle) = b.origin + widths(b)
 minimum(b::HyperRectangle) = b.origin
 origin(b::HyperRectangle) = b.origin
 length{T, N}(b::HyperRectangle{N, T}) = N
@@ -80,7 +80,7 @@ function *{N1,N2,T1,T2}(m::Mat{N1,N1,T1}, h::HyperRectangle{N2,T2})
     D = N1 - N2
 
     # get all points on the HyperRectangle
-    d = decompose(Vec, h)
+    d   = decompose(Vec, h)
     pts = (Vec{N1,T}[Vec{N1,T}(pt, Vec{D,T}(one(T))...) for pt in d]...)::NTuple{2^N2,Vec{N1,T}}
 
     # make sure our points are sized for the tranform
@@ -165,4 +165,3 @@ end
 function setindex!{T}(a::Array{T,2}, b::Array{T,2}, rect::SimpleRectangle)
     a[rect.x+1:rect.w, rect.y+1:rect.h] = b
 end
-
