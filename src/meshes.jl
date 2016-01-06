@@ -32,18 +32,19 @@ all_attributes{M <: HMesh}(m::Type{M}) = Dict{Symbol, Any}(map(field -> (field =
 all_attributes{M <: HMesh}(m::M) = Dict{Symbol, Any}(map(field -> (field => getfield(m, field)),  fieldnames(M)))
 
 # Needed to not get into an stack overflow
-convert{HM1 <: HMesh}(::Type{HM1}, mesh::HM1) = mesh
+convert{M <: AbstractMesh}(::Type{M}, mesh::Union{AbstractMesh, GeometryPrimitive}) = M(mesh)
+call{HM1 <: AbstractMesh}(::Type{HM1}, mesh::HM1) = mesh
 
 # Uses getindex to get all the converted attributes from the meshtype and
 # creates a new mesh with the desired attributes from the converted attributs
 # Getindex can be defined for any arbitrary geometric type or exotic mesh type.
 # This way, we can make sure, that you can convert most of the meshes from one type to the other
 # with minimal code.
-function convert{HM1 <: HMesh}(::Type{HM1}, any::Union{AbstractMesh, GeometryPrimitive})
+function call{HM1 <: AbstractMesh}(::Type{HM1}, primitive::Union{AbstractMesh, GeometryPrimitive})
     result = Dict{Symbol, Any}()
     for (field, target_type) in zip(fieldnames(HM1), HM1.parameters)
         if target_type != Void
-            result[field] = any[target_type]
+            result[field] = decompose(target_type, primitive)
         end
     end
     HM1(result)
@@ -99,7 +100,7 @@ function call{HM <: HMesh, ConstAttrib}(::Type{HM}, mesh::AbstractMesh, constatt
         if target_type <: ConstAttrib
             result[field] = constattrib
         elseif target_type != Void
-            result[field] = mesh[target_type]
+            result[field] = decompose(target_type, mesh)
         end
     end
     HM(result)
@@ -115,68 +116,7 @@ function call{HM <: HMesh, ConstAttrib}(::Type{HM}, x::Tuple{Any, ConstAttrib})
     any, const_attribute = x
     add_attribute(HM(any), const_attribute)
 end
-# Getindex methods, for converted indexing into the mesh
-# Define getindex for your own meshtype, to easily convert it to Homogenous attributes
 
-#Gets the normal attribute to a mesh
-function getindex{VT}(mesh::HMesh, T::Type{Point{3, VT}})
-    vts = mesh.vertices
-    eltype(vts) == T       && return vts
-    eltype(vts) <: Point   && return map(T, vts)
-end
-
-# gets the wanted face type
-function getindex{FT, Offset}(mesh::HMesh, T::Type{Face{3, FT, Offset}})
-    fs = faces(mesh)
-    eltype(fs) == T       && return fs
-    eltype(fs) <: Face{3} && return map(T, fs)
-    if eltype(fs) <:  Face{4}
-        convert(Vector{Face{3, FT, Offset}}, fs)
-    end
-    error("can't get the wanted attribute $(T) from mesh:")
-end
-
-#Gets the normal attribute to a mesh
-function getindex{NT}(mesh::HMesh, T::Type{Normal{3, NT}})
-    n = mesh.normals
-    eltype(n) == T       && return n
-    eltype(n) <: Normal{3} && return map(T, n)
-    n == Void[]       && return normals(mesh.vertices, mesh.faces, T)
-end
-
-#Gets the uv attribute to a mesh, or creates it, or converts it
-function getindex{UVT}(mesh::HMesh, ::Type{UV{UVT}})
-    uv = mesh.texturecoordinates
-    eltype(uv) == UV{UVT}           && return uv
-    (eltype(uv) <: UV || eltype(uv) <: UVW) && return map(UV{UVT}, uv)
-    eltype(uv) == Void           && return zeros(UV{UVT}, length(mesh.vertices))
-end
-
-
-#Gets the uv attribute to a mesh
-function getindex{UVWT}(mesh::HMesh, ::Type{UVW{UVWT}})
-    uvw = mesh.texturecoordinates
-    typeof(uvw) == UVW{UVT}     && return uvw
-    (isa(uvw, UV) || isa(uv, UVW))  && return map(UVW{UVWT}, uvw)
-    uvw == nothing          && return zeros(UVW{UVWT}, length(mesh.vertices))
-end
-const DefaultColor = RGBA(0.2, 0.2, 0.2, 1.0)
-
-#Gets the color attribute from a mesh
-function getindex{T <: Color}(mesh::HMesh, ::Type{Vector{T}})
-    colors = mesh.attributes
-    typeof(colors) == Vector{T} && return colors
-    colors == nothing           && return fill(DefaultColor, length(mesh.attribute_id))
-    map(T, colors)
-end
-
-#Gets the color attribute from a mesh
-function getindex{T <: Color}(mesh::HMesh, ::Type{T})
-    c = mesh.color
-    typeof(c) == T    && return c
-    c == nothing      && return DefaultColor
-    convert(T, c)
-end
 
 merge{M <: AbstractMesh}(m::Vector{M}) = merge(m...)
 
@@ -234,4 +174,3 @@ function *{T}(m::Mat{4,4,T}, mesh::AbstractMesh)
     map!(MeshMulFunctor(m), msh.vertices)
     msh
 end
-

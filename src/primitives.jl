@@ -1,15 +1,15 @@
 function call{T <: HMesh,HT}(meshtype::Type{T}, c::HyperRectangle{3,HT})
     ET = Float32
-    xdir = Vec{3, ET}(c.widths[1],0f0,0f0)
-    ydir = Vec{3, ET}(0f0,c.widths[2],0f0)
-    zdir = Vec{3, ET}(0f0,0f0,c.widths[3])
+    xdir = Vec{3, ET}(widths(c)[1],0f0,0f0)
+    ydir = Vec{3, ET}(0f0,widths(c)[2],0f0)
+    zdir = Vec{3, ET}(0f0,0f0,widths(c)[3])
     quads = [
-        Quad(c.origin + zdir,   xdir, ydir), # Top
-        Quad(c.origin,          ydir, xdir), # Bottom
-        Quad(c.origin + xdir,   ydir, zdir), # Right
-        Quad(c.origin,          zdir, ydir), # Left
-        Quad(c.origin,          xdir, zdir), # Back
-        Quad(c.origin + ydir,   zdir, xdir) #Front
+        Quad(origin(c) + zdir,   xdir, ydir), # Top
+        Quad(origin(c),          ydir, xdir), # Bottom
+        Quad(origin(c) + xdir,   ydir, zdir), # Right
+        Quad(origin(c),          zdir, ydir), # Left
+        Quad(origin(c),          xdir, zdir), # Back
+        Quad(origin(c) + ydir,   zdir, xdir) #Front
     ]
     merge(map(meshtype, quads))
 end
@@ -20,52 +20,17 @@ function call{T <: HMesh,HT}(meshtype::Type{T}, c::HyperCube{3,HT})
     ydir = Vec{3, ET}(0f0,c.width,0f0)
     zdir = Vec{3, ET}(0f0,0f0,c.width)
     quads = [
-        Quad(c.origin + zdir,   xdir, ydir), # Top
-        Quad(c.origin,          ydir, xdir), # Bottom
-        Quad(c.origin + xdir,   ydir, zdir), # Right
-        Quad(c.origin,          zdir, ydir), # Left
-        Quad(c.origin,          xdir, zdir), # Back
-        Quad(c.origin + ydir,   zdir, xdir) #Front
+        Quad(origin(c) + zdir,   xdir, ydir), # Top
+        Quad(origin(c),          ydir, xdir), # Bottom
+        Quad(origin(c) + xdir,   ydir, zdir), # Right
+        Quad(origin(c),          zdir, ydir), # Left
+        Quad(origin(c),          xdir, zdir), # Back
+        Quad(origin(c) + ydir,   zdir, xdir) #Front
     ]
     merge(map(meshtype, quads))
 end
 
-
-
-function getindex{NT}(q::Quad, T::Type{Normal{3, NT}})
-    normal = T(normalize(cross(q.width, q.height)))
-    T[normal for i=1:4]
-end
-
-getindex{FT, IndexOffset}(q::Quad, T::Type{Face{3, FT, IndexOffset}}) = T[
-    Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
-]
-
-getindex{ET}(q::Quad, T::Type{UV{ET}}) = T[
-    T(0,0), T(0,1), T(1,1), T(1,0)
-]
-
-getindex{ET}(q::Quad, T::Type{UVW{ET}}) = T[
-    q.downleft,
-    q.downleft + q.height,
-    q.downleft + q.width + q.height,
-    q.downleft + q.width
-]
-
-getindex{UVT}(r::SimpleRectangle, T::Type{UV{UVT}}) = T[
-    T(0, 0),
-    T(0, 1),
-    T(1, 1),
-    T(1, 0)
-]
-
-getindex{FT, IndexOffset}(r::SimpleRectangle, T::Type{Face{3, FT, IndexOffset}}) = T[
-    Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
-]
-
-convert{T <: HMesh}(meshtype::Type{T}, c::Pyramid)                      = T(c[vertextype(T)], c[facetype(T)])
-getindex{FT, IndexOffset}(r::Pyramid, T::Type{Face{3, FT, IndexOffset}})  = reinterpret(T, collect(map(FT,(1:18)+IndexOffset)))
-
+call{T <: HMesh}(meshtype::Type{T}, c::Pyramid) = T(decompose(vertextype(T), c), decompose(facetype(T), c))
 
 spherical{T}(theta::T, phi::T) = Point{3, T}(
     sin(theta)*cos(phi),

@@ -3,6 +3,7 @@ module GeometryTypes
 
 using FixedSizeArrays
 using ColorTypes
+import FixedSizeArrays: eltype_or, ndims_or
 
 import Base: ==,
              *,
