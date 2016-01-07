@@ -60,6 +60,18 @@ Decompose an N-Simplex into tuple of Simplex{2}
 
 Decompose an N-Simplex into a tuple of Simplex{3}
 
+```
+decompose{N, FT1, FT2, O1, O2}(::Type{Face{2, FT1, O1}},
+                               f::Face{N, FT2, O2})
+```
+
 Extract all line segments in a Face.
 
+```
+decompose{N, FT1, FT2, O1, O2}(::Type{Face{3, FT1, O1}},
+                               f::Face{N, FT2, O2})
+```
+
 Triangulate an N-Face into a tuple of triangular faces.
+
+Allow to call decompose with unspecified vector type and infer types from primitive.

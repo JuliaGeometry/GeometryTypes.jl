@@ -6,7 +6,7 @@
 
 <a name="GeometryTypes.HyperRectangle"></a>
 
-A `HyperRectangle` is a generalization of a rectangle into N-dimensions. Formally it is the cartesian product of intervals, which is represented by the `minimum` and `maximum` fields, whose indices correspond to each of the `N` axes.
+A `HyperRectangle` is a generalization of a rectangle into N-dimensions. Formally it is the cartesian product of intervals, which is represented by the `origin` and `width` fields, whose indices correspond to each of the `N` axes.
 
 <a name="GeometryTypes.HyperSphere"></a>
 
@@ -84,7 +84,7 @@ No documentation found.
 **Summary:**
 
 ```julia
-abstract GeometryTypes.AbstractMesh{VertT,FaceT} <: Any
+abstract GeometryTypes.AbstractMesh{VertT,FaceT} <: GeometryTypes.GeometryPrimitive{N,T}
 ```
 
 **Subtypes:**
