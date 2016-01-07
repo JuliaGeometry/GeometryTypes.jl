@@ -73,3 +73,5 @@ decompose{N, FT1, FT2, O1, O2}(::Type{Face{3, FT1, O1}},
 ```
 
 Triangulate an N-Face into a tuple of triangular faces.
+
+Allow to call decompose with unspecified vector type and infer types from primitive.
