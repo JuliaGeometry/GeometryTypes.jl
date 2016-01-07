@@ -47,6 +47,7 @@ include("slice.jl")
 include("decompose.jl")
 include("deprecated.jl")
 include("checkbounds.jl")
+include("center.jl")
 
 export AABB,
        AbsoluteRectangle,

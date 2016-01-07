@@ -75,16 +75,13 @@ immutable HyperRectangle{N, T} <: GeometryPrimitive{N, T}
     origin::Vec{N, T}
     widths::Vec{N, T}
 end
-centered{N,T}(R::Type{HyperRectangle{N,T}}) = R(Vec{N,T}(-0.5), Vec{N,T}(0.5))
-centered{T<:HyperRectangle}(::Type{T}) = centered(HyperRectangle{ndims_or(T, 3), eltype_or(T, Float32)})
 
 
 immutable HyperCube{N, T} <: GeometryPrimitive{N, T}
     origin::Vec{N, T}
     width::T
 end
-centered{N,T}(C::Type{HyperCube{N,T}}) = C(Vec{N,T}(-0.5), T(1))
-centered{T<:HyperCube}(::Type{T}) = centered(HyperCube{ndims_or(T, 3), eltype_or(T, Float32)})
+
 origin(prim::HyperCube) = prim.origin
 widths{N,T}(prim::HyperCube{N,T}) = Vec{N,T}(prim.width)
 maximum{N,T}(prim::HyperCube{N,T}) = origin(prim)+widths(prim)
@@ -98,8 +95,6 @@ immutable HyperSphere{N, T} <: GeometryPrimitive{N, T}
     center::Point{N, T}
     r::T
 end
-centered{N,T}(S::Type{HyperSphere{N,T}}) = S(Vec{N,T}(0), T(1))
-centered{T<:HyperSphere}(::Type{T}) = centered(HyperSphere{ndims_or(T, 3), eltype_or(T, Float32)})
 
 immutable SimpleRectangle{T} <: GeometryPrimitive{2, T}
     x::T
