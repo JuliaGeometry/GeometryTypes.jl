@@ -7,16 +7,6 @@ Abstract to categorize geometry primitives of dimensionality `N`.
 abstract GeometryPrimitive{N, T}
 abstract AbstractMesh{VertT, FaceT} <: GeometryPrimitive
 
-
-eltype_or{N, T}(::Type{GeometryPrimitive{N, T}}, OR) = T
-eltype_or{T}(::Type{GeometryPrimitive{TypeVar(:N), T}}, OR) = T
-eltype_or{T<:GeometryPrimitive}(::Type{T}, OR) = OR
-
-ndims_or{N, T}(::Type{GeometryPrimitive{N, T}}, OR) = N
-ndims_or{N}(::Type{GeometryPrimitive{N, TypeVar(:T)}}, OR) = N
-ndims_or{T<:GeometryPrimitive}(::Type{T}, OR) = OR
-
-
 """
 Abstract to classify Simplices. The convention for N starts at 1, which means
 a Simplex has 1 point. A 2-simplex has 2 points, and so forth. This convention
@@ -82,10 +72,6 @@ immutable HyperCube{N, T} <: GeometryPrimitive{N, T}
     width::T
 end
 
-origin(prim::HyperCube) = prim.origin
-widths{N,T}(prim::HyperCube{N,T}) = Vec{N,T}(prim.width)
-maximum{N,T}(prim::HyperCube{N,T}) = origin(prim)+widths(prim)
-minimum{N,T}(prim::HyperCube{N,T}) = origin(prim)
 
 """
 A `HyperSphere` is a generalization of a sphere into N-dimensions.

@@ -30,12 +30,14 @@ import Base: ==,
 
 
 include("types.jl")
+include("typeutils.jl")
 include("typealias.jl")
 include("simplices.jl")
 include("algorithms.jl")
 include("faces.jl")
 include("hyperrectangles.jl")
 include("hypersphere.jl")
+include("hypercube.jl")
 include("relations.jl")
 include("operations.jl")
 include("meshes.jl")
