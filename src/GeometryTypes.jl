@@ -67,11 +67,15 @@ include("angles.jl")
 include("decompose.jl")
 include("deprecated.jl")
 include("center.jl")
+<<<<<<< HEAD
 include("convexhulls.jl")
 include("gjk.jl")
 include("polygons.jl")
 include("lines.jl")
 include("cylinder.jl")
+=======
+include("centroid.jl")
+>>>>>>> round out some more tests
 
 export AABB,
        AbstractFlexibleGeometry,
@@ -153,6 +157,7 @@ export AABB,
        attributes,
        attributes_noVF,
        before,
+       centroid,
        colors,
        colortype,
        during,
@@ -184,8 +189,13 @@ export AABB,
        nvertices,
        overlaps,
        origin,
+<<<<<<< HEAD
        polygon2faces,
        radius,
+=======
+       radius,
+       row,
+>>>>>>> round out some more tests
        setindex,
        slice,
        spacedim,

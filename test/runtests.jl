@@ -29,5 +29,9 @@ end
     include("cylinder.jl")
 =======
     include("angles.jl")
+<<<<<<< HEAD
 >>>>>>> wip
+=======
+    include("hypercube.jl")
+>>>>>>> round out some more tests
 end

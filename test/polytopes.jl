@@ -12,10 +12,20 @@ context("scale") do
     @fact p1.elements --> [Point(0,0), Point(5,0), Point(5,4), Point(0,4)]
 end
 
-context("Polygon Volume") do
+context("Polygon volume") do
     p = Polygon(Point(-.5,-.5), Point(-.5, .5), Point(.5,.5))
     @fact volume(p) --> 0.5
     p = Polygon(Point(-.5,-.5), Point(.5,-.5), Point(.5,.5))
     @fact volume(p) --> -0.5
 end
+
+context("Polygon centroid") do
+    p1 = Polygon(Point(-.5,-.5), Point(-.5, .5), Point(.5,.5), Point(.5,-.5))
+    p2 = Polygon(Point(-.5,-.5), Point(.5,-.5), Point(.5,.5), Point(-.5,.5))
+    @fact centroid(p1) --> Point(0,0)
+    @fact centroid(p1) --> centroid(p2)
+    p3 = Polygon(Point(0.,0), Point(4., 0), Point(4.,2), Point(0.,2))
+    @fact centroid(p3) --> Point(2,1)
+end
+
 end

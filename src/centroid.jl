@@ -1,15 +1,15 @@
 function centroid{T}(poly::Polygon{T})
     area = 0.0
-    c = zero(T)
+    cent = zero(T)
     n = length(elements(poly))
     i = n
     @inbounds for j = 1:n
-        p = elements(poly)[i]
-        n = elements(poly)[j]
-        d = p[1]*n[2]-n[1]*p[2]
+        v1 = elements(poly)[i]
+        v2 = elements(poly)[j]
+        d = v1[1]*v2[2]-v2[1]*v1[2]
         area += d
-        c += (p+n)*d
+        cent += (v1+v2)*d
         i = j
     end
-    return c/3*a
+    return cent/(3*area)
 end
