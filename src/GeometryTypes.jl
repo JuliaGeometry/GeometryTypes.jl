@@ -29,6 +29,8 @@ import Base: ==,
              merge,
              merge,
              minimum,
+             scale,
+             scale!,
              setindex!,
              show,
              size,
@@ -46,6 +48,7 @@ include("baseutils.jl")
 include("linalgutils.jl")
 include("simplices.jl")
 include("algorithms.jl")
+include("volume.jl")
 include("faces.jl")
 include("hyperrectangles.jl")
 include("hypersphere.jl")
@@ -58,6 +61,7 @@ include("distancefields.jl")
 include("setops.jl")
 include("display.jl")
 include("slice.jl")
+include("scale.jl")
 include("polytopes.jl")
 include("angles.jl")
 include("decompose.jl")
@@ -146,7 +150,6 @@ export AABB,
        UVW,
        UVWMesh,
        Vec,
-       area,
        attributes,
        attributes_noVF,
        before,
@@ -194,8 +197,11 @@ export AABB,
        update,
        vertextype,
        vertices,
+<<<<<<< HEAD
        vertexmat,
        vertexmatrix,
+=======
+>>>>>>> wip
        volume,
        width,
        widths,

@@ -139,4 +139,9 @@ end
 
 isequal(b1::HyperRectangle, b2::HyperRectangle) = b1 == b2
 
+<<<<<<< HEAD
 isless(a::SimpleRectangle, b::SimpleRectangle) = isless(area(a), area(b))
+=======
+isless(a::SimpleRectangle, b::SimpleRectangle) = isless(volume(a), volume(b))
+
+>>>>>>> wip

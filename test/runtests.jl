@@ -21,9 +21,13 @@ end
     include("simplerectangle.jl")
     include("hypersphere.jl")
     include("typeutils.jl")
+<<<<<<< HEAD
     include("simplices.jl")
     include("gjk.jl")
     include("lines.jl")
     include("polygons.jl")
     include("cylinder.jl")
+=======
+    include("angles.jl")
+>>>>>>> wip
 end

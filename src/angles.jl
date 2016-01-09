@@ -1,8 +1,11 @@
 """
-Compute the angle between two vectors
+```angle(a,b)```
+Compute the angle of `b` relative to `a` in radians.
 """
 function angle(a,b)
-    acos(dot(a,b)/sqrt(dot(a,a))*sqrt(dot(b,b)))
+    v1 = normalize(a)
+    v2 = normalize(b)
+    atan2(v2[2],v2[1]) - atan2(v1[2], v1[1])
 end
 
 """
@@ -20,6 +23,5 @@ function angle(s::Simplex{3}, i)
         v2 = s[1] - s[i]
     end
     a = angle(v1,v2)
-    a < pi/2 ? a : pi - a
 end
 
