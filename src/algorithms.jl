@@ -17,8 +17,9 @@ function normals{VT,FD,FT,FO}(vertices::Vector{Point{3, VT}},
         a = v[2] - v[1]
         b = v[3] - v[1]
         n = cross(a,b)
-        for elt in face
-            normals_result[elt-FO] = normals_result[elt-FO] + n
+        for i =1:3
+            fi = onebased(face, i)
+            normals_result[fi] = normals_result[fi] + n
         end
     end
     map!(normalize, normals_result)
