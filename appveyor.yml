@@ -18,7 +18,7 @@ install:
 build_script:
 # Need to convert from shallow to complete for Pkg.clone to work
 #  - git fetch --unshallow
-  - C:\projects\julia\bin\julia-debug -e "versioninfo(); Pkg.init(); Pkg.clone(pwd(), \"GeometryTypes\")"
+  - C:\projects\julia\bin\julia -e "versioninfo(); Pkg.init(); Pkg.clone(pwd(), \"GeometryTypes\")"
 
 test_script:
-  - C:\projects\julia\bin\julia-debug -e "Pkg.test(\"GeometryTypes\")"
+  - C:\projects\julia\bin\julia -e "Pkg.test(\"GeometryTypes\")"
