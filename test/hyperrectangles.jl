@@ -1,6 +1,6 @@
 context("Hyper Rectangles") do
 
-    
+
 context("constructors and containment") do
     # HyperRectangle(vals...)
     a = HyperRectangle(0,0,1,1)
@@ -49,6 +49,18 @@ context("constructors and containment") do
     # AABB
     a = AABB(0,0,1,1)
     @fact a --> HyperRectangle{2,Int}(Vec(0,0),Vec(1,1))
+
+    centered_rect = centered(HyperRectangle)
+    @fact centered_rect --> HyperRectangle{3,Float32}(Vec3f0(-0.5),Vec3f0(1))
+    centered_rect = centered(HyperRectangle{2})
+    @fact centered_rect --> HyperRectangle{2,Float32}(Vec2f0(-0.5),Vec2f0(1))
+
+    centered_rect = centered(HyperRectangle{2, Float64})
+    @fact centered_rect --> HyperRectangle{2,Float64}(Vec(-0.5, -0.5),Vec(1.,1.))
+
+    centered_rect = centered(HyperRectangle{3, Float32})
+    @fact centered_rect --> HyperRectangle{3,Float64}(Vec(-0.5,-0.5,-0.5),Vec(1.,1.,1.))
+
 
 end
 

@@ -17,7 +17,7 @@ function normals{VT,FD,FT,FO}(vertices::Vector{Point{3, VT}},
         a = v[2] - v[1]
         b = v[3] - v[1]
         n = cross(a,b)
-        for i =1:3
+        for i =1:FD
             fi = onebased(face, i)
             normals_result[fi] = normals_result[fi] + n
         end
@@ -25,5 +25,3 @@ function normals{VT,FD,FT,FO}(vertices::Vector{Point{3, VT}},
     map!(normalize, normals_result)
     map(NT, normals_result)
 end
-
-

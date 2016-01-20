@@ -6,4 +6,3 @@ centered{T<:HyperRectangle}(::Type{T}) = centered(HyperRectangle{ndims_or(T, 3),
 
 centered{N,T}(S::Type{HyperSphere{N,T}}) = S(Vec{N,T}(0), T(1))
 centered{T<:HyperSphere}(::Type{T}) = centered(HyperSphere{ndims_or(T, 3), eltype_or(T, Float32)})
-

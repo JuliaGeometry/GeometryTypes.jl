@@ -37,4 +37,49 @@ context("SimpleRectangle") do
                    Point(1,0)]
 end
 
+
+context("Normals") do
+    n64 = Normal{3, Float64}[
+        (0.0,0.0,-1.0),
+        (0.0,0.0,-1.0),
+        (0.0,0.0,-1.0),
+        (0.0,0.0,-1.0),
+        (0.0,0.0,1.0),
+        (0.0,0.0,1.0),
+        (0.0,0.0,1.0),
+        (0.0,0.0,1.0),
+        (-1.0,0.0,0.0),
+        (-1.0,0.0,0.0),
+        (-1.0,0.0,0.0),
+        (-1.0,0.0,0.0),
+        (1.0,0.0,0.0),
+        (1.0,0.0,0.0),
+        (1.0,0.0,0.0),
+        (1.0,0.0,0.0),
+        (0.0,1.0,0.0),
+        (0.0,1.0,0.0),
+        (0.0,1.0,0.0),
+        (0.0,1.0,0.0),
+        (0.0,-1.0,0.0),
+        (0.0,-1.0,0.0),
+        (0.0,-1.0,0.0),
+        (0.0,-1.0,0.0),
+    ]
+    n32 = map(Normal{3,Float32}, n64)
+    r = GLPlainMesh(centered(HyperRectangle))
+    @fact normals(vertices(r), faces(r), Normal{3, Float32}) --> n32
+    @fact normals(vertices(r), faces(r), Normal{3, Float64}) --> n64
+
+    r = PlainMesh{Float64, Face{3, UInt32, 0}}(centered(HyperRectangle))
+    @fact normals(vertices(r), faces(r), Normal{3, Float32}) --> n32
+    @fact normals(vertices(r), faces(r), Normal{3, Float64}) --> n64
+
+    r = PlainMesh{Float16, Face{3, UInt64, -1}}(centered(HyperRectangle))
+    @fact normals(vertices(r), faces(r), Normal{3, Float32}) --> n32
+    @fact normals(vertices(r), faces(r), Normal{3, Float64}) --> n64
+
+end
+
+
+
 end
