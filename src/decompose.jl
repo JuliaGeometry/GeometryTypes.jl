@@ -47,7 +47,7 @@ Extract all line segments in a Face.
         )) for i = 1:N-1]
     )
     # connect vertices N and 1
-    push!(v.args, 
+    push!(v.args,
         :(Face{2,$FT1,$O1}(
             offsetbased(f, N, O1),
             offsetbased(f, 1, O1)
@@ -222,7 +222,7 @@ function decompose{NT}(T::Type{Normal{3, NT}}, mesh::AbstractMesh)
     n = mesh.normals
     eltype(n) == T && return n
     eltype(n) <: Normal{3} && return map(T, n)
-    n == Void[] && return normals(mesh.vertices, mesh.faces, T)
+    n == Void[] && return normals(vertices(mesh), faces(mesh), T)
 end
 
 #Gets the uv attribute to a mesh, or creates it, or converts it
@@ -230,7 +230,7 @@ function decompose{UVT}(::Type{UV{UVT}}, mesh::AbstractMesh)
     uv = mesh.texturecoordinates
     eltype(uv) == UV{UVT} && return uv
     (eltype(uv) <: UV || eltype(uv) <: UVW) && return map(UV{UVT}, uv)
-    eltype(uv) == Void && return zeros(UV{UVT}, length(mesh.vertices))
+    eltype(uv) == Void && return zeros(UV{UVT}, length(vertices(mesh)))
 end
 
 
