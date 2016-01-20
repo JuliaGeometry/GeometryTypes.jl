@@ -17,9 +17,13 @@ Triangulate an N-Face into a tuple of triangular faces.
     3 <= N || error("decompose not implented for N <= 3 yet. N: $N")# other wise degenerate
 
     v = Expr(:tuple)
-    append!(v.args, [:(Face{3,$FT1,$O1}(f[1]+$(-O2+O1),
-                                        f[$(i-1)]+$(-O2+O1),
-                                        f[$(i)]+$(-O2+O1))) for i = 3:N])
+    append!(v.args, [
+        :(Face{3,FT1,O1}(
+            offsetbased(f,1, O1),
+            offsetbased(f,$(i-1), O1),
+            offsetbased(f,$i, O1)
+        )) for i = 3:N]
+    )
     v
 end
 
@@ -36,11 +40,19 @@ Extract all line segments in a Face.
     2 <= N || error("decompose not implented for N <= 2 yet. N: $N")# other wise degenerate
 
     v = Expr(:tuple)
-    append!(v.args, [:(Face{2,$FT1,$O1}(f[$(i)]+$(-O2+O1),
-                                        f[$(i+1)]+$(-O2+O1))) for i = 1:N-1])
+    append!(v.args, [
+        :(Face{2,$FT1,$O1}(
+            offsetbased(f, $i    , O1),
+            offsetbased(f, $(i+1), O1),
+        )) for i = 1:N-1]
+    )
     # connect vertices N and 1
-    push!(v.args, :(Face{2,$FT1,$O1}(f[$(N)]+$(-O2+O1),
-                                     f[$(1)]+$(-O2+O1)))) # not enough dollars
+    push!(v.args,
+        :(Face{2,$FT1,$O1}(
+            offsetbased(f, N, O1),
+            offsetbased(f, 1, O1)
+        ))
+    )
     v
 end
 
@@ -52,9 +64,13 @@ Decompose an N-Simplex into a tuple of Simplex{3}
     3 <= N || error("decompose not implented for N <= 3 yet. N: $N")# other wise degenerate
 
     v = Expr(:tuple)
-    append!(v.args, [:(Simplex{3,$T1}(f[1],
-                                        f[$(i-1)],
-                                        f[$i])) for i = 3:N])
+    append!(v.args, [
+        :(Simplex{3,$T1}(
+            f[1],
+            f[$(i-1)],
+            f[$i]
+        )) for i = 3:N]
+    )
     v
 end
 
@@ -206,7 +222,7 @@ function decompose{NT}(T::Type{Normal{3, NT}}, mesh::AbstractMesh)
     n = mesh.normals
     eltype(n) == T && return n
     eltype(n) <: Normal{3} && return map(T, n)
-    n == Void[] && return normals(mesh.vertices, mesh.faces, T)
+    n == Void[] && return normals(vertices(mesh), faces(mesh), T)
 end
 
 #Gets the uv attribute to a mesh, or creates it, or converts it
@@ -214,7 +230,7 @@ function decompose{UVT}(::Type{UV{UVT}}, mesh::AbstractMesh)
     uv = mesh.texturecoordinates
     eltype(uv) == UV{UVT} && return uv
     (eltype(uv) <: UV || eltype(uv) <: UVW) && return map(UV{UVT}, uv)
-    eltype(uv) == Void && return zeros(UV{UVT}, length(mesh.vertices))
+    eltype(uv) == Void && return zeros(UV{UVT}, length(vertices(mesh)))
 end
 
 

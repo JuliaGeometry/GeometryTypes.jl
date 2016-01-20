@@ -12,6 +12,7 @@ facts("GeometryTypes") do
     include("decompose.jl")
     include("simplerectangle.jl")
     include("hypersphere.jl")
+    include("typeutils.jl")
 end
 
 FactCheck.exitstatus()

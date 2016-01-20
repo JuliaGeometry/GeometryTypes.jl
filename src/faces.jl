@@ -11,24 +11,38 @@ Also be aware when writing generic code that faces may be of more than
                                                f::Face{FD, FT, Offset})
     v = Expr(:tuple)
     for i = 1:FD
-        push!(v.args, Expr(:call, Base.unsafe_getindex, :a, :(f[$i]-Offset)))
+        push!(v.args, Expr(:call, Base.unsafe_getindex, :a, :(Int(f[$i])-Int(Offset))))
     end
-    Expr(:(::), v, :(NTuple{FD,T}))
+    :($(v)::NTuple{FD,T})
 end
 
-function setindex!{T,N,FD,FT,Offset}(a::Array{T,N}, b::Array{T,N}, i::Face{FD, FT, Offset})
-    a[[(map(Int,i)-Offset)...]] = b
+function setindex!{T,N,FD,FT,Offset}(a::Array{T,N}, b::Array{T,N}, f::Face{FD, FT, Offset})
+	for i=1:FD
+    	a[onebased(f,i)] = b[i]
+    end
 end
 
-convert{T, IndexOffset1, N}(::Type{Face{N, T, IndexOffset1}}, f::Face{N, T, IndexOffset1}) = f
-convert{T, T2, IndexOffset1, N}(::Type{Face{N, T, IndexOffset1}}, f::Face{N, T2, IndexOffset1}) = Face{N, T, IndexOffset1}(convert(NTuple{N, T}, f.(1)))
-convert{T1, T2, IndexOffset1, IndexOffset2, N}(t::Type{Face{N, T1, IndexOffset1}}, f::Face{N, T2, IndexOffset2}) = t((map(Int,f)+IndexOffset1-IndexOffset2)...)
+convert{T1<:Face}(::Type{T1}, f::T1) = f
+convert{T1<:Face, T2<:Face}(::Type{T1}, f::T2) = T1(f)
 
 # Silly duplication, but call(::FixedVector, ::Any) = convert is overloaded in FixedSizeArrays
-call{T, O, N}(::Type{Face{N, T, O}}, f::Face{N, T, O}) = f
+call{F<:Face}(::Type{F}, f::F) = f
 call{T, T2, O, N}(::Type{Face{N, T, O}}, f::Face{N, T2, O}) = Face{N, T, O}(convert(NTuple{N, T}, f.(1)))
-call{T1, T2, O1, O2, N}(t::Type{Face{N, T1, O1}}, f::Face{N, T2, O2}) = t((map(Int,f)+O1-O2)...)
+immutable IndexConvertFunc{T1, T2}
+	f::T2
+end
+function call{N,T1,T2,O1,O2}(ifunc::IndexConvertFunc{Face{N,T1,O1}, Face{N,T2,O2}}, i)
+	Int(ifunc.f[i])+Int(O1)-Int(O2)
+end
+function call{N, T1, O1, F<:Face}(T::Type{Face{N, T1, O1}}, f::F)
+	map(IndexConvertFunc{T,F}(f), T)
+end
 
 function Face{T<:Number}(vals::T...)
     Face{length(vals), T, 0}(vals...)
 end
+onebased{N,T,Offset}(face::Face{N,T,Offset}, i) = T(Int(face[i]) - Int(Offset))
+zerobased{N,T,Offset}(face::Face{N,T,Offset}, i) = T(Int(face[i]) - Int(Offset) - 1)
+offsetbased{N,T,Offset}(face::Face{N,T,Offset}, i, offset) = T(Int(face[i]) - Int(Offset) + Int(offset))
+
+export onebased, zerobased
