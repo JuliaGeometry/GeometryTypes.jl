@@ -1,6 +1,12 @@
 context("Polytopes") do
 
 context("Constructors") do
+    p = Polyhedron(Simplex(:a,:b,:c),
+                   Simplex(:b,:a,:d),
+                   Simplex(:c,:b,:d),
+                   Simplex(:a,:c,:d))
+    @fact typeof(p) --> Polytope{3,Simplex{3,Symbol}}
+    @fact length(elements(p)) --> 4
     p1 = Polygon(Point(0,0), Point(1,0), Point(1,1), Point(0,1))
     @fact typeof(p1) --> Polytope{2,Point{2,Int}}
     @fact length(p1.elements) --> 4

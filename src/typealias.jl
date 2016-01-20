@@ -72,7 +72,7 @@ typealias Polygon{T} Polytope{2,T}
 A `Polyhedron` is a `Polytope` realizable with only three dimensions.
 Generally this will be composed of `Face`s or two-simplices (`Simplex{3}`).
 """
-typealias Polyhedron{T} Polytope{2,T}
+typealias Polyhedron{T} Polytope{3,T}
 
 typealias HMesh HomogenousMesh
 

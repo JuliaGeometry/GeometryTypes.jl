@@ -92,8 +92,12 @@ end
     @test uvs == uv_target
 end
 
+<<<<<<< HEAD
 
 @testset "Normals" begin
+=======
+context("Normals") do
+>>>>>>> wip
     n64 = Normal{3, Float64}[
         (0.0,0.0,-1.0),
         (0.0,0.0,-1.0),
@@ -160,6 +164,13 @@ end
 
 end
 
+context("Polyhedron") do
+    p = Polyhedron(Simplex(:a,:b,:c),
+                   Simplex(:b,:a,:d),
+                   Simplex(:c,:b,:d),
+                   Simplex(:a,:c,:d))
+    d = decompose(LineSegment, p)
 
+end
 
 end
