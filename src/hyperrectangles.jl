@@ -20,13 +20,13 @@ function _split{H<:HyperRectangle}(b::H, axis, value)
 end
 
 # empty constructor such that update will always include the first point
-function call{T,N}(::Type{HyperRectangle{N,T}})
-    HyperRectangle{N, T}(Vec{N,T}(typemax(T)), Vec{N,T}(typemin(T)))
+function call{T,N}(HR::Type{HyperRectangle{N,T}})
+    HR(Vec{N,T}(typemax(T)), Vec{N,T}(typemin(T)))
 end
 
 # conversion from other HyperRectangles
-function call{N,T1,T2}(::Type{HyperRectangle{N,T1}}, a::HyperRectangle{N,T2})
-    HyperRectangle{N,T1}(Vec{N, T1}(minimum(a)), Vec{N, T1}(widths(a)))
+function call{N,T1,T2}(HR::Type{HyperRectangle{N,T1}}, a::HyperRectangle{N,T2})
+    HR(Vec{N, T1}(minimum(a)), Vec{N, T1}(widths(a)))
 end
 
 function HyperRectangle{N,T1,T2}(v1::Vec{N,T1}, v2::Vec{N,T2})
@@ -34,6 +34,10 @@ function HyperRectangle{N,T1,T2}(v1::Vec{N,T1}, v2::Vec{N,T2})
     HyperRectangle(Vec{N,T}(v1), Vec{N,T}(v2))
 end
 
+
+function call{N,T}(HR::Type{HyperRectangle{N,T}}, a::GeometryPrimitive)
+    HR(Vec{N, T}(minimum(a)), Vec{N, T}(widths(a)))
+end
 """
 ```
 HyperRectangle(vals::Number...)
@@ -80,7 +84,7 @@ function *{N1,N2,T1,T2}(m::Mat{N1,N1,T1}, h::HyperRectangle{N2,T2})
     D = N1 - N2
 
     # get all points on the HyperRectangle
-    d   = decompose(Vec, h)
+    d   = decompose(Point, h)
     pts = (Vec{N1,T}[Vec{N1,T}(pt, Vec{D,T}(one(T))...) for pt in d]...)::NTuple{2^N2,Vec{N1,T}}
 
     # make sure our points are sized for the tranform
@@ -125,7 +129,10 @@ end
 """
 Construct a HyperRectangle enclosing all points.
 """
-function call{N1, N2, T1, T2}(t::Type{HyperRectangle{N1, T1}}, geometry::Array{Point{N2, T2}})
+function call{N1, T1, PT<:Point}(
+        t::Type{HyperRectangle{N1, T1}}, geometry::AbstractArray{PT}
+    )
+    N2, T2 = length(PT), eltype(PT)
     @assert N1 >= N2
     vmin = Point{N2, T2}(typemax(T2))
     vmax = Point{N2, T2}(typemin(T2))

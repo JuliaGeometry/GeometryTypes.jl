@@ -2,8 +2,22 @@
 Allow to call decompose with unspecified vector type and infer types from
 primitive.
 """
-decompose{FSV <: FixedVector, N, T}(::Type{FSV}, r::GeometryPrimitive{N, T}) =
-    decompose(similar(FSV, eltype_or(FSV, T), size_or(FSV, (N,))[1]), r)
+function decompose{FSV <: FixedVector, N, T}(::Type{FSV}, r::GeometryPrimitive{N, T})
+    vectype = similar(FSV, eltype_or(FSV, T), size_or(FSV, N))
+    # since we have not triangular dispatch, we can't define a function with the
+    # signature for a fully specified Vector type. But we need to check for it
+    # as it means that decompose is not implemented for that version
+    if FSV == vectype
+        error("Decompose not implemented for decompose(::Type{$FSV}, ::$(typeof(r)))")
+    end
+    decompose(vectype, r)
+end
+
+isdecomposable{T1, T2}(::Type{T1}, ::T2) = isdecomposable(T1, T2)
+isdecomposable{T1, T2}(::Type{T1}, ::Type{T2}) = false
+isdecomposable{T<:Point, HR<:HyperRectangle}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:Face, HR<:HyperRectangle}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:UVW, HR<:HyperRectangle}(::Type{T}, ::Type{HR}) = true
 
 """
 ```
@@ -113,22 +127,60 @@ decompose{N, T}(::Type{Simplex{1}}, f::Simplex{N, T}) = decompose(Simplex{1,T}, 
 """
 Get decompose a `HyperRectangle` into points.
 """
-@generated function decompose{N, T1<:FixedVector, T2}(::Type{T1},
-                                 rect::HyperRectangle{N, T2})
+function decompose{N, T1, T2}(
+        PT::Type{Point{3, T1}}, rect::HyperRectangle{N, T2}
+    )
     # The general strategy is that since there are a deterministic number of
     # points, we can generate all points by looking at the binary increments.
-    v = Expr(:tuple)
-    for i = 0:(2^N-1)
-        ex = Expr(:call, T1)
-        for j = 0:(N-1)
-            n = 2^j
-            push!(ex.args, :(origin(rect)[$(j+1)]+$((i>>j)&1)*widths(rect)[$(j+1)]))
+    w = widths(rect)
+    o = origin(rect)
+    points = T1[o[j]+((i>>(j-1))&1)*w[j] for j=1:N, i=0:(2^N-1)]
+    reinterpret(PT, points, (8,))
+end
+"""
+Get decompose a `HyperRectangle` into Texture Coordinates.
+"""
+function decompose{N, T1, T2}(
+        UVWT::Type{UVW{T1}}, rect::HyperRectangle{N, T2}
+    )
+    # The general strategy is that since there are a deterministic number of
+    # points, we can generate all points by looking at the binary increments.
+    w = Vec{3,T1}(1)
+    o = Vec{3,T1}(0)
+    points = T1[((i>>(j-1))&1) for j=1:N, i=0:(2^N-1)]
+    reinterpret(UVWT, points, (8,))
+end
+decompose{FT<:Face}(::Type{FT}, faces::Vector{FT}) = faces
+function decompose{FT1<:Face, FT2<:Face}(::Type{FT1}, faces::Vector{FT2})
+    N1,N2 = length(FT1), length(FT2)
+    outfaces = Array(FT1, length(faces)*(2^(N2-N1)))
+    i = 1
+    for face in faces
+        for outface in decompose(FT1, face)
+            outfaces[i] = outface
+            i += 1
         end
-        push!(v.args, ex)
     end
-    v
+    outfaces
 end
 
+
+"""
+Get decompose a `HyperRectangle` into faces.
+"""
+function decompose{N, T, O, T2}(
+        FT::Type{Face{N, T, O}}, rect::HyperRectangle{3, T2}
+    )
+    faces = Face{4, Int, 0}[
+        (1,2,4,3),
+        (2,4,8,6),
+        (4,3,7,8),
+        (1,3,7,5),
+        (1,5,6,2),
+        (5,6,8,7),
+    ]
+    decompose(FT, faces)
+end
 
 
 function decompose{PT}(P::Type{Point{2, PT}}, r::SimpleRectangle)
@@ -181,7 +233,9 @@ end
 decompose{FT, IO}(T::Type{Face{3, FT, IO}}, q::Quad) = T[
     Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
 ]
-
+decompose{FT, IO}(T::Type{Face{4, FT, IO}}, q::Quad) = T[
+    Face{4, Int, 0}(1,2,3,4)
+]
 decompose{ET}( T::Type{UV{ET}}, q::Quad) = T[
     T(0,0), T(0,1), T(1,1), T(1,0)
 ]
@@ -195,6 +249,9 @@ decompose{ET}(T::Type{UVW{ET}}, q::Quad) = T[
 
 decompose{FT, IO}(T::Type{Face{3, FT, IO}}, r::Pyramid) =
     reinterpret(T, collect(map(FT,(1:18)+IO)))
+
+
+
 
 # Getindex methods, for converted indexing into the mesh
 # Define decompose for your own meshtype, to easily convert it to Homogenous attributes
@@ -237,8 +294,8 @@ end
 #Gets the uv attribute to a mesh
 function decompose{UVWT}(::Type{UVW{UVWT}}, mesh::AbstractMesh)
     uvw = mesh.texturecoordinates
-    typeof(uvw) == UVW{UVT} && return uvw
-    (isa(uvw, UV) || isa(uv, UVW)) && return map(UVW{UVWT}, uvw)
+    typeof(uvw) == UVW{UVWT} && return uvw
+    (isa(uvw, UV) || isa(uvw, UVW)) && return map(UVW{UVWT}, uvw)
     uvw == nothing && return zeros(UVW{UVWT}, length(mesh.vertices))
 end
 const DefaultColor = RGBA(0.2, 0.2, 0.2, 1.0)
@@ -257,4 +314,46 @@ function decompose{T <: Color}(::Type{T}, mesh::AbstractMesh)
     typeof(c) == T && return c
     c == nothing && return DefaultColor
     convert(T, c)
+end
+
+
+
+
+spherical{T}(theta::T, phi::T) = Point{3, T}(
+    sin(theta)*cos(phi),
+    sin(theta)*sin(phi),
+    cos(theta)
+)
+
+function decompose{N,T}(PT::Type{Point{N,T}}, s::Sphere, facets=12)
+    vertices      = Array(PT, facets*facets+1)
+    vertices[end] = PT(s.center) - PT(0,0,radius(s)) #Create a vertex for last triangle fan
+    for j=1:facets
+        theta = T((pi*(j-1))/facets)
+        for i=1:facets
+            position           = sub2ind((facets,), j, i)
+            phi                = T((2*pi*(i-1))/facets)
+            vertices[position] = (spherical(theta, phi)*T(s.r))+PT(s.center)
+        end
+    end
+    vertices
+end
+function decompose{FT<:Face}(::Type{FT}, s::Sphere, facets=12)
+    indexes          = Array(FT, facets*facets*2)
+    FTE              = eltype(FT)
+    psydo_triangle_i = facets*facets+1
+    index            = 1
+    for j=1:facets
+        for i=1:facets
+            next_index = mod1(i+1, facets)
+            i1 = sub2ind((facets,), j, i)
+            i2 = sub2ind((facets,), j, next_index)
+            i3 = (j != facets) ? sub2ind((facets,), j+1, i)          : psydo_triangle_i
+            i6 = (j != facets) ? sub2ind((facets,), j+1, next_index) : psydo_triangle_i
+            indexes[index]   = FT(Triangle{FTE}(i1,i2,i3)) # convert to required Face index offset
+            indexes[index+1] = FT(Triangle{FTE}(i3,i2,i6))
+            index += 2
+        end
+    end
+    indexes
 end

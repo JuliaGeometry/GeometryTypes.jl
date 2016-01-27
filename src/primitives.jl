@@ -1,75 +1,23 @@
-function call{T <: HMesh,HT}(meshtype::Type{T}, c::HyperRectangle{3,HT})
-    ET = Float32
-    xdir = Vec{3, ET}(widths(c)[1],0f0,0f0)
-    ydir = Vec{3, ET}(0f0,widths(c)[2],0f0)
-    zdir = Vec{3, ET}(0f0,0f0,widths(c)[3])
-    quads = [
-        Quad(origin(c) + zdir,   xdir, ydir), # Top
-        Quad(origin(c),          ydir, xdir), # Bottom
-        Quad(origin(c) + xdir,   ydir, zdir), # Right
-        Quad(origin(c),          zdir, ydir), # Left
-        Quad(origin(c),          xdir, zdir), # Back
-        Quad(origin(c) + ydir,   zdir, xdir) #Front
-    ]
-    merge(map(meshtype, quads))
+
+function call{T <: AbstractMesh}(meshtype::Type{T}, c::Pyramid)
+    T(decompose(vertextype(T), c), decompose(facetype(T), c))
+end
+function call{T <: AbstractMesh}(meshtype::Type{T}, c::Sphere, facets=12)
+    T(decompose(vertextype(T), c, facets), decompose(facetype(T), c, facets))
 end
 
-function call{T <: HMesh,HT}(meshtype::Type{T}, c::HyperCube{3,HT})
-    ET = Float32
-    xdir = Vec{3, ET}(c.width,0f0,0f0)
-    ydir = Vec{3, ET}(0f0,c.width,0f0)
-    zdir = Vec{3, ET}(0f0,0f0,c.width)
-    quads = [
-        Quad(origin(c) + zdir,   xdir, ydir), # Top
-        Quad(origin(c),          ydir, xdir), # Bottom
-        Quad(origin(c) + xdir,   ydir, zdir), # Right
-        Quad(origin(c),          zdir, ydir), # Left
-        Quad(origin(c),          xdir, zdir), # Back
-        Quad(origin(c) + ydir,   zdir, xdir) #Front
-    ]
-    merge(map(meshtype, quads))
-end
-
-call{T <: HMesh}(meshtype::Type{T}, c::Pyramid) = T(decompose(vertextype(T), c), decompose(facetype(T), c))
-
-spherical{T}(theta::T, phi::T) = Point{3, T}(
-    sin(theta)*cos(phi),
-    sin(theta)*sin(phi),
-    cos(theta)
-)
-
-function call{MT <: AbstractMesh}(::Type{MT}, s::Sphere, facets=12)
-    PT, FT = vertextype(MT), facetype(MT)
-    FTE    = eltype(FT)
-    PTE    = eltype(PT)
-
-    vertices      = Array(PT, facets*facets+1)
-    vertices[end] = PT(0, 0, -1) #Create a vertex for last triangle fan
-    for j=1:facets
-        theta = PTE((pi*(j-1))/facets)
-        for i=1:facets
-            position           = sub2ind((facets,), j, i)
-            phi                = PTE((2*pi*(i-1))/facets)
-            vertices[position] = (spherical(theta, phi)*PTE(s.r))+PT(s.center)
+function call{T <: AbstractMesh}(meshtype::Type{T}, c::HyperRectangle)
+    attribs = attributes(T)
+    newattribs = Dict{Symbol, Any}()
+    for (fieldname, typ) in attribs
+        if isdecomposable(eltype(typ), c)
+            newattribs[fieldname] = decompose(eltype(typ), c)
         end
     end
-    indexes          = Array(FT, facets*facets*2)
-    psydo_triangle_i = length(vertices)
-    index            = 1
-    for j=1:facets
-        for i=1:facets
-            next_index = mod1(i+1, facets)
-            i1 = sub2ind((facets,), j, i)
-            i2 = sub2ind((facets,), j, next_index)
-            i3 = (j != facets) ? sub2ind((facets,), j+1, i)          : psydo_triangle_i
-            i6 = (j != facets) ? sub2ind((facets,), j+1, next_index) : psydo_triangle_i
-            indexes[index]   = FT(Triangle{FTE}(i1,i2,i3)) # convert to required Face index offset
-            indexes[index+1] = FT(Triangle{FTE}(i3,i2,i6))
-            index += 2
-        end
-    end
-    MT(vertices, indexes)
+    T(homogenousmesh(newattribs))
 end
+
+
 
 
 signedpower(v, n) = sign(v)*abs(v)^n
