@@ -52,6 +52,7 @@ include("checkbounds.jl")
 include("center.jl")
 
 export AABB,
+       AbstractGeometry,
        AbsoluteRectangle,
        AbstractMesh,
        AbstractSimplex,

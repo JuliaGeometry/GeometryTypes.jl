@@ -2,7 +2,7 @@
 Allow to call decompose with unspecified vector type and infer types from
 primitive.
 """
-function decompose{FSV <: FixedVector, N, T}(::Type{FSV}, r::GeometryPrimitive{N, T})
+function decompose{FSV <: FixedVector, N, T}(::Type{FSV}, r::AbstractGeometry{N, T})
     vectype = similar(FSV, eltype_or(FSV, T), size_or(FSV, N))
     # since we have not triangular dispatch, we can't define a function with the
     # signature for a fully specified Vector type. But we need to check for it

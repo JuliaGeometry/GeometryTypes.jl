@@ -32,7 +32,7 @@ all_attributes{M <: HMesh}(m::Type{M}) = Dict{Symbol, Any}(map(field -> (field =
 all_attributes{M <: HMesh}(m::M) = Dict{Symbol, Any}(map(field -> (field => getfield(m, field)),  fieldnames(M)))
 
 # Needed to not get into an stack overflow
-convert{M <: AbstractMesh}(::Type{M}, mesh::Union{AbstractMesh, GeometryPrimitive}) = M(mesh)
+convert{M <: AbstractMesh}(::Type{M}, mesh::AbstractGeometry) = M(mesh)
 call{HM1 <: AbstractMesh}(::Type{HM1}, mesh::HM1) = mesh
 
 # Uses getindex to get all the converted attributes from the meshtype and

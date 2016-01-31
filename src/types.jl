@@ -2,10 +2,13 @@ abstract AbstractDistanceField
 abstract AbstractUnsignedDistanceField <: AbstractDistanceField
 abstract AbstractSignedDistanceField <: AbstractDistanceField
 """
-Abstract to categorize geometry primitives of dimensionality `N`.
+Abstract to categorize geometry primitives of dimensionality `N` and
+the numeric element type `T`.
 """
-abstract GeometryPrimitive{N, T}
-abstract AbstractMesh{VertT, FaceT} <: GeometryPrimitive
+abstract AbstractGeometry{N, T}
+abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry
+abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
+
 
 """
 Abstract to classify Simplices. The convention for N starts at 1, which means
