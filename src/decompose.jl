@@ -218,7 +218,7 @@ end
 function decompose{PT}(T::Type{Point{3, PT}}, p::Pyramid)
     leftup   = T(-p.width , p.width, PT(0)) / PT(2)
     leftdown = T(-p.width, -p.width, PT(0)) / PT(2)
-    tip = T(p.middle + T(PT(0), PT(0), p.length))UVW
+    tip = T(p.middle + T(PT(0), PT(0), p.length))
     lu  = T(p.middle + leftup)
     ld  = T(p.middle + leftdown)
     ru  = T(p.middle - leftdown)
