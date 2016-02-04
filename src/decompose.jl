@@ -192,11 +192,11 @@ isdecomposable{T<:Normal, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
 
 function decompose{PT}(P::Type{Point{2, PT}}, r::SimpleRectangle, resolution=(2,2))
     w,h = resolution
-    vec(P[(x,y) for x=linspace(r.x, r.w, w), y=linspace(r.y, r.h, h)])
+    vec(P[(x,y) for x=linspace(r.x, r.x+r.w, w), y=linspace(r.y, r.y+r.h, h)])
 end
 function decompose{PT}(P::Type{Point{3, PT}}, r::SimpleRectangle, resolution=(2,2))
     w,h = resolution
-    vec(P[(x,y,0) for x=linspace(r.x, r.w, w), y=linspace(r.y, r.h, h)])
+    vec(P[(x,y,0) for x=linspace(r.x, r.x+r.w, w), y=linspace(r.y, r.y+r.h, h)])
 end
 function decompose{UVT}(T::Type{UV{UVT}}, r::SimpleRectangle, resolution=(2,2))
     w,h = resolution
