@@ -6,12 +6,12 @@ function call{T <: AbstractMesh}(meshtype::Type{T}, c::Sphere, facets=12)
     T(decompose(vertextype(T), c, facets), decompose(facetype(T), c, facets))
 end
 
-function call{T <: AbstractMesh}(meshtype::Type{T}, c::HyperRectangle)
+function call{T <: AbstractMesh}(meshtype::Type{T}, c::GeometryPrimitive, args...)
     attribs = attributes(T)
     newattribs = Dict{Symbol, Any}()
     for (fieldname, typ) in attribs
         if isdecomposable(eltype(typ), c)
-            newattribs[fieldname] = decompose(eltype(typ), c)
+            newattribs[fieldname] = decompose(eltype(typ), c, args...)
         end
     end
     T(homogenousmesh(newattribs))

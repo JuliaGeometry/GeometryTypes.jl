@@ -15,9 +15,12 @@ end
 
 isdecomposable{T1, T2}(::Type{T1}, ::T2) = isdecomposable(T1, T2)
 isdecomposable{T1, T2}(::Type{T1}, ::Type{T2}) = false
+
 isdecomposable{T<:Point, HR<:HyperRectangle}(::Type{T}, ::Type{HR}) = true
 isdecomposable{T<:Face, HR<:HyperRectangle}(::Type{T}, ::Type{HR}) = true
 isdecomposable{T<:UVW, HR<:HyperRectangle}(::Type{T}, ::Type{HR}) = true
+
+
 
 """
 ```
@@ -182,27 +185,40 @@ function decompose{N, T, O, T2}(
     decompose(FT, faces)
 end
 
+isdecomposable{T<:Point, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:Face, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:TextureCoordinate, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:Normal, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
 
-function decompose{PT}(P::Type{Point{2, PT}}, r::SimpleRectangle)
-   P[P(r.x, r.y),
-    P(r.x, r.y + r.h),
-    P(r.x + r.w, r.y + r.h),
-    P(r.x + r.w, r.y)]
+function decompose{PT}(P::Type{Point{2, PT}}, r::SimpleRectangle, resolution=(2,2))
+    w,h = resolution
+    vec(P[(x,y) for x=linspace(r.x, r.w, w), y=linspace(r.y, r.h, h)])
 end
-decompose{UVT}(T::Type{UV{UVT}}, r::SimpleRectangle) = T[
-    T(0, 0),
-    T(0, 1),
-    T(1, 1),
-    T(1, 0)
-]
-decompose{FT, IO}(T::Type{Face{3, FT, IO}}, r::SimpleRectangle) = T[
-    Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
-]
+function decompose{PT}(P::Type{Point{3, PT}}, r::SimpleRectangle, resolution=(2,2))
+    w,h = resolution
+    vec(P[(x,y,0) for x=linspace(r.x, r.w, w), y=linspace(r.y, r.h, h)])
+end
+function decompose{UVT}(T::Type{UV{UVT}}, r::SimpleRectangle, resolution=(2,2))
+    w,h = resolution
+    vec(T[(x,y) for x=linspace(0, 1, w), y=linspace(0, 1, h)])
+end
+function decompose{T<:Normal}(::Type{T}, r::SimpleRectangle, resolution=(2,2))
+    fill(T(0,0,1), prod(resolution))
+end
+function decompose{T<:Face}(::Type{T}, r::SimpleRectangle, resolution=(2,2))
+    w,h = resolution
+    faces = vec([Face{4, Int, 0}(
+            sub2ind(resolution, i, j), sub2ind(resolution, i+1, j),
+            sub2ind(resolution, i+1, j+1), sub2ind(resolution, i, j+1)
+        ) for i=1:(w-1), j=1:(h-1)]
+    )
+    decompose(T, faces)
+end
 
 function decompose{PT}(T::Type{Point{3, PT}}, p::Pyramid)
     leftup   = T(-p.width , p.width, PT(0)) / PT(2)
     leftdown = T(-p.width, -p.width, PT(0)) / PT(2)
-    tip = T(p.middle + T(PT(0), PT(0), p.length))
+    tip = T(p.middle + T(PT(0), PT(0), p.length))UVW
     lu  = T(p.middle + leftup)
     ld  = T(p.middle + leftdown)
     ru  = T(p.middle - leftdown)
