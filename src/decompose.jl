@@ -20,6 +20,16 @@ isdecomposable{T<:Point, HR<:HyperRectangle}(::Type{T}, ::Type{HR}) = true
 isdecomposable{T<:Face, HR<:HyperRectangle}(::Type{T}, ::Type{HR}) = true
 isdecomposable{T<:UVW, HR<:HyperRectangle}(::Type{T}, ::Type{HR}) = true
 
+isdecomposable{T<:Point, HR<:Quad}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:Face, HR<:Quad}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:UVW, HR<:Quad}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:Normal, HR<:Quad}(::Type{T}, ::Type{HR}) = true
+
+isdecomposable{T<:Point, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:Face, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:TextureCoordinate, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:Normal, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
+
 
 
 """
@@ -185,11 +195,6 @@ function decompose{N, T, O, T2}(
     decompose(FT, faces)
 end
 
-isdecomposable{T<:Point, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
-isdecomposable{T<:Face, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
-isdecomposable{T<:TextureCoordinate, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
-isdecomposable{T<:Normal, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
-
 function decompose{PT}(P::Type{Point{2, PT}}, r::SimpleRectangle, resolution=(2,2))
     w,h = resolution
     vec(P[(x,y) for x=linspace(r.x, r.x+r.w, w), y=linspace(r.y, r.y+r.h, h)])
@@ -263,8 +268,9 @@ decompose{ET}(T::Type{UVW{ET}}, q::Quad) = T[
     q.downleft + q.width
 ]
 
-decompose{FT, IO}(T::Type{Face{3, FT, IO}}, r::Pyramid) =
-    reinterpret(T, collect(map(FT,(1:18)+IO)))
+function decompose{FT, IO}(T::Type{Face{3, FT, IO}}, r::Pyramid)
+    reinterpret(T, collect(map(FT, (1:18)+IO)))
+end
 
 
 
