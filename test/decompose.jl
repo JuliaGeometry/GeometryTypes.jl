@@ -2,10 +2,10 @@ context("decompose functions") do
 
 context("HyperRectangles") do
     a = HyperRectangle(Vec(0,0),Vec(1,1))
-    pt_expa = (Point(0,0), Point(1,0), Point(0,1), Point(1,1))
+    pt_expa = Point{2,Int}[(0,0), (1,0), (0,1), (1,1)]
     @fact decompose(Point{2,Int},a) --> pt_expa
     b = HyperRectangle(Vec(1,1,1),Vec(1,1,1))
-    pt_expb = (Point{3,Int64}((1,1,1)),Point{3,Int64}((2,1,1)),Point{3,Int64}((1,2,1)),Point{3,Int64}((2,2,1)),Point{3,Int64}((1,1,2)),Point{3,Int64}((2,1,2)),Point{3,Int64}((1,2,2)),Point{3,Int64}((2,2,2)))
+    pt_expb = Point{3,Int}[(1,1,1),(2,1,1),(1,2,1),(2,2,1),(1,1,2),(2,1,2),(1,2,2),(2,2,2)]
     @fact decompose(Point{3,Int}, b) --> pt_expb
 end
 
@@ -31,10 +31,12 @@ end
 context("SimpleRectangle") do
     r = SimpleRectangle(0,0,1,1)
     pts = decompose(Point, r)
-    @fact pts --> [Point(0,0),
-                   Point(0,1),
-                   Point(1,1),
-                   Point(1,0)]
+    @fact pts --> Point{2,Int}[
+        (0,0),
+        (1,0),
+        (0,1),
+        (1,1)
+    ]
 end
 
 

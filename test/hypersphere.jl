@@ -7,13 +7,13 @@ context("HyperSphere") do
     @fact isinside(c, 0.5, 0.5) --> true
 
     centered_rect = centered(HyperSphere)
-    @fact centered_rect --> HyperSphere{3,Float32}(Point3f0(0), 1f0)
+    @fact centered_rect --> HyperSphere{3,Float32}(Point3f0(0), 0.5f0)
     centered_rect = centered(HyperSphere{2})
-    @fact centered_rect --> HyperSphere{2,Float32}(Point2f0(0),1f0)
+    @fact centered_rect --> HyperSphere{2,Float32}(Point2f0(0),0.5f0)
 
     centered_rect = centered(HyperSphere{2, Float64})
-    @fact centered_rect --> HyperSphere{2,Float64}(Point(0.,0.), 1.)
+    @fact centered_rect --> HyperSphere{2,Float64}(Point(0.,0.), 0.5)
 
     centered_rect = centered(HyperSphere{3, Float32})
-    @fact centered_rect --> HyperSphere{3,Float32}(Point3f0(0), 1f0)
+    @fact centered_rect --> HyperSphere{3,Float32}(Point3f0(0), 0.5f0)
 end
