@@ -141,14 +141,14 @@ decompose{N, T}(::Type{Simplex{1}}, f::Simplex{N, T}) = decompose(Simplex{1,T}, 
 Get decompose a `HyperRectangle` into points.
 """
 function decompose{N, T1, T2}(
-        PT::Type{Point{3, T1}}, rect::HyperRectangle{N, T2}
+        PT::Type{Point{N, T1}}, rect::HyperRectangle{N, T2}
     )
     # The general strategy is that since there are a deterministic number of
     # points, we can generate all points by looking at the binary increments.
     w = widths(rect)
     o = origin(rect)
     points = T1[o[j]+((i>>(j-1))&1)*w[j] for j=1:N, i=0:(2^N-1)]
-    reinterpret(PT, points, (8,))
+    reinterpret(PT, points, (2^N,))
 end
 """
 Get decompose a `HyperRectangle` into Texture Coordinates.
