@@ -2,19 +2,27 @@
 Allow to call decompose with unspecified vector type and infer types from
 primitive.
 """
-function decompose{FSV <: FixedVector, N, T}(::Type{FSV}, r::AbstractGeometry{N, T})
+function decompose{FSV <: FixedVector, N, T}(::Type{FSV},
+        r::AbstractGeometry{N, T}, args...
+    )
     vectype = similar(FSV, eltype_or(FSV, T), size_or(FSV, N))
     # since we have not triangular dispatch, we can't define a function with the
     # signature for a fully specified Vector type. But we need to check for it
     # as it means that decompose is not implemented for that version
     if FSV == vectype
-        error("Decompose not implemented for decompose(::Type{$FSV}, ::$(typeof(r)))")
+        throw(ArgumentError(
+            "Decompose not implemented for decompose(::Type{$FSV}, ::$(typeof(r)))"
+        ))
     end
-    decompose(vectype, r)
+    decompose(vectype, r, args...)
 end
 
-isdecomposable{T1, T2}(::Type{T1}, ::T2) = isdecomposable(T1, T2)
+"""
+Tests if a geometric primitive is decomposable for a certain type.
+"""
 isdecomposable{T1, T2}(::Type{T1}, ::Type{T2}) = false
+
+isdecomposable{T1, T2}(::Type{T1}, ::T2) = isdecomposable(T1, T2)
 
 isdecomposable{T<:Point, HR<:HyperRectangle}(::Type{T}, ::Type{HR}) = true
 isdecomposable{T<:Face, HR<:HyperRectangle}(::Type{T}, ::Type{HR}) = true
@@ -30,7 +38,8 @@ isdecomposable{T<:Face, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
 isdecomposable{T<:TextureCoordinate, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
 isdecomposable{T<:Normal, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
 
-
+isdecomposable{T<:Point, HR<:HyperSphere}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:Face, HR<:HyperSphere}(::Type{T}, ::Type{HR}) = true
 
 """
 ```

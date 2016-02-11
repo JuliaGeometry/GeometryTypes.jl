@@ -2,9 +2,7 @@
 function call{T <: AbstractMesh}(meshtype::Type{T}, c::Pyramid)
     T(decompose(vertextype(T), c), decompose(facetype(T), c))
 end
-function call{T <: AbstractMesh}(meshtype::Type{T}, c::Sphere, facets=12)
-    T(decompose(vertextype(T), c, facets), decompose(facetype(T), c, facets))
-end
+
 
 """
 Standard way of creating a mesh from a primitive.
