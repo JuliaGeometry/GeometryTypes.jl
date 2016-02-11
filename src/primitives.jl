@@ -6,6 +6,12 @@ function call{T <: AbstractMesh}(meshtype::Type{T}, c::Sphere, facets=12)
     T(decompose(vertextype(T), c, facets), decompose(facetype(T), c, facets))
 end
 
+"""
+Standard way of creating a mesh from a primitive.
+Just walk through all attributes of the mesh and try to decompose it.
+If there are attributes missing, just hope it will get managed by the mesh constructor.
+(E.g. normal calculation, which needs to have vertices and faces present)
+"""
 function call{T <: AbstractMesh}(meshtype::Type{T}, c::GeometryPrimitive, args...)
     attribs = attributes(T)
     newattribs = Dict{Symbol, Any}()
@@ -18,7 +24,37 @@ function call{T <: AbstractMesh}(meshtype::Type{T}, c::GeometryPrimitive, args..
 end
 
 
+function call{T <: HMesh,HT}(meshtype::Type{T}, c::HyperRectangle{3,HT})
+    ET = Float32
+    xdir = Vec{3, ET}(widths(c)[1],0f0,0f0)
+    ydir = Vec{3, ET}(0f0,widths(c)[2],0f0)
+    zdir = Vec{3, ET}(0f0,0f0,widths(c)[3])
+    quads = [
+        Quad(origin(c) + zdir,   xdir, ydir), # Top
+        Quad(origin(c),          ydir, xdir), # Bottom
+        Quad(origin(c) + xdir,   ydir, zdir), # Right
+        Quad(origin(c),          zdir, ydir), # Left
+        Quad(origin(c),          xdir, zdir), # Back
+        Quad(origin(c) + ydir,   zdir, xdir) #Front
+    ]
+    merge(map(meshtype, quads))
+end
 
+function call{T <: HMesh,HT}(meshtype::Type{T}, c::HyperCube{3,HT})
+    ET = Float32
+    xdir = Vec{3, ET}(c.width,0f0,0f0)
+    ydir = Vec{3, ET}(0f0,c.width,0f0)
+    zdir = Vec{3, ET}(0f0,0f0,c.width)
+    quads = [
+        Quad(origin(c) + zdir,   xdir, ydir), # Top
+        Quad(origin(c),          ydir, xdir), # Bottom
+        Quad(origin(c) + xdir,   ydir, zdir), # Right
+        Quad(origin(c),          zdir, ydir), # Left
+        Quad(origin(c),          xdir, zdir), # Back
+        Quad(origin(c) + ydir,   zdir, xdir) #Front
+    ]
+    merge(map(meshtype, quads))
+end
 
 signedpower(v, n) = sign(v)*abs(v)^n
 
