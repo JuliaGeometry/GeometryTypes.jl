@@ -107,7 +107,7 @@ function *{N,T1,T2}(m::Mat{N,N,T1}, h::HyperRectangle{N,T2})
     T = promote_type(T1,T2)
 
     # get all points on the HyperRectangle
-    pts = decompose(Vec, h)
+    pts = decompose(Point, h)
 
     # make sure our points are sized for the tranform
     vmin = Vec{N, T}(typemax(T))
@@ -115,7 +115,7 @@ function *{N,T1,T2}(m::Mat{N,N,T1}, h::HyperRectangle{N,T2})
 
     # tranform all points, tracking min and max points
     for pt in pts
-        pn = m*pt
+        pn = m*Vec(pt)
         vmin = min(pn,vmin)
         vmax = max(pn,vmax)
     end
