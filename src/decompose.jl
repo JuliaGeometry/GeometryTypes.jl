@@ -310,7 +310,7 @@ function decompose{NT}(T::Type{Normal{3, NT}}, mesh::AbstractMesh)
     n = mesh.normals
     eltype(n) == T && return n
     eltype(n) <: Normal{3} && return map(T, n)
-    n == Void[] && return normals(vertices(mesh), faces(mesh), T)
+    (n == Void[] || isempty(n)) && return normals(vertices(mesh), faces(mesh), T)
 end
 
 #Gets the uv attribute to a mesh, or creates it, or converts it
@@ -332,7 +332,7 @@ end
 const DefaultColor = RGBA(0.2, 0.2, 0.2, 1.0)
 
 #Gets the color attribute from a mesh
-function decompose{T <: Color}(::Type{Vector{T}}, mesh::AbstractMesh)
+function decompose{T <: Colorant}(::Type{Vector{T}}, mesh::AbstractMesh)
     colors = mesh.attributes
     typeof(colors) == Vector{T} && return colors
     colors == nothing && return fill(DefaultColor, length(mesh.attribute_id))
@@ -340,7 +340,7 @@ function decompose{T <: Color}(::Type{Vector{T}}, mesh::AbstractMesh)
 end
 
 #Gets the color attribute from a mesh
-function decompose{T <: Color}(::Type{T}, mesh::AbstractMesh)
+function decompose{T <: Colorant}(::Type{T}, mesh::AbstractMesh)
     c = mesh.color
     typeof(c) == T && return c
     c == nothing && return DefaultColor
