@@ -302,7 +302,7 @@ function decompose{FT, Offset}(T::Type{Face{3, FT, Offset}}, mesh::AbstractMesh)
     if eltype(fs) <:  Face{4}
         convert(Vector{Face{3, FT, Offset}}, fs)
     end
-    error("can't get the wanted attribute $(T) from mesh:")
+    error("can't get the wanted attribute $(T) from mesh: $mesh")
 end
 
 #Gets the normal attribute to a mesh
