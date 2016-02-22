@@ -32,19 +32,28 @@ all_attributes{M <: HMesh}(m::Type{M}) = Dict{Symbol, Any}(map(field -> (field =
 all_attributes{M <: HMesh}(m::M) = Dict{Symbol, Any}(map(field -> (field => getfield(m, field)),  fieldnames(M)))
 
 # Needed to not get into an stack overflow
-convert{M <: AbstractMesh}(::Type{M}, mesh::Union{AbstractMesh, GeometryPrimitive}) = M(mesh)
+convert{M <: AbstractMesh}(::Type{M}, mesh::AbstractGeometry) = M(mesh)
 call{HM1 <: AbstractMesh}(::Type{HM1}, mesh::HM1) = mesh
 
-# Uses getindex to get all the converted attributes from the meshtype and
-# creates a new mesh with the desired attributes from the converted attributs
-# Getindex can be defined for any arbitrary geometric type or exotic mesh type.
-# This way, we can make sure, that you can convert most of the meshes from one type to the other
-# with minimal code.
+"""
+Uses decompose to get all the converted attributes from the meshtype and
+creates a new mesh with the desired attributes from the converted attributs
+Getindex can be defined for any arbitrary geometric type or exotic mesh type.
+This way, we can make sure, that you can convert most of the meshes from one type to the other
+with minimal code.
+"""
 function call{HM1 <: AbstractMesh}(::Type{HM1}, primitive::Union{AbstractMesh, GeometryPrimitive})
     result = Dict{Symbol, Any}()
     for (field, target_type) in zip(fieldnames(HM1), HM1.parameters)
         if target_type != Void
-            result[field] = decompose(target_type, primitive)
+            if field == :attribute_id
+                if !isa(primitive, HomogenousMesh)
+                    error("Primitive $primitive doesn't hold attribute indexes")
+                end
+                result[field] = primitive.attribute_id
+            else
+                result[field] = decompose(target_type, primitive)
+            end
         end
     end
     HM1(result)
@@ -61,8 +70,10 @@ end
 get_default(x::Union{Type, TypeVar}) = nothing
 get_default{X <: Array}(x::Type{X}) = Void[]
 
-# generic constructor for abstract HomogenousMesh, infering the types from the keywords (which have to match the field names)
-# some problems with the dispatch forced me to use this method name... need to further investigate this
+"""
+generic constructor for abstract HomogenousMesh, infering the types from the keywords (which have to match the field names)
+some problems with the dispatch forced me to use this method name... need to further investigate this
+"""
 function homogenousmesh(attribs::Dict{Symbol, Any})
     newfields = []
     for name in fieldnames(HMesh)
@@ -71,29 +82,35 @@ function homogenousmesh(attribs::Dict{Symbol, Any})
     HomogenousMesh(newfields...)
 end
 
-# Creates a mesh from keyword arguments, which have to match the field types of the given concrete mesh
+"""
+Creates a mesh from keyword arguments, which have to match the field types of the given concrete mesh
+"""
 call{M <: HMesh}(::Type{M}; kw_args...) = M(Dict{Symbol, Any}(kw_args))
 
-# Creates a new mesh from a dict of fieldname => value and converts the types to the given meshtype
+"""
+Creates a new mesh from a dict of `fieldname => value` and converts the types to the given meshtype
+"""
 function call{M <: HMesh}(::Type{M}, attribs::Dict{Symbol, Any})
     newfields = map(zip(fieldnames(HomogenousMesh), M.parameters)) do field_target_type
         field, target_type = field_target_type
-        default = fieldtype(HomogenousMesh, field) <: Vector ? Array(target_type, 0) : target_type
-        default = default == Void ? nothing : default
+        default = fieldtype(HomogenousMesh, field) <: Vector ? Void[] : nothing
         get(attribs, field, default)
     end
-    HomogenousMesh(newfields...)
+    M(HomogenousMesh(newfields...))
 end
 
-#Creates a new mesh from an old one, with changed attributes given by the keyword arguments
+"""
+Creates a new mesh from an old one, with changed attributes given by the keyword arguments
+"""
 function call{M <: HMesh}(::Type{M}, mesh::AbstractMesh, attributes::Dict{Symbol, Any})
     newfields = map(fieldnames(HomogenousMesh)) do field
         get(attributes, field, mesh.(field))
     end
     HomogenousMesh(newfields...)
 end
-
-#Creates a new mesh from an old one, with a new constant attribute (like a color)
+"""
+Creates a new mesh from an old one, with a new constant attribute (like a color)
+"""
 function call{HM <: HMesh, ConstAttrib}(::Type{HM}, mesh::AbstractMesh, constattrib::ConstAttrib)
     result = Dict{Symbol, Any}()
     for (field, target_type) in zip(fieldnames(HM), HM.parameters)
@@ -111,8 +128,10 @@ function add_attribute(m::AbstractMesh, attribute)
     homogenousmesh(attribs)
 end
 
-#Creates a new mesh from a pair of any and a const attribute
-function call{HM <: HMesh, ConstAttrib}(::Type{HM}, x::Tuple{Any, ConstAttrib})
+"""
+Creates a new mesh from a tuple of a geometry type and a constant attribute
+"""
+function call{HM <: HMesh, ConstAttrib, P<:AbstractGeometry}(::Type{HM}, x::Tuple{P, ConstAttrib})
     any, const_attribute = x
     add_attribute(HM(any), const_attribute)
 end
@@ -120,7 +139,12 @@ end
 
 merge{M <: AbstractMesh}(m::Vector{M}) = merge(m...)
 
-#Merges an arbitrary mesh. This function probably doesn't work for all types of meshes
+"""
+Merges an arbitrary mesh. This function probably doesn't work for all types of meshes
+parameters:
+`m1` first mesh
+`meshes...` other meshes
+"""
 function merge{M <: AbstractMesh}(m1::M, meshes::M...)
     v = m1.vertices
     f = m1.faces
@@ -135,14 +159,18 @@ function merge{M <: AbstractMesh}(m1::M, meshes::M...)
     return M(attribs)
 end
 
-# A mesh with one constant attribute can be merged as an attribute mesh. Possible attributes are FSArrays
+"""
+A mesh with one constant attribute can be merged as an attribute mesh.
+Possible attributes are FSArrays
+"""
 function merge{_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}(
         m1::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6},
         meshes::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6}...
     )
     vertices     = copy(m1.vertices)
     faces        = copy(m1.faces)
-    attribs      = attributes_noVF(m1)
+    attribs      = filter((k,v) -> k != :color, attributes_noVF(m1))
+    attribs      = [k=>copy(v) for (k,v) in attribs]
     color_attrib = RGBA{U8}[RGBA{U8}(m1.color)]
     index        = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
     for mesh in meshes
@@ -150,7 +178,7 @@ function merge{_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}(
         append!(vertices, mesh.vertices)
         attribsb = attributes_noVF(mesh)
         for (k,v) in attribsb
-            k != :color && append!(attribs[k], v)
+            k != :color && append!(attribs[k], copy(v))
         end
         push!(color_attrib, mesh.color)
         append!(index, Float32[length(color_attrib)-1 for i=1:length(mesh.vertices)])

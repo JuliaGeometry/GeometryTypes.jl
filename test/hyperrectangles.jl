@@ -1,3 +1,12 @@
+context("Hyper Cubes") do
+    context("Core") do
+        x = centered(HyperCube)
+        @fact origin(x) --> Vec3f0(-0.5)
+        @fact widths(x) --> Vec3f0(1.0)
+        @fact maximum(x) --> Vec3f0(0.5)
+        @fact minimum(x) --> Vec3f0(-0.5)
+    end
+end
 context("Hyper Rectangles") do
 
 

@@ -52,6 +52,7 @@ include("checkbounds.jl")
 include("center.jl")
 
 export AABB,
+       AbstractGeometry,
        AbsoluteRectangle,
        AbstractMesh,
        AbstractSimplex,
@@ -144,6 +145,7 @@ export AABB,
        overlaps,
        origin,
        row,
+       radius,
        setindex,
        starts,
        texturecoordinates,
