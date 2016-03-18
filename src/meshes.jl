@@ -59,6 +59,24 @@ function call{HM1 <: AbstractMesh}(::Type{HM1}, primitive::Union{AbstractMesh, G
     HM1(result)
 end
 
+isvoid{T}(::Type{T}) = false
+isvoid(::Type{Void}) = true
+isvoid{T}(::Type{Vector{T}}) = isvoid(T)
+function call{HM1 <: HomogenousMesh}(::Type{HM1}, primitive::HomogenousMesh)
+    fnames = fieldnames(HM1)
+    args = ntuple(nfields(HM1)) do i
+        field, target_type = fnames[i], fieldtype(HM1, i)
+        soure_type = fieldtype(typeof(primitive), i)
+        isa(HM1.parameters[i], TypeVar) && return primitive.(field) # target is not defined
+        if !isvoid(target_type) && isvoid(soure_type) # target not there yet, maybe we can decompose though (e.g. normals)
+            return decompose(HM1.parameters[i], primitive)
+        else
+            return convert(target_type, primitive.(field))
+        end
+    end
+    HM1(args...)
+end
+
 
 #Should be:
 #function call{M <: HMesh, VT <: Point, FT <: Face}(::Type{M}, vertices::Vector{VT}, faces::Vector{FT})

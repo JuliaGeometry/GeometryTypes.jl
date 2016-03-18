@@ -79,6 +79,8 @@ typealias GLUVMesh2D UVMesh2D{Float32, GLTriangle, Float32}
 typealias NormalColorMesh{VT, FT, NT, CT} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, CT, Void, Void}
 typealias GLNormalColorMesh NormalColorMesh{Float32, GLTriangle, Float32, RGBA{Float32}}
 
+typealias NormalVertexcolorMesh{VT, FT, NT, CT} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Vector{CT}, Void, Void}
+typealias GLNormalVertexcolorMesh NormalVertexcolorMesh{Float32, GLTriangle, Float32, RGBA{Float32}}
 
 typealias NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, AT, A_ID_T}
 typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBA{U8}}, Float32}
