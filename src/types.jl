@@ -9,22 +9,6 @@ abstract AbstractGeometry{N, T}
 abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry
 abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
 
-
-Base.eltype{N,T}(x::Type{AbstractGeometry{N, T}}) = T
-Base.eltype{T}(x::Type{AbstractGeometry{TypeVar(:N), T}}) = T
-Base.eltype{N}(x::Type{AbstractGeometry{N, TypeVar(:T)}}) = error("Eltype not defined: $x")
-Base.eltype(x::Type{AbstractGeometry{TypeVar(:N), TypeVar(:T)}}) = error("Eltype not defined: $x")
-Base.eltype{T<:AbstractGeometry}(x::Type{T}) = eltype(super(T))
-
-Base.ndims{N,T}(x::Type{AbstractGeometry{N, T}}) = N
-Base.ndims{N}(x::Type{AbstractGeometry{N, TypeVar(:T)}}) = N
-Base.ndims{T}(x::Type{AbstractGeometry{TypeVar(:N), T}}) = error("NDims not defined: $x")
-Base.ndims(x::Type{AbstractGeometry{TypeVar(:N), TypeVar(:T)}}) = error("NDims not defined: $x")
-Base.ndims{T<:AbstractGeometry}(x::Type{T}) = eltype(super(T))
-
-Base.eltype{N, T}(x::AbstractGeometry{N, T}) = T
-Base.ndims{N, T}(x::AbstractGeometry{N, T}) = N
-
 """
 Abstract to classify Simplices. The convention for N starts at 1, which means
 a Simplex has 1 point. A 2-simplex has 2 points, and so forth. This convention
