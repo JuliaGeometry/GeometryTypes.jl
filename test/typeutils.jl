@@ -5,6 +5,7 @@ context("eltype") do
     @fact eltype_or(SimpleRectangle, Int) --> Int
     @fact eltype_or(SimpleRectangle{Float32}, Int) --> Float32
 
+    @fact eltype(SimpleRectangle(0,0,1,1)) --> Int
     @fact eltype(SimpleRectangle) --> Any
     @fact eltype(HyperCube{2}) --> Any
     @fact eltype(HyperCube{2, Float32}) --> Float32
@@ -16,6 +17,7 @@ context("ndims") do
     @fact ndims_or(HyperCube{2, Float32}, nothing) --> 2
     @fact ndims_or(SimpleRectangle, 0) --> 2
 
+    @fact ndims(SimpleRectangle(0,0,1,1)) --> 2
     @fact ndims(SimpleRectangle) --> 2
     @fact ndims(HyperCube{2}) --> 2
     @fact ndims(HyperCube{2, Float32}) --> 2
