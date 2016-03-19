@@ -9,7 +9,6 @@ abstract AbstractGeometry{N, T}
 abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry
 abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
 
-
 """
 Abstract to classify Simplices. The convention for N starts at 1, which means
 a Simplex has 1 point. A 2-simplex has 2 points, and so forth. This convention
