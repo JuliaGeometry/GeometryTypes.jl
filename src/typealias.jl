@@ -58,6 +58,11 @@ typealias HMesh HomogenousMesh
 typealias UV{T} TextureCoordinate{2, T}
 typealias UVW{T} TextureCoordinate{3, T}
 
+"""
+A `SimpleMesh` is an alias for a `HomogenousMesh` parameterized only by
+vertex and face types.
+"""
+typealias SimpleMesh{VT, FT} HMesh{VT, FT, Void, Void, Void, Void, Void}
 typealias PlainMesh{VT, FT} HMesh{Point{3, VT}, FT, Void, Void, Void, Void, Void}
 typealias GLPlainMesh PlainMesh{Float32, GLTriangle}
 
