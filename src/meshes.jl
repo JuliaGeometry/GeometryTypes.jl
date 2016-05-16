@@ -85,6 +85,8 @@ function call{HM1 <: HomogenousMesh}(::Type{HM1}, primitive::HomogenousMesh)
         isa(HM1.parameters[i], TypeVar) && return getfield(primitive, field) # target is not defined
         if !isvoid(target_type) && isvoid(soure_type) # target not there yet, maybe we can decompose though (e.g. normals)
             return decompose(HM1.parameters[i], primitive)
+        elseif isvoid(target_type)
+            return target_type()
         else
             return convert(target_type, getfield(primitive, field))
         end
