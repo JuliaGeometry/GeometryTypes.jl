@@ -27,7 +27,10 @@ convert{T1<:Face, T2<:Face}(::Type{T1}, f::T2) = T1(f)
 
 # Silly duplication, but call(::FixedVector, ::Any) = convert is overloaded in FixedSizeArrays
 call{F<:Face}(::Type{F}, f::F) = f
-call{T, T2, O, N}(::Type{Face{N, T, O}}, f::Face{N, T2, O}) = Face{N, T, O}(convert(NTuple{N, T}, f.(1)))
+
+function call{T, T2, O, N}(::Type{Face{N, T, O}}, f::Face{N, T2, O})
+    Face{N, T, O}(convert(NTuple{N, T}, getfield(f, 1)))
+end
 immutable IndexConvertFunc{T1, T2}
 	f::T2
 end

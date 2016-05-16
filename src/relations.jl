@@ -9,8 +9,9 @@ function before{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
     true
 end
 
-@inline meets{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) =
+@inline function meets{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
     maximum(b1) == minimum(b2)
+end
 
 function overlaps{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
     for i = 1:N
@@ -124,4 +125,3 @@ end
 isequal(b1::HyperRectangle, b2::HyperRectangle) = b1 == b2
 
 isless(a::SimpleRectangle, b::SimpleRectangle) = isless(area(a), area(b))
-

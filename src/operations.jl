@@ -7,11 +7,13 @@ function update{N, T}(b::HyperRectangle{N, T}, v::Vec{N, T})
 end
 
 # Min maximum distance functions between hrectangle and point for a given dimension
-@inline min_dist_dim{N, T}(rect::HyperRectangle{N, T}, p::Vec{N, T}, dim::Int) = 
+@inline function min_dist_dim{N, T}(rect::HyperRectangle{N, T}, p::Vec{N, T}, dim::Int)
     max(zero(T), max(minimum(rect)[dim] - p[dim], p[dim] - maximum(rect)[dim]))
+end
 
-@inline max_dist_dim{N, T}(rect::HyperRectangle{N, T}, p::Vec{N, T}, dim::Int) =
+@inline function max_dist_dim{N, T}(rect::HyperRectangle{N, T}, p::Vec{N, T}, dim::Int)
     max(maximum(rect)[dim] - p[dim], p[dim] - minimum(rect)[dim])
+end
 
 @inline function min_dist_dim{N, T}(rect1::HyperRectangle{N, T},
                                     rect2::HyperRectangle{N, T},
@@ -38,8 +40,9 @@ end
     end
     return minimum_dist
 end
-min_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}}) = sqrt(min_euclideansq(rect, p))
-
+function min_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}})
+    sqrt(min_euclideansq(rect, p))
+end
 
 @inline function max_euclideansq{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}})
     maximum_dist = T(0.0)
@@ -49,7 +52,9 @@ min_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectang
     end
     return maximum_dist
 end
-max_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}}) = sqrt(max_euclideansq(rect, p))
+function max_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}})
+    sqrt(max_euclideansq(rect, p))
+end
 
 
 # Functions that return both minimum and maximum for convenience
