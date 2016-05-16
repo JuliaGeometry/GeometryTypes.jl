@@ -1,8 +1,8 @@
 #Create typealiases like Mat4f0, Point2, Point2f0
 for i=1:4
     for T=[:Point, :Vec]
-        name 	= symbol("$T$i")
-        namef0 	= symbol("$T$(i)f0")
+        name 	= Symbol("$T$i")
+        namef0 	= Symbol("$T$(i)f0")
         @eval begin
             typealias $name $T{$i}
             typealias $namef0 $T{$i, Float32}
@@ -10,8 +10,8 @@ for i=1:4
             export $namef0
         end
     end
-    name   = symbol("Mat$i")
-    namef0 = symbol("Mat$(i)f0")
+    name   = Symbol("Mat$i")
+    namef0 = Symbol("Mat$(i)f0")
     @eval begin
         typealias $name $Mat{$i,$i}
         typealias $namef0 $Mat{$i,$i, Float32}

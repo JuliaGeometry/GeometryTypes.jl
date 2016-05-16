@@ -22,14 +22,29 @@ colors(msh) = msh.color
 
 
 # Bad, bad name! But it's a little tricky to filter out faces and verts from the attributes, after get_attribute
-attributes_noVF(m::AbstractMesh) = filter((key,val) -> (val != nothing && val != Void[]), Dict{Symbol, Any}(map(field->(field => m.(field)), fieldnames(typeof(m))[3:end])))
+function attributes_noVF{T<:AbstractMesh}(m::T)
+    fielddict = Dict{Symbol, Any}(map(fieldnames(T)[3:end]) do field
+        field => getfield(m, field)
+    end)
+    return filter(fielddict) do key,val
+        val != nothing && val != Void[]
+    end
+end
 #Gets all non Void attributes from a mesh in form of a Dict fieldname => value
-attributes(m::AbstractMesh) = filter((key,val) -> (val != nothing && val != Void[]), all_attributes(m))
+function attributes(m::AbstractMesh)
+    filter((key,val) -> (val != nothing && val != Void[]), all_attributes(m))
+end
 #Gets all non Void attributes types from a mesh type fieldname => ValueType
-attributes{M <: HMesh}(m::Type{M}) = filter((key,val) -> (val != Void && val != Vector{Void}), all_attributes(M))
+function attributes{M <: HMesh}(m::Type{M})
+    filter((key,val) -> (val != Void && val != Vector{Void}), all_attributes(M))
+end
 
-all_attributes{M <: HMesh}(m::Type{M}) = Dict{Symbol, Any}(map(field -> (field => fieldtype(M, field)), fieldnames(M)))
-all_attributes{M <: HMesh}(m::M) = Dict{Symbol, Any}(map(field -> (field => getfield(m, field)),  fieldnames(M)))
+function all_attributes{M <: HMesh}(m::Type{M})
+    Dict{Symbol, Any}(map(field -> (field => fieldtype(M, field)), fieldnames(M)))
+end
+function all_attributes{M <: HMesh}(m::M)
+    Dict{Symbol, Any}(map(field -> (field => getfield(m, field)),  fieldnames(M)))
+end
 
 # Needed to not get into an stack overflow
 convert{M <: AbstractMesh}(::Type{M}, mesh::AbstractGeometry) = M(mesh)
@@ -67,11 +82,11 @@ function call{HM1 <: HomogenousMesh}(::Type{HM1}, primitive::HomogenousMesh)
     args = ntuple(nfields(HM1)) do i
         field, target_type = fnames[i], fieldtype(HM1, i)
         soure_type = fieldtype(typeof(primitive), i)
-        isa(HM1.parameters[i], TypeVar) && return primitive.(field) # target is not defined
+        isa(HM1.parameters[i], TypeVar) && return getfield(primitive, field) # target is not defined
         if !isvoid(target_type) && isvoid(soure_type) # target not there yet, maybe we can decompose though (e.g. normals)
             return decompose(HM1.parameters[i], primitive)
         else
-            return convert(target_type, primitive.(field))
+            return convert(target_type, getfield(primitive, field))
         end
     end
     HM1(args...)
@@ -122,7 +137,7 @@ Creates a new mesh from an old one, with changed attributes given by the keyword
 """
 function call{M <: HMesh}(::Type{M}, mesh::AbstractMesh, attributes::Dict{Symbol, Any})
     newfields = map(fieldnames(HomogenousMesh)) do field
-        get(attributes, field, mesh.(field))
+        get(attributes, field, getfield(mesh, field))
     end
     HomogenousMesh(newfields...)
 end
@@ -211,7 +226,7 @@ end
 
 # Fast but slightly ugly way to implement mesh multiplication
 # This should probably go into FixedSizeArrays.jl, Vector{FSA} * FSA
-immutable MeshMulFunctor{T} <: Base.Func{2}
+immutable MeshMulFunctor{T}
     matrix::Mat{4,4,T}
 end
 call{T}(m::MeshMulFunctor{T}, vert) = Vec{3, T}(m.matrix*Vec{4, T}(vert..., 1))
