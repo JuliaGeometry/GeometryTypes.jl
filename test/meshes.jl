@@ -8,6 +8,7 @@ context("Merging Mesh") do
         (HyperRectangle{3,Float32}(Vec3f0(baselen), Vec3f0(baselen, dirlen, baselen)), RGBA(0f0,1f0,0f0,1f0)),
         (HyperRectangle{3,Float32}(Vec3f0(baselen), Vec3f0(baselen, baselen, dirlen)), RGBA(0f0,0f0,1f0,1f0))
     ]
+
     am = map(GLNormalMesh, a)
     axis = merge(am)
     axis2 = merge(am)
@@ -15,6 +16,7 @@ context("Merging Mesh") do
     @fact typeof(am[1]) --> GLNormalColorMesh
 
     @fact typeof(axis) --> GLNormalAttributeMesh
+    @fact typeof(GLPlainMesh(axis)) --> GLPlainMesh
 
     @fact vertextype(axis) --> Point{3, Float32}
     @fact normaltype(axis) --> Normal{3, Float32}
