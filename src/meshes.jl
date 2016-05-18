@@ -181,13 +181,15 @@ parameters:
 `meshes...` other meshes
 """
 function merge{M <: AbstractMesh}(m1::M, meshes::M...)
-    v = m1.vertices
-    f = m1.faces
-    attribs = attributes_noVF(m1)
+    v = copy(m1.vertices)
+    f = copy(m1.faces)
+    attribs = deepcopy(attributes_noVF(m1))
     for mesh in meshes
         append!(f, mesh.faces + length(v))
         append!(v, mesh.vertices)
-        map(append!, values(attribs), values(attributes_noVF(mesh)))
+        for (v1, v2) in zip(values(attribs), values(attributes_noVF(mesh)))
+            append!(v1, v2)
+        end
     end
     attribs[:vertices]  = v
     attribs[:faces]     = f
