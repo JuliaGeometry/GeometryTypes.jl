@@ -21,4 +21,15 @@ context("setindex") do
     @fact a --> [7,6,5,4]
 end
 
+context("NBaseIndex") do
+    A = [1,2,3,4]
+    i0 = 1*iB0
+    @fact i0.i --> 1
+    @fact A[i0] --> 2
+    i1 = i0*iB1
+    @fact i1.i --> 2
+    @fact A[i1] --> 2
+
+end
+
 end
