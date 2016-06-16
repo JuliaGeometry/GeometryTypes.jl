@@ -4,6 +4,7 @@ module GeometryTypes
 using FixedSizeArrays
 using ColorTypes
 import FixedSizeArrays: eltype_or, ndims_or
+using Compat
 
 import Base: ==,
              *,

@@ -1,6 +1,6 @@
-call(::Type{Sphere}, x...) = HyperSphere(x...)
+@compat (::Type{Sphere})(x...) = HyperSphere(x...)
 
-call(::Type{Circle}, x...) = HyperSphere(x...)
+@compat (::Type{Circle})(x...) = HyperSphere(x...)
 
 widths{N, T}(c::HyperSphere{N, T}) = Vec{N, T}(radius(c)*2)
 radius(c::HyperSphere) = c.r
