@@ -5,7 +5,7 @@ primitive.
 function decompose{FSV <: FixedVector, N, T}(::Type{FSV},
         r::AbstractGeometry{N, T}, args...
     )
-    vectype = similar(FSV, eltype_or(FSV, T), size_or(FSV, N))
+    vectype = similar_type(FSV, eltype_or(FSV, T), size_or(FSV, (N,)))
     # since we have not triangular dispatch, we can't define a function with the
     # signature for a fully specified Vector type. But we need to check for it
     # as it means that decompose is not implemented for that version
@@ -174,8 +174,11 @@ function decompose{N, T1, T2}(
 end
 decompose{FT<:Face}(::Type{FT}, faces::Vector{FT}) = faces
 function decompose{FT1<:Face, FT2<:Face}(::Type{FT1}, faces::Vector{FT2})
+    isempty(faces) && return FT1[]
     N1,N2 = length(FT1), length(FT2)
-    outfaces = Array(FT1, length(faces)*(2^(N2-N1)))
+
+    n = length(decompose(FT1, first(faces)))
+    outfaces = Array(FT1, length(faces)*n)
     i = 1
     for face in faces
         for outface in decompose(FT1, face)
@@ -295,14 +298,10 @@ function decompose{VT}(T::Type{Point{3, VT}}, mesh::AbstractMesh)
 end
 
 # gets the wanted face type
-function decompose{FT, Offset}(T::Type{Face{3, FT, Offset}}, mesh::AbstractMesh)
+function decompose{N, FT, Offset}(T::Type{Face{N, FT, Offset}}, mesh::AbstractMesh)
     fs = faces(mesh)
     eltype(fs) == T && return fs
-    eltype(fs) <: Face{3} && return map(T, fs)
-    if eltype(fs) <:  Face{4}
-        convert(Vector{Face{3, FT, Offset}}, fs)
-    end
-    error("can't get the wanted attribute $(T) from mesh: $mesh")
+    return decompose(T, fs)
 end
 
 #Gets the normal attribute to a mesh

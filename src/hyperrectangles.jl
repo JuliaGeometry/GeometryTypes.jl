@@ -20,12 +20,12 @@ function _split{H<:HyperRectangle}(b::H, axis, value)
 end
 
 # empty constructor such that update will always include the first point
-function call{T,N}(HR::Type{HyperRectangle{N,T}})
+@compat function (HR::Type{HyperRectangle{N,T}}){T,N}()
     HR(Vec{N,T}(typemax(T)), Vec{N,T}(typemin(T)))
 end
 
 # conversion from other HyperRectangles
-function call{N,T1,T2}(HR::Type{HyperRectangle{N,T1}}, a::HyperRectangle{N,T2})
+@compat function (HR::Type{HyperRectangle{N,T1}}){N,T1,T2}(a::HyperRectangle{N,T2})
     HR(Vec{N, T1}(minimum(a)), Vec{N, T1}(widths(a)))
 end
 
@@ -35,7 +35,7 @@ function HyperRectangle{N,T1,T2}(v1::Vec{N,T1}, v2::Vec{N,T2})
 end
 
 
-function call{N,T}(HR::Type{HyperRectangle{N,T}}, a::GeometryPrimitive)
+@compat function (HR::Type{HyperRectangle{N,T}}){N,T}(a::GeometryPrimitive)
     HR(Vec{N, T}(minimum(a)), Vec{N, T}(widths(a)))
 end
 """
@@ -63,7 +63,7 @@ function HyperRectangle{T}(r::SimpleRectangle{T})
     HyperRectangle{2,T}(r)
 end
 
-function call{N,T}(::Type{HyperRectangle{N,T}}, r::SimpleRectangle)
+@compat function (::Type{HyperRectangle{N,T}}){N,T}(r::SimpleRectangle)
     if N > 2
         return HyperRectangle(Vec{N, T}(T(r.x), T(r.y), Vec{N-2,T}(zero(T))...),
                               Vec{N, T}(T(r.w), T(r.h), Vec{N-2,T}(zero(T))...))
@@ -129,8 +129,8 @@ end
 """
 Construct a HyperRectangle enclosing all points.
 """
-function call{N1, T1, PT<:Point}(
-        t::Type{HyperRectangle{N1, T1}}, geometry::AbstractArray{PT}
+@compat function (t::Type{HyperRectangle{N1, T1}}){N1, T1, PT<:Point}(
+        geometry::AbstractArray{PT}
     )
     N2, T2 = length(PT), eltype(PT)
     @assert N1 >= N2
@@ -162,7 +162,7 @@ maximum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x + widths(a)[1], a.y +widths(
 minimum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
 origin{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
 
-call{T}(::Type{SimpleRectangle}, val::Vec{2, T}) = SimpleRectangle{T}(0, 0, val...)
+@compat (::Type{SimpleRectangle}){T}(val::Vec{2, T}) = SimpleRectangle{T}(0, 0, val...)
 function SimpleRectangle{T}(position::Vec{2,T}, width::Vec{2,T})
     SimpleRectangle{T}(position..., width...)
 end
