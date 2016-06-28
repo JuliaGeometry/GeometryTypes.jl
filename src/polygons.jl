@@ -156,7 +156,7 @@ function topoint{T}(::Type{Point{2, T}}, p::Point{3, T})
   Point{2, T}(p[1], p[2])
 end
 
-function (::Type{M}){M<:AbstractMesh, P<:Point}(
+@compat function (::Type{M}){M<:AbstractMesh, P<:Point}(
     points::AbstractArray{P}
   )
   faces = polygon2faces(points, facetype(M))
