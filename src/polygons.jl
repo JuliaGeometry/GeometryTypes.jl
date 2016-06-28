@@ -84,6 +84,7 @@ function snip{N, T}(
 end
 
 
+
 """
 Triangulates a Polygon given as a `contour`::AbstractArray{Point} without holes.
 It will return a Vector{`facetype`}, defining indexes into `contour`
@@ -96,7 +97,7 @@ function polygon2faces{P<:Point}(
 
   n = length(contour)
   if n < 3
-    error("not enough")
+    error("Not enough points in the contour. Found: $contour")
   end
   #= we want a counter-clockwise polygon in V =#
   if 0 < area(contour)
