@@ -1,6 +1,6 @@
 using GeometryTypes, ColorTypes
 using FactCheck
-
+import Base.Test.@inferred
 facts("GeometryTypes") do
     include("hyperrectangles.jl")
     include("faces.jl")

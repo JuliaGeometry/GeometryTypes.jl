@@ -151,3 +151,37 @@ immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, Attr
     attributes          ::AttribT
     attribute_id        ::Vector{AttribIDT}
 end
+
+"""
+AbstractFlexibleGeometry{T}
+
+AbstractFlexibleGeometry refers to shapes, which are somewhat mutable.
+"""
+abstract AbstractFlexibleGeometry{T}
+typealias AFG AbstractFlexibleGeometry
+
+"""
+FlexibleConvexHull{T}
+
+Represents the convex hull of finitely many points. The number of points is not fixed.
+"""
+immutable FlexibleConvexHull{T} <: AFG{T}
+    _::Vector{T}
+end
+
+"""
+FlexibleSimplex{T}
+
+Represents a Simplex whos number of vertices is not fixed.
+"""
+immutable FlexibleSimplex{T} <: AFG{T}
+    _::Vector{T}
+end
+
+"""
+AbstractConvexHull
+
+Groups all geometry types, that can be described as the convex hull of finitely
+many points.
+"""
+typealias AbstractConvexHull Union{Simplex, FlexibleConvexHull, FlexibleSimplex}
