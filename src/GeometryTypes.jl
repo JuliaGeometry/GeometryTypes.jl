@@ -33,6 +33,8 @@ import Base: ==,
 include("types.jl")
 include("typeutils.jl")
 include("typealias.jl")
+include("baseutils.jl")
+include("linalgutils.jl")
 include("simplices.jl")
 include("algorithms.jl")
 include("faces.jl")
@@ -166,6 +168,7 @@ export AABB,
        vertices,
        vertexmat,
        vertexmatrix,
+       volume,
        width,
        widths,
        xwidth,

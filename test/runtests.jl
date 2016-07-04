@@ -1,6 +1,7 @@
 using GeometryTypes, ColorTypes
 using FactCheck
 import Base.Test.@inferred
+
 facts("GeometryTypes") do
     include("hyperrectangles.jl")
     include("faces.jl")
@@ -11,6 +12,7 @@ facts("GeometryTypes") do
     include("simplerectangle.jl")
     include("hypersphere.jl")
     include("typeutils.jl")
+    include("simplices.jl")
 end
 
 FactCheck.exitstatus()
