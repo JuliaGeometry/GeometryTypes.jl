@@ -29,6 +29,15 @@ context("3d simplex in 3d") do
     @fact contains(s, Vec(0.1,0,0.1)) --> true
 end
 
+context("1d simplex in 2d") do
+    s = Simplex((Vec(-1, 1.), Vec(1,1.)))
+    proj(pt) = GeometryTypes.proj_sqdist(pt, s)[1]
+    @fact proj(Vec( 0.,  2)) ≈ Vec( 0, 1.) --> true
+    @fact proj(Vec( 0., -2)) ≈ Vec( 0, 1.) --> true
+    @fact proj(Vec( 56., 2)) ≈ Vec( 1, 1.) --> true
+    @fact proj(Vec(-56., 2)) ≈ Vec(-1, 1.) --> true
+end
+
 context("1d simplex in 3d") do
     s = Simplex((Vec(0,0.,0), Vec(1,1.,1)))
     @fact (@inferred min_euclidean(Vec(0., 0.,0), s)) --> roughly(0)

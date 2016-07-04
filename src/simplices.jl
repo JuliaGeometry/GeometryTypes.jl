@@ -68,14 +68,13 @@ simplex_face(s::Simplex, i::Int) = Simplex(deleteat(vertices(s), i))
 proj_sqdist{T}(pt::T, s::LineSegment{T}, best_sqd=eltype(T)(Inf))
 """
 function proj_sqdist{T}(pt::T, s::LineSegment{T}, best_sqd=eltype(T)(Inf))
-    # this is almost 3x as fast as the implementation for general nvertices
-    # also it is branch free :)
     v0, v1 = vertices(s)
     pt = pt - v0
     v = v1 - v0
     θ = clamp(dot(v,pt)/sqnorm(v), zero(eltype(T)), one(eltype(T)))
     pt_proj = θ*v
-    proj_sqdist(pt, pt_proj, best_sqd)
+    best_sqd = min(sqdist(pt, pt_proj), best_sqd)
+    return pt_proj + v0, best_sqd
 end
 
 """

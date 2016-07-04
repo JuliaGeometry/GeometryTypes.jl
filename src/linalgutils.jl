@@ -1,4 +1,4 @@
-@inline unshift(v::Vec, item) = Vec(item, v._...)
+@inline unshift(v::Vec, item) = Vec(item, Tuple(v)...)
 @inline sqnorm(x) = sum(x.^2)
 
 """
