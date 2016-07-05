@@ -184,4 +184,5 @@ AbstractConvexHull
 Groups all geometry types, that can be described as the convex hull of finitely
 many points.
 """
-typealias AbstractConvexHull Union{Simplex, FlexibleConvexHull, FlexibleSimplex}
+typealias AbstractConvexHull Union{Simplex, FlexibleConvexHull, FlexibleSimplex,
+HyperCube, HyperRectangle}

@@ -13,6 +13,8 @@ facts("GeometryTypes") do
     include("hypersphere.jl")
     include("typeutils.jl")
     include("simplices.jl")
+    include("convexhulls.jl")
+
 end
 
 FactCheck.exitstatus()

@@ -53,6 +53,7 @@ include("decompose.jl")
 include("deprecated.jl")
 include("checkbounds.jl")
 include("center.jl")
+include("convexhulls.jl")
 
 export AABB,
        AbstractFlexibleGeometry,
