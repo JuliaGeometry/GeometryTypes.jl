@@ -185,4 +185,4 @@ Groups all geometry types, that can be described as the convex hull of finitely
 many points.
 """
 typealias AbstractConvexHull Union{Simplex, FlexibleConvexHull, FlexibleSimplex,
-HyperCube, HyperRectangle}
+HyperCube, HyperRectangle} # should we parametrize ACH by the type of points T?

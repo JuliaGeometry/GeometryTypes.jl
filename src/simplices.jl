@@ -101,13 +101,13 @@ function proj_sqdist{nv,T}(pt::T, s::Simplex{nv,T}, best_sqd=eltype(T)(Inf))
     # at this point best_proj lies in the subspace spanned by s,
     # but not necessarily inside s
     sqd = sqdist(pt, best_proj)
-    if sqd > best_sqd  # pt is far away even from the subspace spanned by s
+    if sqd >= best_sqd  # pt is far away even from the subspace spanned by s
         return best_proj, best_sqd
     elseif any(w .< 0)  # pt is closest to point inside a face of s
         @inbounds for i in 1:length(w)
             if w[i] < 0
                 proj, sqd = proj_sqdist(pt, simplex_face(s,i), best_sqd)
-                if sqd <= best_sqd
+                if sqd < best_sqd
                     best_sqd = sqd
                     best_proj = proj
                 end
@@ -120,7 +120,6 @@ function proj_sqdist{nv,T}(pt::T, s::Simplex{nv,T}, best_sqd=eltype(T)(Inf))
 end
 
 sqdist(pt, s, best=Inf) = proj_sqdist(pt, s, best)[2]
-min_euclidean(pt, s::Simplex) = √(sqdist(pt, s))
 
 """
 proj_sqdist(p::Vec, q::Vec, best_sqd=eltype(p)(Inf))

@@ -12,6 +12,8 @@ numtype(s) = eltype(eltype(s))
 numtype{N,T}(::HyperCube{N,T}) = T
 
 Base.push!(fl::AFG, pt) = (push!(vertices(fl), pt); fl)
+Base.deleteat!(c::AbstractFlexibleGeometry, i) = (deleteat!(vertices(c), i); c)
+
 Base.copy{FG <: AFG}(fl::FG) = FG(copy(vertices(fl)))
 push(fl::AFG, pt) = push!(copy(fl), pt)
 

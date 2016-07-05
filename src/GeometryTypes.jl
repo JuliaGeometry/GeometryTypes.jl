@@ -54,6 +54,7 @@ include("deprecated.jl")
 include("checkbounds.jl")
 include("center.jl")
 include("convexhulls.jl")
+include("gjk.jl")
 
 export AABB,
        AbstractFlexibleGeometry,
@@ -131,6 +132,7 @@ export AABB,
        faces,
        facetype,
        finishes,
+       gjk,
        hascolors,
        hasfaces,
        hasnormals,
