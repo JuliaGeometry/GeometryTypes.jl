@@ -33,6 +33,8 @@ import Base: ==,
 include("types.jl")
 include("typeutils.jl")
 include("typealias.jl")
+include("baseutils.jl")
+include("linalgutils.jl")
 include("simplices.jl")
 include("algorithms.jl")
 include("faces.jl")
@@ -51,8 +53,11 @@ include("decompose.jl")
 include("deprecated.jl")
 include("checkbounds.jl")
 include("center.jl")
+include("convexhulls.jl")
+include("gjk.jl")
 
 export AABB,
+       AbstractFlexibleGeometry,
        AbstractGeometry,
        AbsoluteRectangle,
        AbstractMesh,
@@ -64,6 +69,8 @@ export AABB,
        decompose,
        eltype_or,
        Face,
+       FlexibleConvexHull,
+       FlexibleSimplex,
        GLFace,
        GLMesh2D,
        GLNormalAttributeMesh,
@@ -125,6 +132,7 @@ export AABB,
        faces,
        facetype,
        finishes,
+       gjk,
        hascolors,
        hasfaces,
        hasnormals,
@@ -146,11 +154,13 @@ export AABB,
        normalize,
        normals,
        normaltype,
+       nvertices,
        overlaps,
        origin,
        row,
        radius,
        setindex,
+       spacedim,
        starts,
        texturecoordinates,
        texturecoordinatetype,
@@ -159,6 +169,9 @@ export AABB,
        update,
        vertextype,
        vertices,
+       vertexmat,
+       vertexmatrix,
+       volume,
        width,
        widths,
        xwidth,

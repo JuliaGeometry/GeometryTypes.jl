@@ -55,6 +55,7 @@ end
 # Containment
 #
 
+
 function isinside(rect::SimpleRectangle, x::Real, y::Real)
     rect.x <= x && rect.y <= y && rect.x + rect.w >= x && rect.y + rect.h >= y
 end
@@ -66,6 +67,20 @@ function isinside(c::Circle, x::Real, y::Real)
     xD <= c.r && yD <= c.r
 end
 
+
+"""
+contains(s::Simplex, pt; atol=0., rtol=defaulrtol(eltype(pt)))
+
+Check if a point is contained inside a Simplex. If the intrinsic dimension
+of the simplex is smaller then the dimension of the surrounding space
+(for example a triangle in 3d) one needs the atol, rtol parameters.
+"""
+function contains(s::Simplex, pt; atol=0., rtol=Base.rtoldefault(eltype(pt)))
+    w = weights(pt, s)
+    all(w .>= -atol) || return false  # projection lies outside of s
+    pt_proj = vertexmat(s) * w
+    return isapprox(pt_proj, pt, atol=atol, rtol=rtol)
+end
 
 """
 Check if HyperRectangles are contained in each other. This does not use

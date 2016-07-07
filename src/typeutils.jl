@@ -1,4 +1,3 @@
-
 """
 This is a terrible function. But is there any other way to reliable get the
 abstract supertype of an arbitrary type hierarchy without loosing performance?
@@ -39,3 +38,6 @@ end
 
 Base.eltype{N, T}(x::AbstractGeometry{N, T}) = T
 Base.ndims{N, T}(x::AbstractGeometry{N, T}) = N
+
+Base.eltype{T}(::Type{AFG{T}}) = T
+Base.eltype{FG <: AFG}(::Type{FG}) = eltype(supertype(FG))

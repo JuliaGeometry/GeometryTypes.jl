@@ -40,9 +40,19 @@ end
     end
     return minimum_dist
 end
-function min_euclidean{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}})
-    sqrt(min_euclideansq(rect, p))
-end
+
+# could add an @symmetric macro, which defines min_euclidean(pt, s) from
+# min_euclidean(s, pt) automatically etc.
+@inline min_euclidean(pt1::Vec, pt2::Vec) = norm(pt1-pt2)
+min_euclidean(pt::Vec, s::Simplex) = √(sqdist(pt, s))
+min_euclidean(s::Simplex, pt::Vec) = min_euclidean(pt, s)
+min_euclidean(r1::HyperRectangle, r2::Vec) = sqrt(min_euclideansq(r1, r2))
+min_euclidean(r1::Vec, r2::HyperRectangle) = sqrt(min_euclideansq(r1, r2))
+min_euclidean(r1::HyperRectangle, r2::HyperRectangle) = sqrt(min_euclideansq(r1, r2))
+min_euclidean(c1::AbstractConvexHull, pt::Vec) = gjk(c1,pt)
+min_euclidean(pt::Vec, c2::AbstractConvexHull) = gjk(pt,c2)
+min_euclidean(c1::AbstractConvexHull, c2::AbstractConvexHull) = gjk(c1,c2)
+
 
 @inline function max_euclideansq{N, T}(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}})
     maximum_dist = T(0.0)
