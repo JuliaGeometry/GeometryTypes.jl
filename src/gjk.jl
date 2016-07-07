@@ -64,9 +64,9 @@ any_inside(v::Vec) = v
 support_vector_max(ch::AbstractConvexHull, v) = argmax(x-> x⋅v, vertices(ch))
 support_vector_max(w::Vec, v) = w, w⋅v
 function support_vector_max(c::HyperRectangle, v)
-    s = 0.5widths(c)
-    signs = map(sign, s .* v)::typeof(v)
-    best_pt = origin(c) + signs.*s
+    s = widths(c)
+    takes = map(x -> x > zero(eltype(v)), s .* v)
+    best_pt::typeof(v) = origin(c) + takes.*s
     score = (best_pt ⋅ v)
     return best_pt, score
 end

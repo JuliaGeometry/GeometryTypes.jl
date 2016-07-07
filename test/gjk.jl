@@ -46,7 +46,7 @@ context("gjk") do
         end
 
         context("Cube") do
-            c = HyperCube(Vec(1.,1,1), 1.)
+            c = HyperCube(Vec(0.5,0.5,0.5), 1.)
             @fact min_euclidean(Vec(2,2,2.), c) ≈ gjk(Vec(2,2,2.), c) ≈ √(3/4) --> true
 
             s = Simplex(Vec(1, 0.5, 0.5), Vec(1,2,3.))
@@ -60,11 +60,11 @@ context("gjk") do
     end
 
     context("support_vector_max") do
-        r = HyperRectangle(Vec(0,0.), Vec(1., 2.))
-        @fact support_vector_max(r, Vec(1,0.)) --> (Vec(0.5,0.), 0.5)
-        @fact support_vector_max(r, Vec(2,0.)) --> (Vec(0.5,0.), 1.)
-        @fact support_vector_max(r, Vec(-1,0.)) --> (Vec(-0.5,0.), 0.5)
-        @fact support_vector_max(r, Vec(0, 1.)) --> (Vec(0.,1.), 1.)
+        r = HyperRectangle(Vec(-0.5, -1.), Vec(1., 2.))
+        @fact support_vector_max(r, Vec(1,0.)) --> (Vec(0.5,-1.), 0.5)
+        @fact support_vector_max(r, Vec(2,0.)) --> (Vec(0.5,-1.), 1.)
+        @fact support_vector_max(r, Vec(-1,0.)) --> (Vec(-0.5,-1.), 0.5)
+        @fact support_vector_max(r, Vec(0, 1.)) --> (Vec(-0.5,1.), 1.)
         @fact support_vector_max(r, Vec(1, 1.)) --> (Vec(0.5,1.), 1.5)
         @fact support_vector_max(FlexibleConvexHull(r), Vec(1, 1.)) --> (Vec(0.5,1.), 1.5)
 
