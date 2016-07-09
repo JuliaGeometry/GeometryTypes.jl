@@ -49,3 +49,36 @@ zerobased{N,T,Offset}(face::Face{N,T,Offset}, i) = T(Int(face[i]) - Int(Offset) 
 offsetbased{N,T,Offset}(face::Face{N,T,Offset}, i, offset) = T(Int(face[i]) - Int(Offset) + Int(offset))
 
 export onebased, zerobased
+
+immutable NBaseIndex{B, T<:Integer} <: Integer
+   i::T
+   function NBaseIndex(i::Integer)
+       new(T(i))
+   end
+end
+
+function Base.call{B, T<:Integer}(::Type{NBaseIndex{B}}, i::T)
+    NBaseIndex{B, T}(i)
+end
+function Base.call{T<:Integer}(::Type{NBaseIndex}, i::T)
+    NBaseIndex{0, T}(i)
+end
+function Base.call{NBI<:NBaseIndex}(::Type{NBI}, i::NBaseIndex)
+    NBI(Base.to_index(i))
+end
+
+Base.to_index{B}(z::NBaseIndex{B}) = 1-B+z.i
+Base.convert{T<:NBaseIndex}(::Type{T}, x) = T(x)
+Base.one{B, T}(NI::Type{NBaseIndex{B, T}}) = NI(one(T)+1)
+
+import Base: *, <, <=, -, +
+*{T<:NBaseIndex}(i::Integer, ::Type{T}) = T(i)
+for op in (:(<), :(<=))
+   @eval ($op)(a::NBaseIndex, b::NBaseIndex) = $(op)(a.i, b.i)
+end
+for op in (:(-), :(+))
+   @eval ($op)(a::NBaseIndex, b::NBaseIndex) = NBaseIndex($(op)(a.i, b.i))
+end
+
+typealias iB0 NBaseIndex{0, Int} #index base 0, name up for discussion
+typealias iB1 NBaseIndex{1, Int}
