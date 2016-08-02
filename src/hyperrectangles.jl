@@ -31,7 +31,7 @@ end
 
 function HyperRectangle{N,T1,T2}(v1::Vec{N,T1}, v2::Vec{N,T2})
     T = promote_type(T1,T2)
-    HyperRectangle(Vec{N,T}(v1), Vec{N,T}(v2))
+    HyperRectangle{N,T}(Vec{N,T}(v1), Vec{N,T}(v2))
 end
 
 
