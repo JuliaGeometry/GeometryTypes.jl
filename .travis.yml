@@ -3,7 +3,8 @@ os:
   - linux
   - osx
 julia:
-  - 0.4
+  - release
+  - nightly
 notifications:
   email: false
 sudo: false

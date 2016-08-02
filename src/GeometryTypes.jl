@@ -55,6 +55,7 @@ include("checkbounds.jl")
 include("center.jl")
 include("convexhulls.jl")
 include("gjk.jl")
+include("polygons.jl")
 
 export AABB,
        AbstractFlexibleGeometry,
@@ -157,6 +158,7 @@ export AABB,
        nvertices,
        overlaps,
        origin,
+       polygon2faces,
        row,
        radius,
        setindex,
