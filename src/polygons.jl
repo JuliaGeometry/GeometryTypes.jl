@@ -32,7 +32,7 @@ SUBMITTED BY JOHN W. RATCLIFF (jratcliff@verant.com) July 22, 2000
  *****************************************************************/
 =#
 
-function area{N, T}(contour::Vector{Point{N, T}})
+function area{N, T}(contour::AbstractVector{Point{N, T}})
   n = length(contour)
   A = zero(T)
   p=n; q=1
@@ -58,20 +58,20 @@ function InsideTriangle{T<:Point}(A::T, B::T, C::T, P::T)
 end
 
 function snip{N, T}(
-    contour::Vector{Point{N, T}}, u, v, w, n, V
+    contour::AbstractVector{Point{N, T}}, u, v, w, n, V
   )
 
   A = contour[V[u]]
   B = contour[V[v]]
   C = contour[V[w]]
   x = (
-    ((B[1]-A[1])*(C[2]-A[2])) - 
+    ((B[1]-A[1])*(C[2]-A[2])) -
     ((B[2]-A[2])*(C[1]-A[1]))
   )
   if 0.0000000001f0 > x
     return false
   end
-  
+
   for p=1:n
     ((p == u) || (p == v) || (p == w)) && continue;
     P = contour[V[p]]
