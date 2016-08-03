@@ -2,7 +2,6 @@ import Base: @deprecate, @deprecate_binding
 
 @deprecate triangulate{F<:Face}(t::Type{F}, f::Face) decompose(t, f)
 
-@deprecate call{N,T}(t::Type{Vector{Point{N,T}}}, r::HyperRectangle{N, T}) decompose(t, r)
 
 @deprecate convert{N1, N2, T1, T2}(::Type{HyperRectangle{N1, T1}},
                                    geometry::Array{Point{N2, T2}}) HyperRectangle{N1,T1}(geometry::Array{Point{N2, T2}})
