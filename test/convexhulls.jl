@@ -44,7 +44,7 @@ context("Convex Hulls") do
     context("Rects") do
         c = HyperCube(Vec(1.,2), 1.)
         r = HyperRectangle(Vec(1.,2), Vec(1.,1))
-        fh = FlexibleConvexHull([ Vec(0.5,1.5), Vec(0.5,2.5), Vec(1.5,1.5), Vec(1.5,2.5)])
+        fh = FlexibleConvexHull([ Vec(1,2.), Vec(1.,3.), Vec(2.,2.), Vec(2.,3.)])
         objects = (c,r,fh)
 
         @fact (@inferred convert(HyperRectangle, c)) --> r

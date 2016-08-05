@@ -18,7 +18,7 @@ Base.copy{FG <: AFG}(fl::FG) = FG(copy(vertices(fl)))
 push(fl::AFG, pt) = push!(copy(fl), pt)
 
 vertices(s::Simplex) = s._
-standard_cube_vertices(::Type{Val{1}}) = [Vec(-1), Vec(1)]
+standard_cube_vertices(::Type{Val{1}}) = [Vec(0), Vec(1)]
 _vcat(v1,v2) = Vec(Tuple(v1)..., Tuple(v2)...)
 function _combine_vcat(arr1, arr2)
     T = typeof(_vcat(first(arr1), first(arr2)))
@@ -39,10 +39,10 @@ end
 end
 
 @generated function vertices{N,T}(r::HyperRectangle{N,T})
-    ret_type = NTuple{(2^N), Vec{N,float(T)}}
+    ret_type = NTuple{(2^N), Vec{N,T}}
     quote
         o = origin(r)
-        v = 0.5*widths(r)
+        v = widths(r)
         f(sv) = o + sv .* v
         tuple(map(f, standard_cube_vertices(Val{N}))...)::$ret_type
     end
