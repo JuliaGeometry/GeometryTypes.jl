@@ -70,14 +70,14 @@ end
 function split_intersections{N,T}(points::Vector{Point{N,T}})
     intersections, sections = self_intersections(points)
     if isempty(intersections)
-        return [points]
+        return Vector{Point{N,T}}[points]
     elseif length(intersections) == 2 && length(sections) == 1
         a,b = intersections
         p = sections[1]
         a,b = min(a,b), max(a,b)
         poly1 = simple_concat(points, (a+1):(b-1), p)
         poly2 = simple_concat(points, (b+1):(length(points)+a), p)
-        return [poly1, poly2]
+        return Vector{Point{N,T}}[poly1, poly2]
     else
         error("More than 1 intersections can't be handled currently. Found: $intersections, $sections")
     end
