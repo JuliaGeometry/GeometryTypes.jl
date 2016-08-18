@@ -20,7 +20,10 @@ using GeometryTypes
 #         return true, Point{2,T}(x,y)
 #     end
 # end
-
+"""
+Intersection of 2 line segmens `a` and `b`.
+Returns intersection_found::Bool, intersection_point
+"""
 function intersects{N,T}(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}})
     v1, v2 = a; v3, v4 = b; MT = Mat{2,2,T}; p0 = zero(Point{N,T})
 
@@ -49,6 +52,10 @@ function simple_concat{P}(vec, range, endpoint::P)
     result[end] = endpoint
     result
 end
+
+"""
+Finds all self intersections of polygon `points`
+"""
 function self_intersections{N,T}(points::Vector{Point{N,T}})
     sections = Point{N,T}[]
     intersections = Int[]
@@ -67,6 +74,11 @@ function self_intersections{N,T}(points::Vector{Point{N,T}})
     end
     intersections, sections
 end
+
+"""
+Splits polygon `points` into it's self intersecting parts. Only 1 intersection
+is handled right now.
+"""
 function split_intersections{N,T}(points::Vector{Point{N,T}})
     intersections, sections = self_intersections(points)
     if isempty(intersections)
