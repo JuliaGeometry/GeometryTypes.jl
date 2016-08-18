@@ -16,6 +16,7 @@ facts("GeometryTypes") do
     include("simplices.jl")
     include("convexhulls.jl")
     include("gjk.jl")
+    include("lines.jl")
 end
 
 FactCheck.exitstatus()

@@ -3,6 +3,7 @@ module GeometryTypes
 
 using FixedSizeArrays
 using ColorTypes
+using Iterators
 import FixedSizeArrays: eltype_or, ndims_or
 using Compat
 
@@ -56,6 +57,7 @@ include("center.jl")
 include("convexhulls.jl")
 include("gjk.jl")
 include("polygons.jl")
+include("lines.jl")
 
 export AABB,
        AbstractFlexibleGeometry,
@@ -92,6 +94,7 @@ export AABB,
        HyperRectangle,
        HyperCube,
        HyperSphere,
+       intersects,
        LineSegment,
        Mat,
        Mesh2D,
@@ -109,6 +112,8 @@ export AABB,
        Pyramid,
        Quad,
        Rectangle,
+       self_intersections,
+       split_intersections,
        SignedDistanceField,
        SimpleMesh,
        SimpleRectangle,
