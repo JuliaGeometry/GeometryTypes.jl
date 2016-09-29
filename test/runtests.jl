@@ -3,7 +3,6 @@ using FactCheck
 import Base.Test.@inferred
 
 facts("GeometryTypes") do
-    include("polygons.jl")
     include("hyperrectangles.jl")
     include("faces.jl")
     include("meshes.jl")
@@ -17,6 +16,7 @@ facts("GeometryTypes") do
     include("convexhulls.jl")
     include("gjk.jl")
     include("lines.jl")
+    include("polygons.jl")
 end
 
 FactCheck.exitstatus()

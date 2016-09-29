@@ -14,7 +14,7 @@ Abstract to classify Simplices. The convention for N starts at 1, which means
 a Simplex has 1 point. A 2-simplex has 2 points, and so forth. This convention
 is not the same as most mathematical texts.
 """
-abstract AbstractSimplex{N,T} <: FixedVector{N,T}
+abstract AbstractSimplex{T} <: StaticVector{T}
 
 
 """
@@ -33,16 +33,42 @@ This is for a simpler implementation.
 It applies to infinite dimensions. The structure of this type is designed
 to allow embedding in higher-order spaces by parameterizing on `T`.
 """
-immutable Simplex{N,T} <: AbstractSimplex{N,T}
+immutable Simplex{N,T} <: AbstractSimplex{T}
     _::NTuple{N,T}
 end
 
-immutable Normal{N, T} <: FixedVector{N, T}
+immutable Normal{N, T} <: StaticVector{T}
     _::NTuple{N, T}
 end
-immutable TextureCoordinate{N, T} <: FixedVector{N, T}
+
+@inline (::Type{Normal}){S}(x::NTuple{S}) = Normal{S}(x)
+@inline (::Type{Normal{S}}){S, T}(x::NTuple{S,T}) = Normal{S,T}(x)
+@inline (::Type{Normal{S}}){S, T <: Tuple}(x::T) = Normal{S,promote_tuple_eltype(T)}(x)
+
+Base.@pure Base.size{S}(::Union{Normal{S},Type{Normal{S}}}) = (S, )
+Base.@pure Base.size{S,T}(::Type{Normal{S,T}}) = (S,)
+
+Base.@propagate_inbounds function Base.getindex(v::Normal, i::Integer)
+    v.data[i]
+end
+@inline Base.Tuple(v::Normal) = v.data
+
+immutable TextureCoordinate{N, T} <: StaticVector{T}
     _::NTuple{N, T}
 end
+@inline (::Type{TextureCoordinate}){S}(x::NTuple{S}) = TextureCoordinate{S}(x)
+@inline (::Type{TextureCoordinate{S}}){S, T}(x::NTuple{S,T}) = TextureCoordinate{S,T}(x)
+@inline (::Type{TextureCoordinate{S}}){S, T <: Tuple}(x::T) = TextureCoordinate{S,promote_tuple_eltype(T)}(x)
+
+Base.@pure Base.size{S}(::Union{TextureCoordinate{S},Type{TextureCoordinate{S}}}) = (S, )
+Base.@pure Base.size{S,T}(::Type{TextureCoordinate{S,T}}) = (S,)
+
+Base.@propagate_inbounds function Base.getindex(v::TextureCoordinate, i::Integer)
+    v.data[i]
+end
+
+@inline Base.Tuple(v::TextureCoordinate) = v.data
+
 
 """
 A Face is typically used when constructing subtypes of `AbstractMesh` where
@@ -54,9 +80,21 @@ Face is parameterized by:
 * `O` - The offset relative to Julia arrays. This helps reduce copying when
 communicating with 0-indexed systems such ad OpenGL.
 """
-immutable Face{N, T, IndexOffset} <: FixedVector{N, T}
+immutable Face{N, T, IndexOffset} <: StaticVector{T}
     _::NTuple{N, T}
 end
+@inline (::Type{Face}){S}(x::NTuple{S}) = Face{S}(x)
+@inline (::Type{Face{S, O}}){S, T, O}(x::NTuple{S,T}) = Face{S,T, O}(x)
+@inline (::Type{Face{S, O}}){S, T <: Tuple, O}(x::T) = Face{S,promote_tuple_eltype(T), O}(x)
+
+Base.@pure Base.size{S}(::Union{Face{S},Type{Face{S}}}) = (S, )
+Base.@pure Base.size{S,T}(::Type{Face{S,T}}) = (S,)
+
+Base.@propagate_inbounds function Base.getindex(v::Face, i::Integer)
+    v.data[i]
+end
+
+@inline Base.Tuple(v::Face) = v.data
 
 """
 A `HyperRectangle` is a generalization of a rectangle into N-dimensions.
@@ -80,7 +118,7 @@ A `HyperSphere` is a generalization of a sphere into N-dimensions.
 A `center` and radius, `r`, must be specified.
 """
 immutable HyperSphere{N, T} <: GeometryPrimitive{N, T}
-    center::Point{N, T}
+    center::Face{N, T}
     r::T
 end
 
@@ -104,13 +142,13 @@ immutable Quad{T} <: GeometryPrimitive{3, T}
 end
 
 immutable Pyramid{T} <: GeometryPrimitive{3, T}
-    middle::Point{3, T}
+    middle::Face{3, T}
     length::T
     width ::T
 end
 
 immutable Particle{N, T} <: GeometryPrimitive{N, T}
-    position::Point{N, T}
+    position::Face{N, T}
     velocity::Vec{N, T}
 end
 
