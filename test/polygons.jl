@@ -1,6 +1,6 @@
-context("Polygons") do
+@testset "Polygons" begin
 
-context("construction") do
+@testset "construction" begin
 	points = Point2f0[
 		(0,6),
 		(0,0),
@@ -20,8 +20,8 @@ context("construction") do
 	]
 	mesh = GLNormalMesh(points)
 	faces = polygon2faces(points, Triangle{Int})
-	@fact eltype(faces) --> Triangle{Int}
-	@fact facetype(mesh) --> GLTriangle
+	@test eltype(faces) == Triangle{Int}
+	@test facetype(mesh) == GLTriangle
 
 end
 end
