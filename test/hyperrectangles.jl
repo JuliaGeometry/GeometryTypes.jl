@@ -199,6 +199,9 @@ context("transforms") do
     t = Mat((0,1),(1,0))
     h = t*HyperRectangle(0,0,1,2)
     @fact h --> HyperRectangle(0,0,2,1)
+    m = eye(Mat4f0)
+    h = centered(HyperRectangle{3, Float32})
+    @fact h --> h
 end
 
 end

@@ -60,8 +60,8 @@ function self_intersections{N,T}(points::Vector{Point{N,T}})
     sections = Point{N,T}[]
     intersections = Int[]
     wraparound = i->mod1(i, length(points)-1)
-    for (i, (a,b)) in enumerate(partition(points, 2, 1))
-        for (j, (a2, b2)) in enumerate(partition(points, 2, 1))
+    for (i, (a,b)) in enumerate(Iterators.partition(points, 2, 1))
+        for (j, (a2, b2)) in enumerate(Iterators.partition(points, 2, 1))
             is1, is2 = wraparound(i+1), wraparound(i-1)
             if i!=j && is1!=j && is2!=j && !(i in intersections) && !(j in intersections)
                 intersected, p = GeometryTypes.intersects(LineSegment(a,b), LineSegment(a2, b2))

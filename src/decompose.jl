@@ -355,6 +355,16 @@ spherical{T}(theta::T, phi::T) = Point{3, T}(
     cos(theta)
 )
 
+function decompose{T}(PT::Type{Point{2,T}}, s::Circle, n=32)
+    rad = radius(s)
+    map(linspace(T(0), T(2pi), n)) do fi
+        PT(
+            rad*sin(fi + pi),
+            rad*cos(fi + pi)
+        ) + origin(s)
+    end
+end
+
 function decompose{N,T}(PT::Type{Point{N,T}}, s::Sphere, facets=12)
     vertices      = Array(PT, facets*facets+1)
     vertices[end] = PT(s.center) - PT(0,0,radius(s)) #Create a vertex for last triangle fan

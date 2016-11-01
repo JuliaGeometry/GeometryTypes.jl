@@ -171,6 +171,12 @@ context("HyperSphere") do
         (9,2,9)
     ]
     @fact faces --> face_target
+
+
+    points = decompose(Point2f0, Circle(Point2f0(0), 0f0), 20)
+    @fact length(points) --> 20
+    
+
 end
 
 

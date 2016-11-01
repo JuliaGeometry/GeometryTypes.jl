@@ -1,9 +1,10 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__(true)
+__precompile__()
 module GeometryTypes
 
 using FixedSizeArrays
 using ColorTypes
-using Iterators
+import Iterators
+
 import FixedSizeArrays: eltype_or, ndims_or
 using Compat
 
