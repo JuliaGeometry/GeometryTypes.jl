@@ -1,43 +1,43 @@
-context("decompose functions") do
+@testset "decompose functions" begin
 
-context("General") do
+@testset "General" begin
     # this fails on travis and I can't reproduce it.. It's not the most important
     # test so I uncommented it for now!
     #@fact_throws ArgumentError decompose(Normal{3, Float32}, Circle{Float32}(Point2f0(0), 1f0))
 end
 
-context("HyperRectangles") do
+@testset "HyperRectangles" begin
     a = HyperRectangle(Vec(0,0),Vec(1,1))
     pt_expa = Point{2,Int}[(0,0), (1,0), (0,1), (1,1)]
-    @fact decompose(Point{2,Int},a) --> pt_expa
+    @test decompose(Point{2,Int},a) == pt_expa
     b = HyperRectangle(Vec(1,1,1),Vec(1,1,1))
     pt_expb = Point{3,Int}[(1,1,1),(2,1,1),(1,2,1),(2,2,1),(1,1,2),(2,1,2),(1,2,2),(2,2,2)]
-    @fact decompose(Point{3,Int}, b) --> pt_expb
+    @test decompose(Point{3,Int}, b) == pt_expb
 end
 
-context("Faces") do
-    @fact decompose(GLTriangle, Face{4, Int, 0}(1,2,3,4)) --> (Face{3,UInt32,-1}(0,1,2), Face{3,UInt32,-1}(0,2,3))
-    @fact decompose(Face{3,Int,-1}, Face{4, Int, -1}(1,2,3,4)) --> (Face{3,Int,-1}(1,2,3),Face{3,Int,-1}(1,3,4))
-    @fact decompose(Face{3,Int,2}, Face{4, Int, 1}(1,2,3,4)) --> (Face{3,Int,2}(2,3,4),Face{3,Int,2}(2,4,5))
-    @fact decompose(Face{2,Int,0}, Face{4, Int, 0}(1,2,3,4)) --> (Face{2,Int,0}(1,2),
+@testset "Faces" begin
+    @test decompose(GLTriangle, Face{4, Int, 0}(1,2,3,4)) == (Face{3,UInt32,-1}(0,1,2), Face{3,UInt32,-1}(0,2,3))
+    @test decompose(Face{3,Int,-1}, Face{4, Int, -1}(1,2,3,4)) == (Face{3,Int,-1}(1,2,3),Face{3,Int,-1}(1,3,4))
+    @test decompose(Face{3,Int,2}, Face{4, Int, 1}(1,2,3,4)) == (Face{3,Int,2}(2,3,4),Face{3,Int,2}(2,4,5))
+    @test decompose(Face{2,Int,0}, Face{4, Int, 0}(1,2,3,4)) == (Face{2,Int,0}(1,2),
                                                                   Face{2,Int,0}(2,3),
                                                                   Face{2,Int,0}(3,4),
                                                                   Face{2,Int,0}(4,1))
 end
 
-context("Simplex") do
+@testset "Simplex" begin
     s1 = Simplex(:x1,:x2,:x3)
     s2 = Simplex(:x1,:x2,:x3,:x4)
-    @fact decompose(Simplex{1}, s1) --> (Simplex(:x1),Simplex(:x2),Simplex(:x3))
-    @fact decompose(Simplex{2}, s1) --> (Simplex(:x1,:x2),Simplex(:x2,:x3),Simplex(:x3,:x1))
-    @fact decompose(Simplex{2}, s2) --> (Simplex(:x1,:x2),Simplex(:x2,:x3),Simplex(:x3,:x4),Simplex(:x4,:x1))
-    @fact decompose(Simplex{3}, s2) --> (Simplex(:x1,:x2,:x3),Simplex(:x1,:x3,:x4))
+    @test decompose(Simplex{1}, s1) == (Simplex(:x1),Simplex(:x2),Simplex(:x3))
+    @test decompose(Simplex{2}, s1) == (Simplex(:x1,:x2),Simplex(:x2,:x3),Simplex(:x3,:x1))
+    @test decompose(Simplex{2}, s2) == (Simplex(:x1,:x2),Simplex(:x2,:x3),Simplex(:x3,:x4),Simplex(:x4,:x1))
+    @test decompose(Simplex{3}, s2) == (Simplex(:x1,:x2,:x3),Simplex(:x1,:x3,:x4))
 end
 
-context("SimpleRectangle") do
+@testset "SimpleRectangle" begin
     r = SimpleRectangle(0,0,1,1)
     pts = decompose(Point, r)
-    @fact pts --> Point{2,Int}[
+    @test pts == Point{2,Int}[
         (0,0),
         (1,0),
         (0,1),
@@ -57,7 +57,7 @@ context("SimpleRectangle") do
         (0.5,1.0,0.0)
         (1.0,1.0,0.0)
     ]
-    @fact points --> point_target
+    @test points == point_target
 
     faces = decompose(Face{3, Int, 0}, mesh)
     face_target = Face{3, Int, 0}[
@@ -70,7 +70,7 @@ context("SimpleRectangle") do
         (5,6,9)
         (5,9,8)
     ]
-    @fact faces --> face_target
+    @test faces == face_target
 
     uvs = decompose(UV{Float64}, mesh)
     uv_target = UV{Float64}[
@@ -84,11 +84,11 @@ context("SimpleRectangle") do
         (0.5,1.0)
         (1.0,1.0)
     ]
-    @fact uvs --> uv_target
+    @test uvs == uv_target
 end
 
 
-context("Normals") do
+@testset "Normals" begin
     n64 = Normal{3, Float64}[
         (0.0,0.0,-1.0),
         (0.0,0.0,-1.0),
@@ -117,21 +117,21 @@ context("Normals") do
     ]
     n32 = map(Normal{3,Float32}, n64)
     r = GLPlainMesh(centered(HyperRectangle))
-    @fact normals(vertices(r), faces(r), Normal{3, Float32}) --> n32
-    @fact normals(vertices(r), faces(r), Normal{3, Float64}) --> n64
+    @test normals(vertices(r), faces(r), Normal{3, Float32}) == n32
+    @test normals(vertices(r), faces(r), Normal{3, Float64}) == n64
 
     r = PlainMesh{Float64, Face{3, UInt32, 0}}(centered(HyperRectangle))
-    @fact normals(vertices(r), faces(r), Normal{3, Float32}) --> n32
-    @fact normals(vertices(r), faces(r), Normal{3, Float64}) --> n64
+    @test normals(vertices(r), faces(r), Normal{3, Float32}) == n32
+    @test normals(vertices(r), faces(r), Normal{3, Float64}) == n64
 
     r = PlainMesh{Float16, Face{3, UInt64, -1}}(centered(HyperRectangle))
-    @fact normals(vertices(r), faces(r), Normal{3, Float32}) --> n32
-    @fact normals(vertices(r), faces(r), Normal{3, Float64}) --> n64
+    @test normals(vertices(r), faces(r), Normal{3, Float32}) == n32
+    @test normals(vertices(r), faces(r), Normal{3, Float64}) == n64
 
 end
 
 
-context("HyperSphere") do
+@testset "HyperSphere" begin
     sphere = Sphere{Float32}(Point3f0(0), 1f0)
 
     points = decompose(Point, sphere, 3)
@@ -147,7 +147,7 @@ context("HyperSphere") do
         (-0.4330126,-0.75,-0.50000006)
         (0.0,0.0,-1.0)
     ]
-    @fact points --> point_target
+    @test points == point_target
 
     faces = decompose(GLTriangle, sphere, 3)
     face_target = GLTriangle[
@@ -170,12 +170,10 @@ context("HyperSphere") do
         (8,2,9)
         (9,2,9)
     ]
-    @fact faces --> face_target
-
+    @test faces == face_target
 
     points = decompose(Point2f0, Circle(Point2f0(0), 0f0), 20)
-    @fact length(points) --> 20
-    
+    @test length(points) == 20
 
 end
 
