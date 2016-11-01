@@ -122,6 +122,39 @@ function *{N,T1,T2}(m::Mat{N,N,T1}, h::HyperRectangle{N,T2})
     HyperRectangle{N,T}(vmin, vmax-vmin)
 end
 
+# fast path. TODO make other versions fast without code duplications like now
+function *{T}(m::Mat{4,4,T}, h::HyperRectangle{3,T})
+    # equal dimension case
+
+    # get all points on the HyperRectangle
+    pts = (
+        Vec{4,T}(0.0,0.0,0.0, 1.0),
+        Vec{4,T}(1.0,0.0,0.0, 1.0),
+        Vec{4,T}(0.0,1.0,0.0, 1.0),
+        Vec{4,T}(1.0,1.0,0.0, 1.0),
+        Vec{4,T}(0.0,0.0,1.0, 1.0),
+        Vec{4,T}(1.0,0.0,1.0, 1.0),
+        Vec{4,T}(0.0,1.0,1.0, 1.0),
+        Vec{4,T}(1.0,1.0,1.0, 1.0)
+    )
+
+    # make sure our points are sized for the tranform
+    vmin = Vec{4, T}(typemax(T))
+    vmax = Vec{4, T}(typemin(T))
+    o, w = origin(h), widths(h)
+    _o = Vec{4, T}(o[1], o[2], o[3], T(0))
+    _w = Vec{4, T}(w[1], w[2], w[3], T(1))
+    # tranform all points, tracking min and max points
+    for pt in pts
+        pn = m * (_o + (pt .* _w))
+        vmin = min(pn, vmin)
+        vmax = max(pn, vmax)
+    end
+    _vmin = Vec{3,T}(vmin[1], vmin[2], vmin[3])
+    _vmax = Vec{3,T}(vmax[1], vmax[2], vmax[3])
+    HyperRectangle{3,T}(_vmin, _vmax-_vmin)
+end
+
 function HyperRectangle{N,T}(geometry::Array{Point{N, T}})
     HyperRectangle{N,T}(geometry)
 end
