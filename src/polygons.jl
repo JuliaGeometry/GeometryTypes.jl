@@ -73,6 +73,11 @@ function polygon2faces{P<:Point}(
     )
     #= allocate and initialize list of Vertices in polygon =#
     result = facetype[]
+    
+    # the algorithm doesn't like closed contours
+    if isapprox(last(contour), first(contour))
+        pop!(contour)
+    end
 
     n = length(contour)
     if n < 3
@@ -137,5 +142,5 @@ end
     )
     faces = polygon2faces(points, facetype(M))
     VT = vertextype(M)
-    GLNormalMesh(faces=faces, vertices=VT[topoint(VT, p) for p in points])
+    GLNormalMesh(faces = faces, vertices = VT[topoint(VT, p) for p in points])
 end
