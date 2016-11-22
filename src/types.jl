@@ -69,7 +69,7 @@ immutable OffsetInteger{O, T <: Integer} <: Integer
         new(x - O)
     end
 end
-
+raw(x::OffsetInteger) = x.i
 
 """
 A `HyperRectangle` is a generalization of a rectangle into N-dimensions.
