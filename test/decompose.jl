@@ -16,13 +16,18 @@ end
 end
 
 @testset "Faces" begin
-    @test decompose(GLTriangle, Face{4, Int, 0}(1,2,3,4)) == (Face{3,UInt32,-1}(0,1,2), Face{3,UInt32,-1}(0,2,3))
-    @test decompose(Face{3,Int,-1}, Face{4, Int, -1}(1,2,3,4)) == (Face{3,Int,-1}(1,2,3),Face{3,Int,-1}(1,3,4))
-    @test decompose(Face{3,Int,2}, Face{4, Int, 1}(1,2,3,4)) == (Face{3,Int,2}(2,3,4),Face{3,Int,2}(2,4,5))
-    @test decompose(Face{2,Int,0}, Face{4, Int, 0}(1,2,3,4)) == (Face{2,Int,0}(1,2),
-                                                                  Face{2,Int,0}(2,3),
-                                                                  Face{2,Int,0}(3,4),
-                                                                  Face{2,Int,0}(4,1))
+    @test decompose(GLTriangle, Face{4, Int}(1,2,3,4)) == (GLTriangle(1,2,3), GLTriangle(1,3,4))
+    @test decompose(Face{3, ZeroIndex{Int}}, Face{4, ZeroIndex{Int}}(1,2,3,4)) == (Face{3,ZeroIndex{Int}}(1,2,3), Face{3, ZeroIndex{Int}}(1,3,4))
+    @test decompose(Face{3, OffsetInteger{3, Int}}, Face{4, OffsetInteger{2, Int}}(1,2,3,4)) == (
+            Face{3, OffsetInteger{3, Int}}(1,2,3),
+            Face{3, OffsetInteger{3, Int}}(1,3,4)
+    )
+    @test decompose(Face{2, Int}, Face{4, Int}(1,2,3,4)) == (
+        Face{2, Int}(1,2),
+        Face{2, Int}(2,3),
+        Face{2, Int}(3,4),
+        Face{2, Int}(4,1)
+    )
 end
 
 @testset "Simplex" begin
@@ -59,8 +64,8 @@ end
     ]
     @test points == point_target
 
-    faces = decompose(Face{3, Int, 0}, mesh)
-    face_target = Face{3, Int, 0}[
+    faces = decompose(Face{3, Int}, mesh)
+    face_target = Face{3, Int}[
         (1,2,5)
         (1,5,4)
         (2,3,6)
@@ -120,11 +125,11 @@ end
     @test normals(vertices(r), faces(r), Normal{3, Float32}) == n32
     @test normals(vertices(r), faces(r), Normal{3, Float64}) == n64
 
-    r = PlainMesh{Float64, Face{3, UInt32, 0}}(centered(HyperRectangle))
+    r = PlainMesh{Float64, Face{3, UInt32}}(centered(HyperRectangle))
     @test normals(vertices(r), faces(r), Normal{3, Float32}) == n32
     @test normals(vertices(r), faces(r), Normal{3, Float64}) == n64
 
-    r = PlainMesh{Float16, Face{3, UInt64, -1}}(centered(HyperRectangle))
+    r = PlainMesh{Float16, Face{3, ZeroIndex{UInt64}}}(centered(HyperRectangle))
     @test normals(vertices(r), faces(r), Normal{3, Float32}) == n32
     @test normals(vertices(r), faces(r), Normal{3, Float64}) == n64
 
@@ -150,7 +155,7 @@ end
     @test points == point_target
 
     faces = decompose(GLTriangle, sphere, 3)
-    face_target = GLTriangle[
+    face_target = NTuple{3, Cuint}[
         (0,3,1)
         (1,3,4)
         (3,6,4)
@@ -170,6 +175,7 @@ end
         (8,2,9)
         (9,2,9)
     ]
+    face_target = reinterpret(GLTriangle, face_target)
     @test faces == face_target
 
     points = decompose(Point2f0, Circle(Point2f0(0), 0f0), 20)
