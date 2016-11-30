@@ -2,16 +2,16 @@
 Allow to call decompose with unspecified vector type and infer types from
 primitive.
 """
-function decompose{FSV <: FixedVector, N, T}(::Type{FSV},
+function decompose{SV <: StaticVector, N, T}(::Type{SV},
         r::AbstractGeometry{N, T}, args...
     )
-    vectype = similar_type(FSV, eltype_or(FSV, T), size_or(FSV, (N,)))
+    vectype = similar_type(SV, eltype_or(SV, T), size_or(SV, (N,)))
     # since we have not triangular dispatch, we can't define a function with the
     # signature for a fully specified Vector type. But we need to check for it
     # as it means that decompose is not implemented for that version
-    if FSV == vectype
+    if SV == vectype
         throw(ArgumentError(
-            "Decompose not implemented for decompose(::Type{$FSV}, ::$(typeof(r)))"
+            "Decompose not implemented for decompose(::Type{$SV}, ::$(typeof(r)))"
         ))
     end
     decompose(vectype, r, args...)
@@ -48,18 +48,14 @@ decompose{N, FT1, FT2, O1, O2}(::Type{Face{3, FT1, O1}},
 ```
 Triangulate an N-Face into a tuple of triangular faces.
 """
-@generated function decompose{N, FT1, FT2, O1, O2}(::Type{Face{3, FT1, O1}},
-                                       f::Face{N, FT2, O2})
+@generated function decompose{N, FT1, FT2}(::Type{Face{3, FT1}},
+                                       f::Face{N, FT2})
     3 <= N || error("decompose not implented for N <= 3 yet. N: $N")# other wise degenerate
 
     v = Expr(:tuple)
-    append!(v.args, [
-        :(Face{3,FT1,O1}(
-            offsetbased(f,1, O1),
-            offsetbased(f,$(i-1), O1),
-            offsetbased(f,$i, O1)
-        )) for i = 3:N]
-    )
+    for i = 3:N
+        push!(v.args, :(Face{3, FT1}(f[1], f[$(i-1)], f[$i])))
+    end
     v
 end
 
@@ -71,24 +67,18 @@ decompose{N, FT1, FT2, O1, O2}(::Type{Face{2, FT1, O1}},
 
 Extract all line segments in a Face.
 """
-@generated function decompose{N, FT1, FT2, O1, O2}(::Type{Face{2, FT1, O1}},
-                                       f::Face{N, FT2, O2})
+@generated function decompose{N, FT1, FT2}(
+        ::Type{Face{2, FT1}},
+        f::Face{N, FT2}
+    )
     2 <= N || error("decompose not implented for N <= 2 yet. N: $N")# other wise degenerate
 
     v = Expr(:tuple)
-    append!(v.args, [
-        :(Face{2,$FT1,$O1}(
-            offsetbased(f, $i    , O1),
-            offsetbased(f, $(i+1), O1),
-        )) for i = 1:N-1]
-    )
+    for i = 1:N-1
+        push!(v.args, :(Face{2, $FT1}(f[$i], f[$(i+1)])))
+    end
     # connect vertices N and 1
-    push!(v.args,
-        :(Face{2,$FT1,$O1}(
-            offsetbased(f, N, O1),
-            offsetbased(f, 1, O1)
-        ))
-    )
+    push!(v.args, :(Face{2, $FT1}(f[$N], f[1])))
     v
 end
 
@@ -193,10 +183,10 @@ end
 """
 Get decompose a `HyperRectangle` into faces.
 """
-function decompose{N, T, O, T2}(
-        FT::Type{Face{N, T, O}}, rect::HyperRectangle{3, T2}
+function decompose{N, T, T2}(
+        FT::Type{Face{N, T}}, rect::HyperRectangle{3, T2}
     )
-    faces = Face{4, Int, 0}[
+    faces = Face{4, Int}[
         (1,2,4,3),
         (2,4,8,6),
         (4,3,7,8),
@@ -208,12 +198,12 @@ function decompose{N, T, O, T2}(
 end
 
 function decompose{PT}(P::Type{Point{2, PT}}, r::SimpleRectangle, resolution=(2,2))
-    w,h = resolution
+    w, h = resolution
     vec(P[(x,y) for x=linspace(r.x, r.x+r.w, w), y=linspace(r.y, r.y+r.h, h)])
 end
 function decompose{PT}(P::Type{Point{3, PT}}, r::SimpleRectangle, resolution=(2,2))
-    w,h = resolution
-    vec(P[(x,y,0) for x=linspace(r.x, r.x+r.w, w), y=linspace(r.y, r.y+r.h, h)])
+    w, h = resolution
+    vec(P[(x, y, 0) for x = linspace(r.x, r.x+r.w, w), y = linspace(r.y, r.y+r.h, h)])
 end
 function decompose{UVT}(T::Type{UV{UVT}}, r::SimpleRectangle, resolution=(2,2))
     w,h = resolution
@@ -224,7 +214,7 @@ function decompose{T<:Normal}(::Type{T}, r::SimpleRectangle, resolution=(2,2))
 end
 function decompose{T<:Face}(::Type{T}, r::SimpleRectangle, resolution=(2,2))
     w,h = resolution
-    faces = vec([Face{4, Int, 0}(
+    faces = vec([Face{4, Int}(
             sub2ind(resolution, i, j), sub2ind(resolution, i+1, j),
             sub2ind(resolution, i+1, j+1), sub2ind(resolution, i, j+1)
         ) for i=1:(w-1), j=1:(h-1)]
@@ -263,11 +253,11 @@ function decompose{NT}(T::Type{Normal{3, NT}}, q::Quad)
     T[normal for i=1:4]
 end
 
-decompose{FT, IO}(T::Type{Face{3, FT, IO}}, q::Quad) = T[
-    Face{3, Int, 0}(1,2,3), Face{3, Int, 0}(3,4,1)
+decompose{FT}(T::Type{Face{3, FT}}, q::Quad) = T[
+    Face{3, FT}(1,2,3), Face{3, FT}(3,4,1)
 ]
-decompose{FT, IO}(T::Type{Face{4, FT, IO}}, q::Quad) = T[
-    Face{4, Int, 0}(1,2,3,4)
+decompose{FT}(T::Type{Face{4, FT}}, q::Quad) = T[
+    Face{4, FT}(1, 2, 3, 4)
 ]
 decompose{ET}( T::Type{UV{ET}}, q::Quad) = T[
     T(0,0), T(0,1), T(1,1), T(1,0)
@@ -280,8 +270,8 @@ decompose{ET}(T::Type{UVW{ET}}, q::Quad) = T[
     q.downleft + q.width
 ]
 
-function decompose{FT, IO}(T::Type{Face{3, FT, IO}}, r::Pyramid)
-    reinterpret(T, collect(map(FT, (1:18)+IO)))
+function decompose{FT}(T::Type{Face{3, FT}}, r::Pyramid)
+    reinterpret(T, map(FT, collect(1:18)))
 end
 
 
@@ -298,7 +288,7 @@ function decompose{VT}(T::Type{Point{3, VT}}, mesh::AbstractMesh)
 end
 
 # gets the wanted face type
-function decompose{N, FT, Offset}(T::Type{Face{N, FT, Offset}}, mesh::AbstractMesh)
+function decompose{N, FT}(T::Type{Face{N, FT}}, mesh::AbstractMesh)
     fs = faces(mesh)
     eltype(fs) == T && return fs
     return decompose(T, fs)
@@ -355,6 +345,16 @@ spherical{T}(theta::T, phi::T) = Point{3, T}(
     cos(theta)
 )
 
+function decompose{T}(PT::Type{Point{2,T}}, s::Circle, n=32)
+    rad = radius(s)
+    map(linspace(T(0), T(2pi), n)) do fi
+        PT(
+            rad*sin(fi + pi),
+            rad*cos(fi + pi)
+        ) + origin(s)
+    end
+end
+
 function decompose{N,T}(PT::Type{Point{N,T}}, s::Sphere, facets=12)
     vertices      = Array(PT, facets*facets+1)
     vertices[end] = PT(s.center) - PT(0,0,radius(s)) #Create a vertex for last triangle fan
@@ -380,8 +380,8 @@ function decompose{FT<:Face}(::Type{FT}, s::Sphere, facets=12)
             i2 = sub2ind((facets,), j, next_index)
             i3 = (j != facets) ? sub2ind((facets,), j+1, i)          : psydo_triangle_i
             i6 = (j != facets) ? sub2ind((facets,), j+1, next_index) : psydo_triangle_i
-            indexes[index]   = FT(Triangle{FTE}(i1,i2,i3)) # convert to required Face index offset
-            indexes[index+1] = FT(Triangle{FTE}(i3,i2,i6))
+            indexes[index]   = FT(i1,i2,i3) # convert to required Face index offset
+            indexes[index+1] = FT(i3,i2,i6)
             index += 2
         end
     end

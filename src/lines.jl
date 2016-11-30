@@ -25,15 +25,18 @@ Intersection of 2 line segmens `a` and `b`.
 Returns intersection_found::Bool, intersection_point
 """
 function intersects{N,T}(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}})
-    v1, v2 = a; v3, v4 = b; MT = Mat{2,2,T}; p0 = zero(Point{N,T})
+    v1, v2 = a; v3, v4 = b; MT = Mat{2,2,T,4}; p0 = zero(Point{N,T})
 
-    a = det(MT((v1[1] - v2[1], v1[2] - v2[2]), (v3[1] - v4[1], v3[2] - v4[2])))
+    a = det(MT(
+        v1[1] - v2[1], v1[2] - v2[2],
+        v3[1] - v4[1], v3[2] - v4[2]
+    ))
     (abs(a) < eps(T)) && return false, p0 # Lines are parallel
 
-    d1 = det(MT(Tuple(v1), Tuple(v2)))
-    d2 = det(MT(Tuple(v3), Tuple(v4)))
-    x = det(MT((d1, v1[1] - v2[1]), (d2, v3[1] - v4[1]))) / a;
-    y = det(MT((d1, v1[2] - v2[2]), (d2, v3[2] - v4[2]))) / a;
+    d1 = det(MT(v1..., v2...))
+    d2 = det(MT(v3..., v4...))
+    x = det(MT(d1, v1[1] - v2[1], d2, v3[1] - v4[1])) / a;
+    y = det(MT(d1, v1[2] - v2[2], d2, v3[2] - v4[2])) / a;
 
     (x < min(v1[1], v2[1]) - eps(T) || x > max(v1[1], v2[1]) + eps(T)) && return false, p0
     (y < min(v1[2], v2[2]) - eps(T) || y > max(v1[2], v2[2]) + eps(T)) && return false, p0
@@ -60,8 +63,8 @@ function self_intersections{N,T}(points::Vector{Point{N,T}})
     sections = Point{N,T}[]
     intersections = Int[]
     wraparound = i->mod1(i, length(points)-1)
-    for (i, (a,b)) in enumerate(partition(points, 2, 1))
-        for (j, (a2, b2)) in enumerate(partition(points, 2, 1))
+    for (i, (a,b)) in enumerate(Iterators.partition(points, 2, 1))
+        for (j, (a2, b2)) in enumerate(Iterators.partition(points, 2, 1))
             is1, is2 = wraparound(i+1), wraparound(i-1)
             if i!=j && is1!=j && is2!=j && !(i in intersections) && !(j in intersections)
                 intersected, p = GeometryTypes.intersects(LineSegment(a,b), LineSegment(a2, b2))

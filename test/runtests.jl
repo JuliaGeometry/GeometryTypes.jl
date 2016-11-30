@@ -1,8 +1,15 @@
 using GeometryTypes, ColorTypes
-using FactCheck
+if VERSION >= v"0.5.0-dev+7720"
+    using Base.Test
+else
+    using BaseTestNext
+    const Test = BaseTestNext
+end
 import Base.Test.@inferred
 
-facts("GeometryTypes") do
+
+@testset "GeometryTypes" begin
+    include("polygons.jl")
     include("hyperrectangles.jl")
     include("faces.jl")
     include("meshes.jl")
@@ -18,5 +25,3 @@ facts("GeometryTypes") do
     include("lines.jl")
     include("polygons.jl")
 end
-
-FactCheck.exitstatus()

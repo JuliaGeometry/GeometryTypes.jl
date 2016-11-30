@@ -39,3 +39,24 @@ function argmax(f, iter)
     end
     best_arg, best_val
 end
+
+
+w_component{N, T}(::Type{Point{N, T}}) = T(1)
+w_component{N, T}(::Type{Vec{N, T}}) = T(0)
+
+@generated function transform_convert{T1 <: StaticVector, T2 <: StaticVector}(::Type{T1}, x::T2)
+    w = w_component(T1)
+    n1 = length(T1)
+    n2 = length(T2)
+    n1 <= n2 && return :(T1(x))
+    tupl = Expr(:tuple)
+    ET = eltype(T1)
+    for i = 1:n2
+        push!(tupl.args, :($ET(x[$i])))
+    end
+    for i = 1:(n1 - n2 - 1)
+        push!(tupl.args, :($ET(0)))
+    end
+    push!(tupl.args, :($w))
+    :(T1($tupl))
+end

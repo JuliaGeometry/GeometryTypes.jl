@@ -1,3 +1,5 @@
+
+
 Base.eltype(fg::AFG) = eltype(typeof(fg))
 Base.length(fg::AFG) = length(vertices(fg))
 nvertices(fg::AFG) = length(fg)
@@ -17,7 +19,9 @@ Base.deleteat!(c::AbstractFlexibleGeometry, i) = (deleteat!(vertices(c), i); c)
 Base.copy{FG <: AFG}(fl::FG) = FG(copy(vertices(fl)))
 push(fl::AFG, pt) = push!(copy(fl), pt)
 
-vertices(s::Simplex) = s._
+vertices{T}(x::AbstractFlexibleGeometry{T}) = x._
+vertices(s::Simplex) = Tuple(s)
+
 standard_cube_vertices(::Type{Val{1}}) = [Vec(0), Vec(1)]
 _vcat(v1,v2) = Vec(Tuple(v1)..., Tuple(v2)...)
 function _combine_vcat(arr1, arr2)
@@ -49,13 +53,15 @@ end
 end
 
 vertices(c::HyperCube) = vertices(convert(HyperRectangle, c))
-vertices(s::AbstractConvexHull) = s._
+#vertices(s::AbstractConvexHull) = Tuple(s)
 
-vertexmat(s::Simplex) = Mat(map(Tuple, vertices(s)))
-vertexmat(s::AbstractGeometry) = Mat(map(Tuple, vertices(s)))
+vertexmat{M, T}(s::Simplex{M, T}) = Mat{length(T)}(vcat(vertices(s)...))
+vertexmat{M}(s::AbstractGeometry{M}) = Mat{M}(vcat(vertices(s)...))
+
 function vertexmat(s::AbstractFlexibleGeometry)
-    tuptup = tuple(map(Tuple, vertices(s))...)
-    Mat(tuptup) :: Mat{spacedim(s), nvertices(s), numtype(s)}
+    verts = vcat(vertices(s)...)
+    M, N = spacedim(s), nvertices(s)
+    Mat{M, N}(verts)
 end
 vertexmatrix(s::AbstractConvexHull) = Matrix(vertexmat(s))::Matrix{numtype(s)}
 

@@ -1,35 +1,16 @@
 #=
 ported from:
-COTD Entry submitted by John W. Ratcliff [jratcliff@verant.com]
+http://docs.ros.org/jade/api/convex_decomposition/html/triangulate_8cpp_source.html
 
-THIS IS A CODE SNIPPET WHICH WILL EFFICIEINTLY TRIANGULATE ANY
-POLYGON/CONTOUR (without holes) AS A STATIC CLASS.  THIS SNIPPET
-IS COMPRISED OF 3 FILES, TRIANGULATE.H, THE HEADER FILE FOR THE
-TRIANGULATE BASE CLASS, TRIANGULATE.CPP, THE IMPLEMENTATION OF
-THE TRIANGULATE BASE CLASS, AND TEST.CPP, A SMALL TEST PROGRAM
-DEMONSTRATING THE USAGE OF THE TRIANGULATOR.  THE TRIANGULATE
-BASE CLASS ALSO PROVIDES TWO USEFUL HELPER METHODS, ONE WHICH
-COMPUTES THE AREA OF A POLYGON, AND ANOTHER WHICH DOES AN EFFICENT
-POINT IN A TRIANGLE TEST.
-SUBMITTED BY JOHN W. RATCLIFF (jratcliff@verant.com) July 22, 2000
+The MIT License (MIT)
 
- **********************************************************************/
- ************ HEADER FILE FOR TRIANGULATE.H ***************************/
- **********************************************************************/
- *****************************************************************/
- ** Static class to triangulate any contour/polygon efficiently **/
- ** You should replace Vector2d with whatever your own Vector   **/
- ** class might be.  Does not support polygons with holes.      **/
- ** Uses STL vectors to represent a dynamic array of vertices.  **/
- ** This code snippet was submitted to FlipCode.com by          **/
- ** John W. Ratcliff (jratcliff@verant.com) on July 22, 2000    **/
- ** I did not write the original code/algorithm for this        **/
- ** this triangulator, in fact, I can't even remember where I   **/
- ** found it in the first place.  However, I did rework it into **/
- ** the following black-box static class so you can make easy   **/
- ** use of it in your own code.  Simply replace Vector2d with   **/
- ** whatever your own Vector implementation might be.           **/
- *****************************************************************/
+Copyright (c) 2006 John W. Ratcliff
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 =#
 
 function area{N, T}(contour::AbstractVector{Point{N, T}})
@@ -88,10 +69,15 @@ Triangulates a Polygon given as a `contour`::AbstractArray{Point} without holes.
 It will return a Vector{`facetype`}, defining indexes into `contour`
 """
 function polygon2faces{P<:Point}(
-        contour::AbstractArray{P}, facetype=GLTriangle
+        contour::AbstractArray{P}, facetype = GLTriangle
     )
     #= allocate and initialize list of Vertices in polygon =#
     result = facetype[]
+    
+    # the algorithm doesn't like closed contours
+    if isapprox(last(contour), first(contour))
+        pop!(contour)
+    end
 
     n = length(contour)
     if n < 3
@@ -125,7 +111,7 @@ function polygon2faces{P<:Point}(
             #= true names of the vertices =#
             a = V[u]; b = V[v]; c = V[w];
             #= output Triangle =#
-            push!(result, facetype(Triangle{Int}(a, b, c)))
+            push!(result, facetype(a, b, c))
             #= remove v from remaining polygon =#
             s = v; t = v+1
             while t<=nv
@@ -156,5 +142,5 @@ end
     )
     faces = polygon2faces(points, facetype(M))
     VT = vertextype(M)
-    GLNormalMesh(faces=faces, vertices=VT[topoint(VT, p) for p in points])
+    GLNormalMesh(faces = faces, vertices = VT[topoint(VT, p) for p in points])
 end

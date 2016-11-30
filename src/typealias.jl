@@ -1,8 +1,8 @@
 #Create typealiases like Mat4f0, Point2, Point2f0
 for i=1:4
     for T=[:Point, :Vec]
-        name 	= Symbol("$T$i")
-        namef0 	= Symbol("$T$(i)f0")
+        name = Symbol("$T$i")
+        namef0 = Symbol("$T$(i)f0")
         @eval begin
             typealias $name $T{$i}
             typealias $namef0 $T{$i, Float32}
@@ -13,8 +13,8 @@ for i=1:4
     name   = Symbol("Mat$i")
     namef0 = Symbol("Mat$(i)f0")
     @eval begin
-        typealias $name $Mat{$i,$i}
-        typealias $namef0 $Mat{$i,$i, Float32}
+        typealias $name{T} $Mat{$i,$i, T, $(i*i)}
+        typealias $namef0 $name{Float32}
         export $name
         export $namef0
     end
@@ -27,10 +27,15 @@ An alias for a one-simplex, corresponding to LineSegment{T} -> Simplex{2,T}.
 """
 typealias LineSegment{T} Simplex{2,T}
 
-typealias Triangle{T} Face{3, T, 0}
-typealias GLFace{Dim} Face{Dim, Cuint, -1} #offset is relative to julia, so -1 is 0-indexed
-typealias GLTriangle  Face{3, Cuint, -1}
-typealias GLQuad      Face{4, Cuint, -1}
+
+typealias ZeroIndex{T} OffsetInteger{1, T}
+typealias OneIndex{T} OffsetInteger{0, T}
+typealias GLIndex ZeroIndex{Cuint}
+
+typealias Triangle{T} Face{3, T}
+typealias GLFace{Dim} Face{Dim, GLIndex} #offset is relative to julia, so -1 is 0-indexed
+typealias GLTriangle  Face{3, GLIndex}
+typealias GLQuad      Face{4, GLIndex}
 
 typealias Cube{T}   HyperCube{3, T}
 

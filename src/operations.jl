@@ -1,8 +1,14 @@
-update{N, T, T2}(b::HyperRectangle{N, T}, v::Vec{N, T2}) =
+function update{N, T, T2}(b::HyperRectangle{N, T}, v::Vec{N, T2})
     update(b, Vec{N, T}(v))
+end
 function update{N, T}(b::HyperRectangle{N, T}, v::Vec{N, T})
     m = min(minimum(b), v)
-    mm = max(maximum(b), v)-m
+    maxi = maximum(b)
+    mm = if isnan(maxi)
+        v-m
+    else
+        max(v, maxi) - m
+    end
     HyperRectangle{N, T}(m, mm)
 end
 

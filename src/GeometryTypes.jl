@@ -1,10 +1,13 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__(true)
+__precompile__()
 module GeometryTypes
 
 using StaticArrays
 using StaticArrays.FixedSizeArrays
 using ColorTypes
-using Iterators
+
+import Iterators
+
+
 using Compat
 
 import Base: ==,
@@ -182,6 +185,10 @@ export AABB,
        width,
        widths,
        xwidth,
-       yheight
+       yheight,
+       OffsetInteger,
+       ZeroIndex,
+       OneIndex,
+       GLIndex
 
 end # module

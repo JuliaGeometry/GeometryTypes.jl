@@ -1,3 +1,78 @@
+macro fixed_vector(name, parent)
+    esc(quote
+        immutable $(name){S, T} <: $(parent){T}
+            data::NTuple{S, T}
+
+            function $(name)(x::NTuple{S,T})
+                new(x)
+            end
+            function $(name)(x::NTuple{S})
+                new(StaticArrays.convert_ntuple(T, x))
+            end
+        end
+        @inline function (::Type{$(name){S, T}}){S, T}(x)
+            $(name){S, T}(ntuple(i-> T(x), Val{S}))
+        end
+        @inline function (::Type{$(name){S}}){S, T}(x::T)
+            $(name){S, T}(ntuple(i-> x, Val{S}))
+        end
+        @inline function (::Type{$(name){1, T}}){T}(x::T)
+            $(name){1, T}((x,))
+        end
+        @inline (::Type{$(name)}){S}(x::NTuple{S}) = $(name){S}(x)
+        @inline function (::Type{$(name){S}}){S, T <: Tuple}(x::T)
+            $(name){S, StaticArrays.promote_tuple_eltype(T)}(x)
+        end
+        @generated function (::Type{SV}){SV <: $(name)}(x::StaticVector)
+            len = size_or(SV, size(x))[1]
+            if length(x) == len
+                :(SV(Tuple(x)))
+            elseif length(x) > len
+                elems = [:(x[$i]) for i = 1:len]
+                :(SV($(Expr(:tuple, elems...))))
+            else
+                error("Static Vector too short: $x, target type: $SV")
+            end
+        end
+
+        Base.@pure Base.size{S}(::Union{$(name){S}, Type{$(name){S}}}) = (S, )
+        Base.@pure Base.size{S,T}(::Type{$(name){S, T}}) = (S,)
+
+        Base.@propagate_inbounds function Base.getindex(v::$(name), i::Integer)
+            v.data[i]
+        end
+        @inline Base.Tuple(v::$(name)) = v.data
+        @inline Base.convert{S, T}(::Type{$(name){S, T}}, x::NTuple{S, T}) = $(name){S, T}(x)
+        @inline Base.convert{SV <: $(name)}(::Type{SV}, x::StaticVector) = SV(x)
+        @inline function Base.convert{S, T}(::Type{$(name){S, T}}, x::Tuple)
+            $(name){S, T}(convert(NTuple{S, T}, x))
+        end
+        # StaticArrays.similar_type{SV <: $(name)}(::Union{SV, Type{SV}}) = $(name)
+        # function StaticArrays.similar_type{SV <: $(name), T}(::Union{SV, Type{SV}}, ::Type{T})
+        #     $(name){length(SV), T}
+        # end
+        # function StaticArrays.similar_type{SV <: $(name)}(::Union{SV, Type{SV}}, s::Tuple{Int})
+        #     $(name){s[1], eltype(SV)}
+        # end
+        function StaticArrays.similar_type{SV <: $(name), T}(::Union{SV, Type{SV}}, ::Type{T}, s::Tuple{Int})
+            $(name){s[1], T}
+        end
+        function StaticArrays.similar_type{SV <: $(name)}(::Union{SV, Type{SV}}, s::Tuple{Int})
+            $(name){s[1], eltype(SV)}
+        end
+        eltype_or(::Type{$(name)}, or) = or
+        eltype_or{T}(::Type{$(name){TypeVar(:S), T}}, or) = T
+        eltype_or{S}(::Type{$(name){S, TypeVar(:T)}}, or) = or
+        eltype_or{S, T}(::Type{$(name){S, T}}, or) = T
+
+        size_or(::Type{$(name)}, or) = or
+        size_or{T}(::Type{$(name){TypeVar(:S), T}}, or) = or
+        size_or{S}(::Type{$(name){S, TypeVar(:T)}}, or) = (S,)
+        size_or{S, T}(::Type{$(name){S, T}}, or) = (S,)
+    end)
+end
+
+
 abstract AbstractDistanceField
 abstract AbstractUnsignedDistanceField <: AbstractDistanceField
 abstract AbstractSignedDistanceField <: AbstractDistanceField
@@ -9,12 +84,14 @@ abstract AbstractGeometry{N, T}
 abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry
 abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
 
+
 """
 Abstract to classify Simplices. The convention for N starts at 1, which means
 a Simplex has 1 point. A 2-simplex has 2 points, and so forth. This convention
 is not the same as most mathematical texts.
 """
 abstract AbstractSimplex{T} <: StaticVector{T}
+
 
 
 """
@@ -33,42 +110,25 @@ This is for a simpler implementation.
 It applies to infinite dimensions. The structure of this type is designed
 to allow embedding in higher-order spaces by parameterizing on `T`.
 """
-immutable Simplex{N,T} <: AbstractSimplex{T}
-    _::NTuple{N,T}
+immutable Simplex{S, T} <: AbstractSimplex{T}
+    data::NTuple{S, T}
+    function Simplex(x::NTuple{S, T})
+        new(x)
+    end
+    function Simplex(x::NTuple{S})
+        new(StaticArrays.convert_ntuple(T, x))
+    end
 end
 
-immutable Normal{N, T} <: StaticVector{T}
-    _::NTuple{N, T}
-end
+@fixed_vector Vec StaticVector
 
-@inline (::Type{Normal}){S}(x::NTuple{S}) = Normal{S}(x)
-@inline (::Type{Normal{S}}){S, T}(x::NTuple{S,T}) = Normal{S,T}(x)
-@inline (::Type{Normal{S}}){S, T <: Tuple}(x::T) = Normal{S,promote_tuple_eltype(T)}(x)
+@fixed_vector Point StaticVector
 
-Base.@pure Base.size{S}(::Union{Normal{S},Type{Normal{S}}}) = (S, )
-Base.@pure Base.size{S,T}(::Type{Normal{S,T}}) = (S,)
+@fixed_vector Normal StaticVector
 
-Base.@propagate_inbounds function Base.getindex(v::Normal, i::Integer)
-    v.data[i]
-end
-@inline Base.Tuple(v::Normal) = v.data
+@fixed_vector TextureCoordinate StaticVector
 
-immutable TextureCoordinate{N, T} <: StaticVector{T}
-    _::NTuple{N, T}
-end
-@inline (::Type{TextureCoordinate}){S}(x::NTuple{S}) = TextureCoordinate{S}(x)
-@inline (::Type{TextureCoordinate{S}}){S, T}(x::NTuple{S,T}) = TextureCoordinate{S,T}(x)
-@inline (::Type{TextureCoordinate{S}}){S, T <: Tuple}(x::T) = TextureCoordinate{S,promote_tuple_eltype(T)}(x)
-
-Base.@pure Base.size{S}(::Union{TextureCoordinate{S},Type{TextureCoordinate{S}}}) = (S, )
-Base.@pure Base.size{S,T}(::Type{TextureCoordinate{S,T}}) = (S,)
-
-Base.@propagate_inbounds function Base.getindex(v::TextureCoordinate, i::Integer)
-    v.data[i]
-end
-
-@inline Base.Tuple(v::TextureCoordinate) = v.data
-
+@fixed_vector Face StaticVector
 
 """
 A Face is typically used when constructing subtypes of `AbstractMesh` where
@@ -77,24 +137,25 @@ Face is parameterized by:
 
 * `N` - The number of vertices in the face.
 * `T` - The type of the indices in the face, a subtype of Integer.
+
+"""
+Face
+
+"""
+OffsetInteger type mainly for indexing.
 * `O` - The offset relative to Julia arrays. This helps reduce copying when
 communicating with 0-indexed systems such ad OpenGL.
 """
-immutable Face{N, T, IndexOffset} <: StaticVector{T}
-    _::NTuple{N, T}
-end
-@inline (::Type{Face}){S}(x::NTuple{S}) = Face{S}(x)
-@inline (::Type{Face{S, O}}){S, T, O}(x::NTuple{S,T}) = Face{S,T, O}(x)
-@inline (::Type{Face{S, O}}){S, T <: Tuple, O}(x::T) = Face{S,promote_tuple_eltype(T), O}(x)
-
-Base.@pure Base.size{S}(::Union{Face{S},Type{Face{S}}}) = (S, )
-Base.@pure Base.size{S,T}(::Type{Face{S,T}}) = (S,)
-
-Base.@propagate_inbounds function Base.getindex(v::Face, i::Integer)
-    v.data[i]
+immutable OffsetInteger{O, T <: Integer} <: Integer
+    i::T
+    function OffsetInteger(x::T)
+        new(x - O)
+    end
 end
 
-@inline Base.Tuple(v::Face) = v.data
+
+raw(x::OffsetInteger) = x.i
+raw(x::Integer) = x
 
 """
 A `HyperRectangle` is a generalization of a rectangle into N-dimensions.
@@ -118,7 +179,7 @@ A `HyperSphere` is a generalization of a sphere into N-dimensions.
 A `center` and radius, `r`, must be specified.
 """
 immutable HyperSphere{N, T} <: GeometryPrimitive{N, T}
-    center::Face{N, T}
+    center::Point{N, T}
     r::T
 end
 
@@ -142,13 +203,13 @@ immutable Quad{T} <: GeometryPrimitive{3, T}
 end
 
 immutable Pyramid{T} <: GeometryPrimitive{3, T}
-    middle::Face{3, T}
+    middle::Point{3, T}
     length::T
     width ::T
 end
 
 immutable Particle{N, T} <: GeometryPrimitive{N, T}
-    position::Face{N, T}
+    position::Point{N, T}
     velocity::Vec{N, T}
 end
 
