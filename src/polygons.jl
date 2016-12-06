@@ -73,7 +73,7 @@ function polygon2faces{P<:Point}(
     )
     #= allocate and initialize list of Vertices in polygon =#
     result = facetype[]
-    
+
     # the algorithm doesn't like closed contours
     if isapprox(last(contour), first(contour))
         pop!(contour)
@@ -137,10 +137,10 @@ function topoint{T}(::Type{Point{2, T}}, p::Point{3, T})
     Point{2, T}(p[1], p[2])
 end
 
-@compat function (::Type{M}){M<:AbstractMesh, P<:Point}(
+@compat function (::Type{M}){M <: AbstractMesh, P <: Point}(
         points::AbstractArray{P}
     )
     faces = polygon2faces(points, facetype(M))
     VT = vertextype(M)
-    GLNormalMesh(faces = faces, vertices = VT[topoint(VT, p) for p in points])
+    M(faces = faces, vertices = VT[topoint(VT, p) for p in points])
 end
