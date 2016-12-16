@@ -140,9 +140,9 @@ end
         (2,6,4),
         (4,6,8)
     ])
-    ns = normals(test_mesh.vertices, test_mesh.faces)
+    ns = normals(test_mesh.vertices, test_mesh.faces, Normal{3, Float32})
     @test length(ns) == length(test_mesh.vertices)
-    expect = Normal{3, Float64}[
+    expect = Normal{3, Float32}[
         (-0.408248,-0.408248,0.816497),
         (-0.816497,0.408248,0.408248),
         (-0.57735,-0.57735,-0.57735),
