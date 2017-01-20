@@ -201,7 +201,7 @@ function SimpleRectangle{T}(position::Vec{2,T}, width::Vec{2,T})
 end
 
 function getindex{T}(a::Array{T,2}, rect::SimpleRectangle)
-    a[rect.x+1:rect.w, rect.y+1:rect.h]
+    a[rect.x+1:(rect.x+rect.w), rect.y+1:(rect.y+rect.h)]
 end
 
 function setindex!{T}(a::Array{T,2}, b::Array{T,2}, rect::SimpleRectangle)
