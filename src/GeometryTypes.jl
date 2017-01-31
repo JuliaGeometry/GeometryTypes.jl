@@ -1,12 +1,18 @@
 __precompile__()
 module GeometryTypes
 
-using FixedSizeArrays
-using ColorTypes
+using FixedSizeArrays, FixedPointNumbers, ColorTypes
 import Iterators
+
+if isdefined(FixedPointNumbers, :N0f8)
+    import FixedPointNumbers: N0f8
+else
+    const N0f8 = FixedPointNumbers.UFixed8
+end
 
 import FixedSizeArrays: eltype_or, ndims_or
 using Compat
+
 
 import Base: ==,
              *,
