@@ -179,6 +179,16 @@ immutable FlexibleSimplex{T} <: AFG{T}
 end
 
 """
+A `Cylinder3` is a 3D cylinder defined by its origin point, its extremity
+and a radius. `origin`, `extremity` and `r`, must be specified.
+"""
+immutable Cylinder3{T} <: GeometryPrimitive{3,T}
+  origin::Point{3,T}
+  extremity::Point{3,T}
+  r::T
+end
+
+"""
 AbstractConvexHull
 
 Groups all geometry types, that can be described as the convex hull of finitely
