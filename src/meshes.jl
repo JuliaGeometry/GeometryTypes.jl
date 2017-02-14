@@ -202,9 +202,9 @@ end
 A mesh with one constant attribute can be merged as an attribute mesh.
 Possible attributes are FSArrays
 """
-function merge{_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}(
-        m1::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6},
-        meshes::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6}...
+function merge{N, T, _1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}(
+        m1::HMesh{N, T, _1, _2, _3, _4, ConstAttrib, _5, _6},
+        meshes::HMesh{N, T, _1, _2, _3, _4, ConstAttrib, _5, _6}...
     )
     vertices     = copy(m1.vertices)
     faces        = copy(m1.faces)
@@ -227,7 +227,7 @@ function merge{_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}(
     attribs[:faces]         = faces
     attribs[:attributes]    = color_attrib
     attribs[:attribute_id]  = index
-    return HMesh{_1, _2, _3, _4, Void, typeof(color_attrib), eltype(index)}(attribs)
+    return HMesh{N, T, _1, _2, _3, _4, Void, typeof(color_attrib), eltype(index)}(attribs)
 end
 
 # Fast but slightly ugly way to implement mesh multiplication

@@ -3,6 +3,7 @@ module GeometryTypes
 
 using FixedSizeArrays
 using ColorTypes
+using FixedPointNumbers: Normed
 import Iterators
 
 import FixedSizeArrays: eltype_or, ndims_or

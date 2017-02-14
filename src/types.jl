@@ -6,7 +6,7 @@ Abstract to categorize geometry primitives of dimensionality `N` and
 the numeric element type `T`.
 """
 abstract AbstractGeometry{N, T}
-abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry
+abstract AbstractMesh{N, T, VertT, FaceT} <: AbstractGeometry{N, T}
 abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
 
 """
@@ -142,7 +142,7 @@ one mesh type.
 This is not perfect, but helps to reduce a type explosion (imagine defining
 every attribute combination as a new type).
 """
-immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: AbstractMesh{VertT, FaceT}
+immutable HomogenousMesh{N, T, VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: AbstractMesh{N, T, VertT, FaceT}
     vertices            ::Vector{VertT}
     faces               ::Vector{FaceT}
     normals             ::Vector{NormalT}
