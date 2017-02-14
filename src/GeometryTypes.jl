@@ -11,7 +11,6 @@ using Compat
 
 import Base: ==,
              *,
-             call,
              contains,
              convert,
              diff,
