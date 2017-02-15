@@ -410,8 +410,8 @@ function decompose{T}(PT::Type{Point{3,T}},c::Cylinder3{T},facets=18)
   position = 1; vertices = Array(PT,2*nbv)
   for j = 1:nbv
     phi                = T((2*pi*(j-1))/nbv)
-    vertices[position] = PT(c.r*M*[cos(phi);sin(phi);0])+PT(c.origin)
-    vertices[position+1] = PT(c.r*M*[cos(phi);sin(phi);h])+PT(c.origin)
+    vertices[position] = PT(M*[c.r*cos(phi);c.r*sin(phi);0])+PT(c.origin)
+    vertices[position+1] = PT(M*[c.r*cos(phi);c.r*sin(phi);h])+PT(c.origin)
     position += 2
   end
   vertices
