@@ -1,3 +1,4 @@
+using Compat.TypeUtils
 """
 This is a terrible function. But is there any other way to reliable get the
 abstract supertype of an arbitrary type hierarchy without loosing performance?

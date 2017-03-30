@@ -34,7 +34,7 @@ Slice an AbstractMesh at the specified Z axis value.
 Returns a Vector of LineSegments generated from the faces at the specified
 heights. Note: This will not slice in-plane faces.
 """
-function Base.slice{VT<:AbstractFloat,FT<:Integer}(mesh::AbstractMesh{Point{3,VT}, Face{3, FT}}, height::Number)
+function slice{VT<:AbstractFloat,FT<:Integer}(mesh::AbstractMesh{Point{3,VT}, Face{3, FT}}, height::Number)
 
     height_ct = length(height)
     # intialize the LineSegment array

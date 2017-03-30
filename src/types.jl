@@ -9,7 +9,7 @@ Abstract to categorize geometry primitives of dimensionality `N` and
 the numeric element type `T`.
 """
 abstract AbstractGeometry{N, T}
-abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry
+abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry{3, Float32}
 abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
 
 

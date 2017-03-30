@@ -48,7 +48,7 @@ end
 
 # Needed to not get into an stack overflow
 convert{M <: AbstractMesh}(::Type{M}, mesh::AbstractGeometry) = M(mesh)
-@compat (::Type{HM1}){HM1 <: AbstractMesh}(mesh::HM1) = mesh
+#@compat (::Type{HM1}){HM1 <: AbstractMesh}(mesh::HM1) = mesh
 
 """
 Uses decompose to get all the converted attributes from the meshtype and
@@ -57,7 +57,7 @@ Getindex can be defined for any arbitrary geometric type or exotic mesh type.
 This way, we can make sure, that you can convert most of the meshes from one type to the other
 with minimal code.
 """
-@compat function (::Type{HM1}){HM1 <: AbstractMesh}(primitive::Union{AbstractMesh, GeometryPrimitive})
+@compat function (::Type{HM1}){HM1 <: AbstractMesh}(primitive::GeometryPrimitive)
     result = Dict{Symbol, Any}()
     for (field, target_type) in zip(fieldnames(HM1), HM1.parameters)
         if target_type != Void
