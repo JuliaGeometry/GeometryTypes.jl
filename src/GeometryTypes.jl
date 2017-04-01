@@ -31,6 +31,10 @@ import Base: ==,
              union,
              unique
 
+if VERSION < v"0.6dev"
+    import Base: slice
+end
+
 
 include("types.jl")
 include("typeutils.jl")
