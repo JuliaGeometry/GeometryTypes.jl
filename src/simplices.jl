@@ -2,14 +2,14 @@
 # We need this constructor to route around the FixedSizeArray `call` and
 # so Simplex(Pt, Pt...) etc works. Hopefully these ambiguities will be fixed in
 # forthcoming Julia versions.
-@compat (::Type{S}){S <: Simplex}(s::S) = s
-@compat function (::Type{T}){T<:Simplex,F<:FixedVector}(f::F...)
+(::Type{S}){S <: Simplex}(s::S) = s
+function (::Type{T}){T<:Simplex,F<:FixedVector}(f::F...)
     Simplex{length(f),F}(f)
 end
-@compat (::Type{S}){S <: Simplex}(fs::FlexibleSimplex) = convert(S, fs)
+(::Type{S}){S <: Simplex}(fs::FlexibleSimplex) = convert(S, fs)
 
 # FSA doesn't handle symbols for length 1 well.
-@compat function (::Type{T}){T<:Simplex}(f::Symbol)
+function (::Type{T}){T<:Simplex}(f::Symbol)
     Simplex{1,Symbol}((f,))
 end
 
