@@ -26,18 +26,18 @@ convert{T1<:Face}(::Type{T1}, f::T1) = f
 convert{T1<:Face, T2<:Face}(::Type{T1}, f::T2) = T1(f)
 
 # Silly duplication, but call(::FixedVector, ::Any) = convert is overloaded in FixedSizeArrays
-@compat (::Type{F}){F<:Face}(f::F) = f
+(::Type{F}){F<:Face}(f::F) = f
 
-@compat function (::Type{Face{N, T, O}}){T, T2, O, N}(f::Face{N, T2, O})
+function (::Type{Face{N, T, O}}){T, T2, O, N}(f::Face{N, T2, O})
     Face{N, T, O}(convert(NTuple{N, T}, getfield(f, 1)))
 end
 immutable IndexConvertFunc{T1, T2}
 	f::T2
 end
-@compat function (ifunc::IndexConvertFunc{Face{N,T1,O1}, Face{N,T2,O2}}){N,T1,T2,O1,O2}(i)
+function (ifunc::IndexConvertFunc{Face{N,T1,O1}, Face{N,T2,O2}}){N,T1,T2,O1,O2}(i)
 	Int(ifunc.f[i])+Int(O1)-Int(O2)
 end
-@compat function (T::Type{Face{N, T1, O1}}){N, T1, O1, F<:Face}(f::F)
+function (T::Type{Face{N, T1, O1}}){N, T1, O1, F<:Face}(f::F)
 	map(IndexConvertFunc{T,F}(f), T)
 end
 
