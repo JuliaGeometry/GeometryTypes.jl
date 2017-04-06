@@ -1,4 +1,7 @@
-import Base: +, -, abs, *, /, div, convert, ==, <=, >=, show
+import Base: +, -, abs, *, /, div, convert, ==, <=, >=, show, to_index
+
+
+to_index(I::AbstractArray{<:Face}) = I
 
 function show{O, T}(io::IO, oi::OffsetInteger{O, T})
     i = T(oi)

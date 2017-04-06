@@ -209,5 +209,7 @@ AbstractConvexHull
 Groups all geometry types, that can be described as the convex hull of finitely
 many points.
 """
-const AbstractConvexHull = Union{Simplex, FlexibleConvexHull, FlexibleSimplex,
-                                HyperCube, HyperRectangle} # should we parametrize ACH by the type of points T?
+const AbstractConvexHull = Union{
+    Simplex, FlexibleConvexHull, FlexibleSimplex,
+    HyperCube, HyperRectangle
+} # should we parametrize ACH by the type of points T?

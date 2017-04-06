@@ -1,8 +1,8 @@
-for s in enumerate((:vertextype, :facetype, :normaltype,
+for (i, field) in enumerate((:vertextype, :facetype, :normaltype,
                        :texturecoordinatetype, :colortype))
     @eval begin
-        $(s[2]){T<:HomogenousMesh}(t::Type{T}) = t.parameters[$(s[1])]
-        $(s[2])(mesh::HomogenousMesh) = $(s[2])(typeof(mesh))
+        $field{T <: HomogenousMesh}(t::Type{T}) = eltype(fieldtype(t, $i))
+        $field(mesh::HomogenousMesh) = $field(typeof(mesh))
     end
 end
 
@@ -12,8 +12,6 @@ hasnormals(msh) = normaltype(msh) != Void
 hastexturecoordinates(msh) = texturecoordinatetype(msh) != Void
 hascolors(msh) = colortype(msh) != Void
 
-
-
 vertices(msh) = msh.vertices
 faces(msh) = msh.faces
 normals(msh) = msh.normals
@@ -22,7 +20,7 @@ colors(msh) = msh.color
 
 
 # Bad, bad name! But it's a little tricky to filter out faces and verts from the attributes, after get_attribute
-function attributes_noVF{T<:AbstractMesh}(m::T)
+function attributes_noVF{T <: AbstractMesh}(m::T)
     fielddict = Dict{Symbol, Any}(map(fieldnames(T)[3:end]) do field
         field => getfield(m, field)
     end)
@@ -83,7 +81,7 @@ function (::Type{HM1}){HM1 <: HomogenousMesh}(primitive::HomogenousMesh)
     args = ntuple(nfields(HM1)) do i
         field, target_type = fnames[i], fieldtype(HM1, i)
         soure_type = fieldtype(typeof(primitive), i)
-        isa(HM1.parameters[i], TypeVar) && return getfield(primitive, field) # target is not defined
+        isleaftype(fieldtype(HM1, i)) || return getfield(primitive, field) # target is not defined
         if !isvoid(target_type) && isvoid(soure_type) # target not there yet, maybe we can decompose though (e.g. normals)
             return decompose(HM1.parameters[i], primitive)
         elseif isvoid(target_type)
@@ -102,7 +100,7 @@ end
 function (::Type{M}){M <: HMesh, VT, FT <: Face}(
         vertices::Vector{Point{3, VT}}, faces::Vector{FT}
     )
-    msh = PlainMesh{VT, FT}(vertices=vertices, faces=faces)
+    msh = PlainMesh{VT, FT}(vertices = vertices, faces = faces)
     convert(M, msh)
 end
 get_default(x::Union{Type, TypeVar}) = nothing
@@ -129,8 +127,8 @@ Creates a mesh from keyword arguments, which have to match the field types of th
 Creates a new mesh from a dict of `fieldname => value` and converts the types to the given meshtype
 """
 function (::Type{M}){M <: HMesh}(attribs::Dict{Symbol, Any})
-    newfields = map(zip(fieldnames(HomogenousMesh), M.parameters)) do field_target_type
-        field, target_type = field_target_type
+    newfields = map(fieldnames(HomogenousMesh)) do field
+        target_type = fieldtype(M, field)
         default = fieldtype(HomogenousMesh, field) <: Vector ? Void[] : nothing
         get(attribs, field, default)
     end
