@@ -1,9 +1,10 @@
+# StaticArrays needs to get tagged first!
+Pkg.checkout("StaticArrays", "sd/fixedsizearrays")
+
 using GeometryTypes, ColorTypes
 using Base.Test
 import Base.Test.@inferred
 
-# StaticArrays needs to get tagged first!
-Pkg.checkout("StaticArrays", "sd/fixedsizearrays")
 
 @testset "GeometryTypes" begin
     include("polygons.jl")
