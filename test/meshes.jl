@@ -1,3 +1,4 @@
+using GeometryTypes: slice
 @testset "Mesh Types" begin
 
 @testset "Merging Mesh" begin

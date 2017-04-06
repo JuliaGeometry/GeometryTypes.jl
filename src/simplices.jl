@@ -23,7 +23,7 @@ end
 Base.@pure Base.size{S}(::Union{Simplex{S}, Type{Simplex{S}}}) = (S, )
 Base.@pure Base.size{S,T}(::Type{Simplex{S, T}}) = (S,)
 
-Base.@propagate_inbounds function Base.getindex(v::Simplex, i::Integer)
+Base.@propagate_inbounds function Base.getindex(v::Simplex, i::Int)
     v.data[i]
 end
 @inline Base.Tuple(v::Simplex) = v.data

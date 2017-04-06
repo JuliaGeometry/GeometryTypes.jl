@@ -7,8 +7,8 @@ widths(prim::HyperRectangle) = prim.widths
 """
 Splits an HyperRectangle into two along an axis at a given location.
 """
-split{H<:HyperRectangle}(b::H, axis, value::Integer) = _split(b,axis,value)
-split{H<:HyperRectangle}(b::H, axis, value::Number) = _split(b,axis,value)
+split(b::HyperRectangle, axis, value::Integer) = _split(b, axis, value)
+split(b::HyperRectangle, axis, value::Number) = _split(b, axis, value)
 function _split{H<:HyperRectangle}(b::H, axis, value)
     bmin = minimum(b)
     bmax = maximum(b)
@@ -86,10 +86,10 @@ function *{N1,N2,T1,T2}(m::Mat{N1,N1,T1}, h::HyperRectangle{N2, T2})
     # get all points on the HyperRectangle
     d = decompose(Point, h)
     # make sure our points are sized for the tranform
-    pts = (Vec{N1,T}[vcat(pt, ones(Vec{D,T})) for pt in d]...)::NTuple{2^N2,Vec{N1,T}}
+    pts = (Vec{N1, T}[vcat(pt, ones(Vec{D, T})) for pt in d]...)::NTuple{2^N2,Vec{N1,T}}
 
-    vmin = Vec{D, T}(typemax(T))
-    vmax = Vec{D, T}(typemin(T))
+    vmin = Vec{N1, T}(typemax(T))
+    vmax = Vec{N1, T}(typemin(T))
     # tranform all points, tracking min and max points
     for pt in pts
         pn = m * pt
@@ -115,8 +115,8 @@ function *{N,T1,T2}(m::Mat{N,N,T1}, h::HyperRectangle{N,T2})
     # tranform all points, tracking min and max points
     for pt in pts
         pn = m * Vec(pt)
-        vmin = min(pn,vmin)
-        vmax = max(pn,vmax)
+        vmin = min.(pn, vmin)
+        vmax = max.(pn, vmax)
     end
     HyperRectangle{N,T}(vmin, vmax-vmin)
 end

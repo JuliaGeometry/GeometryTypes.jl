@@ -114,9 +114,9 @@ which has maximal scalar product with v.
 * pt_best: point inside c realizing dist.
 """
 function gjk0(c,
-    atol=1e-6,
-    max_iter=100,
-    pt_best=any_inside(c)
+        atol = 1e-6,
+        max_iter = 100,
+        pt_best = any_inside(c)
     )
     @assert atol >= 0
 
@@ -125,7 +125,6 @@ function gjk0(c,
     sim = FlexibleSimplex(T[])
     for k in 1:max_iter
         direction = -pt_best
-
         wk, score = support_vector_max(c, direction)
         if (score <= (pt_best ⋅ direction) + atol) # pt_best is already most extreme
             return pt_best, norm(pt_best)

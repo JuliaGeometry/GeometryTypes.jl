@@ -4,8 +4,8 @@ for i=1:4
         name = Symbol("$T$i")
         namef0 = Symbol("$T$(i)f0")
         @eval begin
-            typealias $name $T{$i}
-            typealias $namef0 $T{$i, Float32}
+            const $name = $T{$i}
+            const $namef0 = $T{$i, Float32}
             export $name
             export $namef0
         end
@@ -13,8 +13,8 @@ for i=1:4
     name   = Symbol("Mat$i")
     namef0 = Symbol("Mat$(i)f0")
     @eval begin
-        typealias $name{T} $Mat{$i,$i, T, $(i*i)}
-        typealias $namef0 $name{Float32}
+        @compat const $name{T} = $Mat{$i,$i, T, $(i*i)}
+        const $namef0 = $name{Float32}
         export $name
         export $namef0
     end

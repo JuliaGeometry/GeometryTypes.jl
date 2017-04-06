@@ -2,9 +2,9 @@ import GeometryTypes: numtype
 @testset "Convex Hulls" begin
     T = Float64
     V = Vec{2, T}
-    s = Simplex((Vec(0, 0.), Vec(0,1.), Vec(1.,0)))
-    fs = FlexibleSimplex([Vec(0.0,0.0), Vec(0.0,1.0), Vec(1.0,0.0)])
-    fh = FlexibleConvexHull([Vec(0.0,0.0), Vec(0.0,1.0), Vec(1.0,0.0)])
+    s = Simplex((Vec(0.0, 0.), Vec(0.0, 1.0), Vec(1.0, 0.0)))
+    fs = FlexibleSimplex([Vec(0.0, 0.0), Vec(0.0, 1.0), Vec(1.0, 0.0)])
+    fh = FlexibleConvexHull([Vec(0.0, 0.0), Vec(0.0, 1.0), Vec(1.0, 0.0)])
     types = (Simplex, FlexibleSimplex, FlexibleConvexHull)
     objects = (s,fs,fh)
 
@@ -19,7 +19,7 @@ import GeometryTypes: numtype
 
     @testset "Utility functions" begin
 
-        v_matrix = [0. 0 1; 0 1 0]
+        v_matrix = [0.0 0.0 1.0; 0.0 1.0 0.0]
         v_mat = Mat{2, 3}(v_matrix)
         for shape in objects
             @test (@inferred eltype(shape)) == V
@@ -35,18 +35,17 @@ import GeometryTypes: numtype
     end
 
     @testset "isapprox" begin
-        s2 = rand(Simplex{3, Vec{2,Float64}})
+        s2 = rand(Simplex{3, Vec{2, Float64}})
 
-        @test !( isapprox(s, s2) )
-        @test isapprox(s, s2, atol=100.)
+        @test !isapprox(s, s2)
+        @test isapprox(s, s2, atol = 100.0)
     end
 
     @testset "Rects" begin
-        c = HyperCube(Vec(1.,2), 1.)
-        r = HyperRectangle(Vec(1.,2), Vec(1.,1))
-        fh = FlexibleConvexHull([ Vec(1,2.), Vec(1.,3.), Vec(2.,2.), Vec(2.,3.)])
-        objects = (c,r,fh)
-
+        c = HyperCube(Vec(1.0, 2.0), 1.0)
+        r = HyperRectangle(Vec(1.0, 2.0), Vec(1.0, 1.0))
+        fh = FlexibleConvexHull(Vec{2, Float64}[(1.0, 2.0), (1.0, 3.0), (2.0,2.0), (2.0,3.0)])
+        objects = (c, r, fh)
         @test (@inferred convert(HyperRectangle, c)) == r
         fh2 = (@inferred convert(FlexibleConvexHull, c))
         @test vertices(fh2) == vertices(fh)

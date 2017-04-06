@@ -24,8 +24,8 @@ function normals{VT, F <: Face}(
             normals_result[fi] = normals_result[fi] + n
         end
     end
-    map!(normalize, normals_result)
-    map(NT, normals_result)
+    normals_result .= NT.(normalize.(normals_result))
+    normals_result
 end
 
 

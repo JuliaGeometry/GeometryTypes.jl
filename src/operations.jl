@@ -2,7 +2,7 @@ function update{N, T, T2}(b::HyperRectangle{N, T}, v::Vec{N, T2})
     update(b, Vec{N, T}(v))
 end
 function update{N, T}(b::HyperRectangle{N, T}, v::Vec{N, T})
-    m = min(minimum(b), v)
+    m = min.(minimum(b), v)
     maxi = maximum(b)
     mm = if isnan(maxi)
         v-m
@@ -24,15 +24,19 @@ end
 @inline function min_dist_dim{N, T}(rect1::HyperRectangle{N, T},
                                     rect2::HyperRectangle{N, T},
                                     dim::Int)
-    max(zero(T), max(minimum(rect1)[dim] - maximum(rect2)[dim],
-                     minimum(rect2)[dim] - maximum(rect1)[dim]))
+    max(zero(T), max(
+        minimum(rect1)[dim] - maximum(rect2)[dim],
+        minimum(rect2)[dim] - maximum(rect1)[dim]
+    ))
 end
 
 @inline function max_dist_dim{N, T}(rect1::HyperRectangle{N, T},
                                     rect2::HyperRectangle{N, T},
                                     dim::Int)
-    max(maximum(rect1)[dim] - minimum(rect2)[dim],
-        maximum(rect2)[dim] - minimum(rect1)[dim])
+    max(
+        maximum(rect1)[dim] - minimum(rect2)[dim],
+        maximum(rect2)[dim] - minimum(rect1)[dim]
+    )
 end
 
 # Total minimum maximum distance functions

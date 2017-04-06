@@ -48,6 +48,7 @@ end
 
 # Needed to not get into an stack overflow
 convert{M <: AbstractMesh}(::Type{M}, mesh::AbstractGeometry) = M(mesh)
+convert(::Type{T}, mesh::T) where T <: AbstractMesh = mesh
 #@compat (::Type{HM1}){HM1 <: AbstractMesh}(mesh::HM1) = mesh
 
 """

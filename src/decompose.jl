@@ -5,7 +5,7 @@ primitive.
 function decompose{SV <: StaticVector, N, T}(::Type{SV},
         r::AbstractGeometry{N, T}, args...
     )
-    vectype = similar_type(SV, eltype_or(SV, T), size_or(SV, (N,)))
+    vectype = similar_type(SV, eltype_or(SV, T), size_or(SV, Size{(N,)}()))
     # since we have not triangular dispatch, we can't define a function with the
     # signature for a fully specified Vector type. But we need to check for it
     # as it means that decompose is not implemented for that version
@@ -168,7 +168,7 @@ function decompose{FT1<:Face, FT2<:Face}(::Type{FT1}, faces::Vector{FT2})
     N1,N2 = length(FT1), length(FT2)
 
     n = length(decompose(FT1, first(faces)))
-    outfaces = Array(FT1, length(faces)*n)
+    outfaces = Vector{FT1}(length(faces)*n)
     i = 1
     for face in faces
         for outface in decompose(FT1, face)
@@ -356,7 +356,7 @@ function decompose{T}(PT::Type{Point{2,T}}, s::Circle, n=32)
 end
 
 function decompose{N,T}(PT::Type{Point{N,T}}, s::Sphere, facets=12)
-    vertices      = Array(PT, facets*facets+1)
+    vertices = Vector{PT}(facets*facets+1)
     vertices[end] = PT(s.center) - PT(0,0,radius(s)) #Create a vertex for last triangle fan
     for j=1:facets
         theta = T((pi*(j-1))/facets)
@@ -369,7 +369,7 @@ function decompose{N,T}(PT::Type{Point{N,T}}, s::Sphere, facets=12)
     vertices
 end
 function decompose{FT<:Face}(::Type{FT}, s::Sphere, facets=12)
-    indexes          = Array(FT, facets*facets*2)
+    indexes          = Vector{FT}(facets*facets*2)
     FTE              = eltype(FT)
     psydo_triangle_i = facets*facets+1
     index            = 1
@@ -378,7 +378,7 @@ function decompose{FT<:Face}(::Type{FT}, s::Sphere, facets=12)
             next_index = mod1(i+1, facets)
             i1 = sub2ind((facets,), j, i)
             i2 = sub2ind((facets,), j, next_index)
-            i3 = (j != facets) ? sub2ind((facets,), j+1, i)          : psydo_triangle_i
+            i3 = (j != facets) ? sub2ind((facets,), j+1, i) : psydo_triangle_i
             i6 = (j != facets) ? sub2ind((facets,), j+1, next_index) : psydo_triangle_i
             indexes[index]   = FT(i1,i2,i3) # convert to required Face index offset
             indexes[index+1] = FT(i3,i2,i6)
