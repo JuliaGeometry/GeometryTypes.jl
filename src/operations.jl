@@ -7,7 +7,7 @@ function update{N, T}(b::HyperRectangle{N, T}, v::Vec{N, T})
     mm = if isnan(maxi)
         v-m
     else
-        max(v, maxi) - m
+        max.(v, maxi) - m
     end
     HyperRectangle{N, T}(m, mm)
 end

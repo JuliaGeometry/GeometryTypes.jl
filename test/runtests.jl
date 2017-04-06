@@ -2,6 +2,8 @@ using GeometryTypes, ColorTypes
 using Base.Test
 import Base.Test.@inferred
 
+# StaticArrays needs to get tagged first!
+Pkg.checkout("StaticArrays", "sd/fixedsizearrays")
 
 @testset "GeometryTypes" begin
     include("polygons.jl")
@@ -15,8 +17,8 @@ import Base.Test.@inferred
     include("hypersphere.jl")
     include("typeutils.jl")
     include("simplices.jl")
-    include("convexhulls.jl")
-    include("gjk.jl")
     include("lines.jl")
     include("polygons.jl")
+    #include("convexhulls.jl")
+    #include("gjk.jl")
 end

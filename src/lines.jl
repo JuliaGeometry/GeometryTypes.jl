@@ -48,7 +48,7 @@ end
 
 
 function simple_concat{P}(vec, range, endpoint::P)
-    result = Array(P, length(range)+1)
+    result = Vector{P}(length(range)+1)
     for (i,j) in enumerate(range)
         result[i] = vec[mod1(j, length(vec))]
     end

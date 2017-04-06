@@ -42,12 +42,8 @@ to allow embedding in higher-order spaces by parameterizing on `T`.
 """
 immutable Simplex{S, T} <: AbstractSimplex{T}
     data::NTuple{S, T}
-    function Simplex(x::NTuple{S, T})
-        new(x)
-    end
-    function Simplex(x::NTuple{S})
-        new(StaticArrays.convert_ntuple(T, x))
-    end
+    (::Type{Simplex{S, T}}){S, T}(x::NTuple{S, T}) = new{S, T}(x)
+    (::Type{Simplex{S, T}}){S, T}(x::NTuple{S}) = new{S, T}(StaticArrays.convert_ntuple(T, x))
 end
 
 @fixed_vector Vec StaticVector
@@ -78,8 +74,8 @@ communicating with 0-indexed systems such ad OpenGL.
 """
 immutable OffsetInteger{O, T <: Integer} <: Integer
     i::T
-    function OffsetInteger(x::T)
-        new(x - O)
+    function (::Type{OffsetInteger{O, T}}){O, T}(x::T)
+        new{O, T}(x - O)
     end
 end
 
