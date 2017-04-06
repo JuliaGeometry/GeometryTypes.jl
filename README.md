@@ -43,3 +43,42 @@ Pyramid(Point3f0(0), 1f0, 1f0)
 load("cat.obj") # --> GLNormalMesh, via FileIO
 ```
 <img src="https://cloud.githubusercontent.com/assets/1010467/14317773/1c4087f6-fc0a-11e5-95c5-97d4cd840c1a.png" width="132">
+
+
+# Displaying primitives
+
+To display geometry primitives, they need to be decomposable.
+This can be done for any arbitrary primitive, by overloading the following interface:
+```Julia
+# Lets take SimpleRectangle as an example:
+# Minimal set of decomposable attributes to build up a triangle mesh
+isdecomposable{T<:Point, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:Face, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
+
+# Example implementation of decompose for points
+function decompose{PT}(P::Type{Point{3, PT}}, r::SimpleRectangle, resolution=(2,2))
+    w,h = resolution
+    vec(P[(x,y,0) for x=linspace(r.x, r.x+r.w, w), y=linspace(r.y, r.y+r.h, h)])
+end
+
+function decompose{T<:Face}(::Type{T}, r::SimpleRectangle, resolution=(2,2))
+    w,h = resolution
+    faces = vec([Face{4, Int, 0}(
+            sub2ind(resolution, i, j), sub2ind(resolution, i+1, j),
+            sub2ind(resolution, i+1, j+1), sub2ind(resolution, i, j+1)
+        ) for i=1:(w-1), j=1:(h-1)]
+    )
+    decompose(T, faces)
+end
+```
+With these methods defined, this constructor will magically work:
+```Julia
+rect = SimpleRectangle(...)
+mesh = GLNormalMesh(rect)
+vertices(mesh) == decompose(Point3f0, rect)
+
+faces(mesh) == decompose(GLTriangle, rect) # Face{3, UInt32, 0} == GLTriangle
+normals(mesh) # automatically calculated from mesh
+```
+As you can see, the normals are automatically calculated only with the faces and points.
+You can overwrite that behavior, by also defining decompose for the `Normal` type!

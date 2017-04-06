@@ -207,7 +207,7 @@ function decompose{PT}(P::Type{Point{3, PT}}, r::SimpleRectangle, resolution=(2,
 end
 function decompose{UVT}(T::Type{UV{UVT}}, r::SimpleRectangle, resolution=(2,2))
     w,h = resolution
-    vec(T[(x,y) for x=linspace(0, 1, w), y=linspace(0, 1, h)])
+    vec(T[(x, y) for x = linspace(0, 1, w), y = linspace(1, 0, h)])
 end
 function decompose{T<:Normal}(::Type{T}, r::SimpleRectangle, resolution=(2,2))
     fill(T(0,0,1), prod(resolution))
