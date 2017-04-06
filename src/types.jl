@@ -1,16 +1,19 @@
 using StaticArrays.FixedSizeArrays
-import StaticArrays.FixedSizeArrays: @fixed_vector 
+import StaticArrays.FixedSizeArrays: @fixed_vector
 
-abstract AbstractDistanceField
-abstract AbstractUnsignedDistanceField <: AbstractDistanceField
-abstract AbstractSignedDistanceField <: AbstractDistanceField
+@compat abstract type AbstractDistanceField end
+@compat abstract type AbstractUnsignedDistanceField <: AbstractDistanceField end
+@compat abstract type AbstractSignedDistanceField <: AbstractDistanceField end
 """
 Abstract to categorize geometry primitives of dimensionality `N` and
 the numeric element type `T`.
 """
-abstract AbstractGeometry{N, T}
-abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry{3, Float32}
-abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
+# abstract AbstractGeometry{N, T}
+# abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry{3, Float32}
+# abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
+@compat abstract type AbstractGeometry{N, T} end
+@compat abstract type AbstractMesh{VertT, FaceT}  end # <: AbstractGeometry
+@compat abstract type GeometryPrimitive{N, T} <: AbstractGeometry{N, T} end
 
 
 """
@@ -18,8 +21,7 @@ Abstract to classify Simplices. The convention for N starts at 1, which means
 a Simplex has 1 point. A 2-simplex has 2 points, and so forth. This convention
 is not the same as most mathematical texts.
 """
-abstract AbstractSimplex{T} <: StaticVector{T}
-
+@compat abstract type AbstractSimplex{T} <: StaticVector{T} end
 
 
 """
@@ -184,8 +186,8 @@ AbstractFlexibleGeometry{T}
 
 AbstractFlexibleGeometry refers to shapes, which are somewhat mutable.
 """
-abstract AbstractFlexibleGeometry{T}
-typealias AFG AbstractFlexibleGeometry
+@compat abstract type AbstractFlexibleGeometry{T} end
+const AFG = AbstractFlexibleGeometry
 
 """
 FlexibleConvexHull{T}
@@ -211,5 +213,5 @@ AbstractConvexHull
 Groups all geometry types, that can be described as the convex hull of finitely
 many points.
 """
-typealias AbstractConvexHull Union{Simplex, FlexibleConvexHull, FlexibleSimplex,
-HyperCube, HyperRectangle} # should we parametrize ACH by the type of points T?
+const AbstractConvexHull = Union{Simplex, FlexibleConvexHull, FlexibleSimplex,
+                                HyperCube, HyperRectangle} # should we parametrize ACH by the type of points T?

@@ -6,13 +6,13 @@ using StaticArrays.FixedSizeArrays
 using ColorTypes
 
 import Iterators
+import FixedPointNumbers # U8
 
 
 using Compat
 
 import Base: ==,
              *,
-             call,
              contains,
              convert,
              diff,
@@ -32,6 +32,10 @@ import Base: ==,
              split,
              union,
              unique
+
+if VERSION < v"0.6dev"
+    import Base: slice
+end
 
 
 include("types.jl")
@@ -170,6 +174,7 @@ export AABB,
        row,
        radius,
        setindex,
+       slice,
        spacedim,
        starts,
        texturecoordinates,

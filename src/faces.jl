@@ -47,12 +47,8 @@ for op in (:(==), :(>=), :(<=))
 end
 
 
-function Base.promote_type{T <: Int, OI <: OffsetInteger}(::Type{T}, ::Type{OI})
-    T
-end
-function Base.promote_type{T <: Int, OI <: OffsetInteger}(::Type{OI}, ::Type{T})
-    T
-end
+Base.promote_type{T <: Int, OI <: OffsetInteger}(::Type{T}, ::Type{OI}) = T
+Base.promote_type{T <: Int, OI <: OffsetInteger}(::Type{OI}, ::Type{T}) = T
 
 
 @generated function Base.getindex{N}(

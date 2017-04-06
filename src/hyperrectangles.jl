@@ -20,12 +20,12 @@ function _split{H<:HyperRectangle}(b::H, axis, value)
 end
 
 # empty constructor such that update will always include the first point
-@compat function (HR::Type{HyperRectangle{N,T}}){T,N}()
+function (HR::Type{HyperRectangle{N,T}}){T,N}()
     HR(Vec{N,T}(typemax(T)), Vec{N,T}(typemin(T)))
 end
 
 # conversion from other HyperRectangles
-@compat function (HR::Type{HyperRectangle{N,T1}}){N,T1,T2}(a::HyperRectangle{N,T2})
+function (HR::Type{HyperRectangle{N,T1}}){N,T1,T2}(a::HyperRectangle{N,T2})
     HR(Vec{N, T1}(minimum(a)), Vec{N, T1}(widths(a)))
 end
 
@@ -35,7 +35,7 @@ function HyperRectangle{N,T1,T2}(v1::Vec{N,T1}, v2::Vec{N,T2})
 end
 
 
-@compat function (HR::Type{HyperRectangle{N,T}}){N,T}(a::GeometryPrimitive)
+function (HR::Type{HyperRectangle{N,T}}){N,T}(a::GeometryPrimitive)
     HR(Vec{N, T}(minimum(a)), Vec{N, T}(widths(a)))
 end
 """
@@ -63,7 +63,7 @@ function HyperRectangle{T}(r::SimpleRectangle{T})
     HyperRectangle{2,T}(r)
 end
 
-@compat function (::Type{HyperRectangle{N,T}}){N,T}(r::SimpleRectangle)
+function (::Type{HyperRectangle{N,T}}){N,T}(r::SimpleRectangle)
     if N > 2
         return HyperRectangle(Vec{N, T}(T(r.x), T(r.y), Vec{N-2,T}(zero(T))...),
                               Vec{N, T}(T(r.w), T(r.h), Vec{N-2,T}(zero(T))...))
@@ -193,7 +193,7 @@ maximum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x + widths(a)[1], a.y +widths(
 minimum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
 origin{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
 
-@compat (::Type{SimpleRectangle}){T}(val::Vec{2, T}) = SimpleRectangle{T}(0, 0, val...)
+(::Type{SimpleRectangle}){T}(val::Vec{2, T}) = SimpleRectangle{T}(0, 0, val...)
 function SimpleRectangle{T}(position::Vec{2,T}, width::Vec{2,T})
     SimpleRectangle{T}(position..., width...)
 end
