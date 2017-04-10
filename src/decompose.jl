@@ -430,3 +430,42 @@ function decompose{FT<:Face,T}(::Type{FT},c::Cylinder3{T},facets=18)
   indexes[index+1] = (1,index+1,2)
   indexes
 end
+
+#-------------------------------------------------------------------------------
+function decompose{N,T}(PT::Type{Point{N,T}},c::Cylinder{N,T},facets=18)
+  NN = length(c.origin)
+  if NN==3
+    isodd(facets) ? facets = 2*div(facets,2) : nothing
+    facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
+    M = rotation(c); h = height(c)
+    position = 1; vertices = Array(PT,2*nbv)
+    for j = 1:nbv
+      phi = T((2*pi*(j-1))/nbv)
+      vertices[position] = PT(M*[c.r*cos(phi);c.r*sin(phi);0])+PT(c.origin)
+      vertices[position+1] = PT(M*[c.r*cos(phi);c.r*sin(phi);h])+PT(c.origin)
+      position += 2
+    end
+    return vertices
+  elseif NN==2
+    # .......
+  end
+end
+
+function decompose{FT<:Face,N,T}(::Type{FT},c::Cylinder{N,T},facets=18)
+  NN = length(c.origin)
+  if NN==3
+    isodd(facets) ? facets = 2*div(facets,2) : nothing
+    facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
+    indexes = Array(Face{3,Int,0},facets); index = 1
+    for j = 1:(nbv-1)
+      indexes[index] = (index,index+1,index+2)
+      indexes[index+1] = (index+2,index+1,index+3)
+      index += 2
+    end
+    indexes[index] = (index,index+1,1)
+    indexes[index+1] = (1,index+1,2)
+    return indexes
+  elseif NN==2
+    # .......
+  end
+end

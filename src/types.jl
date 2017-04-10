@@ -179,6 +179,16 @@ immutable FlexibleSimplex{T} <: AFG{T}
 end
 
 """
+A `Cylinder` is a 2D rectangle or a 3D cylinder defined by its origin point,
+its extremity and a radius. `origin`, `extremity` and `r`, must be specified.
+"""
+immutable Cylinder{N,T} <: GeometryPrimitive{N,T}
+  origin::Point{N,T}
+  extremity::Point{N,T}
+  r::T
+end
+
+"""
 A `Cylinder3` is a 3D cylinder defined by its origin point, its extremity
 and a radius. `origin`, `extremity` and `r`, must be specified.
 """
