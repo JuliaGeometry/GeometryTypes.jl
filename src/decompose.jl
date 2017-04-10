@@ -409,7 +409,7 @@ function decompose{T}(PT::Type{Point{3,T}},c::Cylinder3{T},facets=18)
   M = rotation(c); h = height(c)
   position = 1; vertices = Array(PT,2*nbv)
   for j = 1:nbv
-    phi                = T((2*pi*(j-1))/nbv)
+    phi = T((2*pi*(j-1))/nbv)
     vertices[position] = PT(M*[c.r*cos(phi);c.r*sin(phi);0])+PT(c.origin)
     vertices[position+1] = PT(M*[c.r*cos(phi);c.r*sin(phi);h])+PT(c.origin)
     position += 2
@@ -420,14 +420,20 @@ end
 function decompose{FT<:Face,T}(::Type{FT},c::Cylinder3{T},facets=18)
   isodd(facets) ? facets = 2*div(facets,2) : nothing
   facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
-  indexes = Array(Face{3,Int,0},facets); index = 1
+  #indexes = Array(Face{3,Int,0},facets); index = 1
+  indexes = Array(FT,facets); index = 1
+  FTE = eltype(FT)
   for j = 1:(nbv-1)
-    indexes[index] = (index,index+1,index+2)
-    indexes[index+1] = (index+2,index+1,index+3)
+    #indexes[index] = (index,index+1,index+2)
+    #indexes[index+1] = (index+2,index+1,index+3)
+    indexes[index] = FT(Triangle{FTE}(index,index+1,index+2))
+    indexes[index+1] = FT(Triangle{FTE}(index+2,index+1,index+3))
     index += 2
   end
-  indexes[index] = (index,index+1,1)
-  indexes[index+1] = (1,index+1,2)
+  #indexes[index] = (index,index+1,1)
+  #indexes[index+1] = (1,index+1,2)
+  indexes[index] = FT(Triangle{FTE}(index,index+1,1))
+  indexes[index+1] = FT(Triangle{FTE}(1,index+1,2))
   indexes
 end
 
