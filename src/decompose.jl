@@ -400,47 +400,20 @@ end
 
 isdecomposable{T<:Point, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
 isdecomposable{T<:Face, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
+isdecomposable{T<:Point, C<:Cylinder}(::Type{T}, ::Type{C}) = true
+isdecomposable{T<:Face, C<:Cylinder}(::Type{T}, ::Type{C}) = true
 #isdecomposable{T<:UVW, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
 #isdecomposable{T<:Normal, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
 
-function decompose{T}(PT::Type{Point{3,T}},c::Cylinder3{T},facets=18)
-  isodd(facets) ? facets = 2*div(facets,2) : nothing
-  facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
-  M = rotation(c); h = height(c)
-  position = 1; vertices = Array(PT,2*nbv)
-  for j = 1:nbv
-    phi = T((2*pi*(j-1))/nbv)
-    vertices[position] = PT(M*[c.r*cos(phi);c.r*sin(phi);0])+PT(c.origin)
-    vertices[position+1] = PT(M*[c.r*cos(phi);c.r*sin(phi);h])+PT(c.origin)
-    position += 2
-  end
-  vertices
-end
+# def of resolution + rotation
 
-function decompose{FT<:Face,T}(::Type{FT},c::Cylinder3{T},facets=18)
-  isodd(facets) ? facets = 2*div(facets,2) : nothing
-  facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
-  #indexes = Array(Face{3,Int,0},facets); index = 1
-  indexes = Array(FT,facets); index = 1
-  FTE = eltype(FT)
-  for j = 1:(nbv-1)
-    #indexes[index] = (index,index+1,index+2)
-    #indexes[index+1] = (index+2,index+1,index+3)
-    indexes[index] = FT(Triangle{FTE}(index,index+1,index+2))
-    indexes[index+1] = FT(Triangle{FTE}(index+2,index+1,index+3))
-    index += 2
-  end
-  #indexes[index] = (index,index+1,1)
-  #indexes[index+1] = (1,index+1,2)
-  indexes[index] = FT(Triangle{FTE}(index,index+1,1))
-  indexes[index+1] = FT(Triangle{FTE}(1,index+1,2))
-  indexes
-end
-
-#-------------------------------------------------------------------------------
-function decompose{N,T}(PT::Type{Point{N,T}},c::Cylinder{N,T},facets=18)
-  NN = length(c.origin)
-  if NN==3
+function decompose{N,T}(PT::Type{Point{3,T}},c::Cylinder{N,T},facets=18)
+  if N==2
+    Np = facets; resolution = [Np Np]; w,h = resolution
+    we = T[2*c.r,height(c)]; o = T[-c.r,0.] #origin(rect)
+    return vec(PT[(x,y,0) for x=linspace(o[1],o[1]+we[1],w),
+                              y=linspace(o[2],o[2]+we[2],h)])
+  elseif N==3
     isodd(facets) ? facets = 2*div(facets,2) : nothing
     facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
     M = rotation(c); h = height(c)
@@ -452,14 +425,18 @@ function decompose{N,T}(PT::Type{Point{N,T}},c::Cylinder{N,T},facets=18)
       position += 2
     end
     return vertices
-  elseif NN==2
-    # .......
   end
 end
 
 function decompose{FT<:Face,N,T}(::Type{FT},c::Cylinder{N,T},facets=18)
-  NN = length(c.origin)
-  if NN==3
+  #NN = length(c.origin)
+  if N==2
+    Np = facets; resolution = [Np Np]; w,h = resolution
+    faces = vec([Face{4,Int,0}(sub2ind(resolution,i,j),sub2ind(resolution, i+1,j),
+                               sub2ind(resolution,i+1,j+1), sub2ind(resolution,i,j+1))
+                 for i=1:(w-1), j=1:(h-1)])
+    return decompose(FT,faces)
+  elseif N==3
     isodd(facets) ? facets = 2*div(facets,2) : nothing
     facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
     indexes = Array(Face{3,Int,0},facets); index = 1
@@ -471,7 +448,5 @@ function decompose{FT<:Face,N,T}(::Type{FT},c::Cylinder{N,T},facets=18)
     indexes[index] = (index,index+1,1)
     indexes[index+1] = (1,index+1,2)
     return indexes
-  elseif NN==2
-    # .......
   end
 end

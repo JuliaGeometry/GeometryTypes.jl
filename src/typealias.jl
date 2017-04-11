@@ -52,6 +52,12 @@ AABB, or Axis Aligned Bounding Box, is an alias for a 3D HyperRectangle.
 typealias AABB{T} HyperRectangle{3, T}
 @compat (::Type{AABB})(m...) = HyperRectangle(m...)
 
+"""
+A `Cylinder3` is a 3D cylinder defined by its origin point, its extremity
+and a radius. `origin`, `extremity` and `r`, must be specified.
+"""
+typealias Cylinder3{T}  Cylinder{3,T}
+
 typealias HMesh HomogenousMesh
 
 typealias UV{T} TextureCoordinate{2, T}
