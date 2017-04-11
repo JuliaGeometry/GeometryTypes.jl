@@ -24,17 +24,25 @@ end
 
 @compat function (meshtype::Type{T}){T <: HMesh,HT}(
         c::Union{HyperCube{3,T}, HyperRectangle{3,HT}}
-    
-)    xdir = Vec{3, HT}(widths(c)[1],0f0,0f0)
-    ydir = Vec{3, HT}(0f0,widths(c)[2],0f0)
-    zdir = Vec{3, HT}(0f0,0f0,widths(c)[3])
+    )
+    xdir = Vec{3, HT}(1, 0, 0)
+    ydir = Vec{3, HT}(0, 1, 0)
+    zdir = Vec{3, HT}(0, 0, 1)
+    o0 = zero(Vec{3, HT})
     quads = [
-        Quad(origin(c) + zdir,   xdir, ydir), # Top
-        Quad(origin(c),          ydir, xdir), # Bottom
-        Quad(origin(c) + xdir,   ydir, zdir), # Right
-        Quad(origin(c),          zdir, ydir), # Left
-        Quad(origin(c),          xdir, zdir), # Back
-        Quad(origin(c) + ydir,   zdir, xdir) #Front
+        Quad(zdir, xdir, ydir), # Top
+        Quad(o0,   ydir, xdir), # Bottom
+        Quad(xdir, ydir, zdir), # Right
+        Quad(o0,   zdir, ydir), # Left
+        Quad(o0,   xdir, zdir), # Back
+        Quad(ydir, zdir, xdir) #Front
     ]
-    merge(map(meshtype, quads))
+    mesh = merge(map(meshtype, quads))
+    v = vertices(mesh)
+    w = widths(c)
+    o = origin(c)
+    map!(v, v) do v
+        (v .* w) + o
+    end
+    mesh
 end
