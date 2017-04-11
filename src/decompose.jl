@@ -411,6 +411,7 @@ function decompose{N,T}(PT::Type{Point{3,T}},c::Cylinder{N,T},facets=18)
   if N==2
     Np = facets; resolution = [Np Np]; w,h = resolution
     we = T[2*c.r,height(c)]; o = T[-c.r,0.] #origin(rect)
+    println("P 2D")
     return vec(PT[(x,y,0) for x=linspace(o[1],o[1]+we[1],w),
                               y=linspace(o[2],o[2]+we[2],h)])
   elseif N==3
@@ -435,6 +436,7 @@ function decompose{FT<:Face,N,T}(::Type{FT},c::Cylinder{N,T},facets=18)
     faces = vec([Face{4,Int,0}(sub2ind(resolution,i,j),sub2ind(resolution, i+1,j),
                                sub2ind(resolution,i+1,j+1), sub2ind(resolution,i,j+1))
                  for i=1:(w-1), j=1:(h-1)])
+    println("F 2D")
     return decompose(FT,faces)
   elseif N==3
     isodd(facets) ? facets = 2*div(facets,2) : nothing
