@@ -53,10 +53,12 @@ typealias AABB{T} HyperRectangle{3, T}
 @compat (::Type{AABB})(m...) = HyperRectangle(m...)
 
 """
-A `Cylinder3` is a 3D cylinder defined by its origin point, its extremity
-and a radius. `origin`, `extremity` and `r`, must be specified.
+A `Cylinder2` or `Cylinder3` is a 2D/3D cylinder defined by its origin point,
+its extremity and a radius. `origin`, `extremity` and `r`, must be specified.
 """
+typealias Cylinder2{T}  Cylinder{2,T}
 typealias Cylinder3{T}  Cylinder{3,T}
+
 
 typealias HMesh HomogenousMesh
 

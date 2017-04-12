@@ -259,7 +259,6 @@ end
 
 
 function decompose{NT}(T::Type{Normal{3, NT}}, q::Quad)
-  println(11111111111111)
     normal = T(normalize(cross(q.width, q.height)))
     T[normal for i=1:4]
 end
@@ -308,9 +307,6 @@ end
 #Gets the normal attribute to a mesh
 function decompose{NT}(T::Type{Normal{3, NT}}, mesh::AbstractMesh)
     n = mesh.normals
-    println(normals(vertices(mesh), faces(mesh), T))
-    println(vertices(mesh))
-    println( faces(mesh))
     eltype(n) == T && return n
     eltype(n) <: Normal{3} && return map(T, n)
     (n == Void[] || isempty(n)) && return normals(vertices(mesh), faces(mesh), T)
@@ -404,53 +400,49 @@ end
 
 isdecomposable{T<:Point, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
 isdecomposable{T<:Face, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
-isdecomposable{T<:Point, C<:Cylinder}(::Type{T}, ::Type{C}) = true
-isdecomposable{T<:Face, C<:Cylinder}(::Type{T}, ::Type{C}) = true
-#isdecomposable{N<:Normal, C<:Cylinder3}(::Type{N},::Type{C}) = true
-#isdecomposable{T<:UVW, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
-#isdecomposable{T<:Normal, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
+isdecomposable{T<:Point, C<:Cylinder2}(::Type{T}, ::Type{C}) = true
+isdecomposable{T<:Face, C<:Cylinder2}(::Type{T}, ::Type{C}) = true
 
 # def of resolution + rotation
-function decompose{T<:Normal}(::Type{T},c::Cylinder{2,T},resolution=(2,2))
-    fill(T(0,0,1), prod(resolution))
-end
-function decompose{N,T}(PT::Type{Point{3,T}},c::Cylinder{N,T},facets=18)
-  if N==2
-    Np = facets; resolution = [Np Np]; w,h = resolution
-    r = SimpleRectangle{T}(c.origin[1]-c.r/2,c.origin[2],c.r,height(c))
-    return decompose(PT,r,resolution)
-  elseif N==3
-    isodd(facets) ? facets = 2*div(facets,2) : nothing
-    facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
-    M = rotation(c); h = height(c)
-    position = 1; vertices = Array(PT,2*nbv)
-    for j = 1:nbv
-      phi = T((2*pi*(j-1))/nbv)
-      vertices[position] = PT(M*[c.r*cos(phi);c.r*sin(phi);0])+PT(c.origin)
-      vertices[position+1] = PT(M*[c.r*cos(phi);c.r*sin(phi);h])+PT(c.origin)
-      position += 2
-    end
-    return vertices
+function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{2,T},facets=18)
+  Np = facets; resolution = (Np,Np); w,h = resolution
+  r = SimpleRectangle{T}(c.origin[1]-c.r/2,c.origin[2],c.r,height(c))
+  M = rotation(c); vertices = decompose(PT,r,resolution)
+  vo = length(c.origin)==2 ? [c.origin...,0] : c.origin
+  for i = 1:length(vertices)
+    vertices[i] = PT(M*(vertices[i]-vo)+vo)
   end
+  return vertices
+end
+function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{3,T},facets=18)
+  isodd(facets) ? facets = 2*div(facets,2) : nothing
+  facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
+  M = rotation(c); h = height(c)
+  position = 1; vertices = Array(PT,2*nbv)
+  for j = 1:nbv
+    phi = T((2*pi*(j-1))/nbv)
+    vertices[position] = PT(M*[c.r*cos(phi);c.r*sin(phi);0])+PT(c.origin)
+    vertices[position+1] = PT(M*[c.r*cos(phi);c.r*sin(phi);h])+PT(c.origin)
+    position += 2
+  end
+  return vertices
 end
 
-function decompose{FT<:Face,N,T}(::Type{FT},c::Cylinder{N,T},facets=18)
-  #NN = length(c.origin)
-  if N==2
-    Np = facets; resolution = [Np Np]; w,h = resolution
-    r = SimpleRectangle{T}(c.origin[1]-c.r/2,c.origin[2],c.r,height(c))
-    return decompose(FT,r,resolution)
-  elseif N==3
-    isodd(facets) ? facets = 2*div(facets,2) : nothing
-    facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
-    indexes = Array(Face{3,Int,0},facets); index = 1
-    for j = 1:(nbv-1)
-      indexes[index] = (index,index+1,index+2)
-      indexes[index+1] = (index+2,index+1,index+3)
-      index += 2
-    end
-    indexes[index] = (index,index+1,1)
-    indexes[index+1] = (1,index+1,2)
-    return indexes
+function decompose{FT<:Face,T}(::Type{FT},c::Cylinder{2,T},facets=18)
+  Np = facets; resolution = (Np,Np); w,h = resolution
+  r = SimpleRectangle{T}(c.origin[1]-c.r/2,c.origin[2],c.r,height(c))
+  return decompose(Face{3,Int,0},r,resolution)
+end
+function decompose{FT<:Face,T}(::Type{FT},c::Cylinder{3,T},facets=18)
+  isodd(facets) ? facets = 2*div(facets,2) : nothing
+  facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
+  indexes = Array(Face{3,Int,0},facets); index = 1
+  for j = 1:(nbv-1)
+    indexes[index] = (index,index+1,index+2)
+    indexes[index+1] = (index+2,index+1,index+3)
+    index += 2
   end
+  indexes[index] = (index,index+1,1)
+  indexes[index+1] = (1,index+1,2)
+  return indexes
 end
