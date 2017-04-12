@@ -259,6 +259,7 @@ end
 
 
 function decompose{NT}(T::Type{Normal{3, NT}}, q::Quad)
+  println(11111111111111)
     normal = T(normalize(cross(q.width, q.height)))
     T[normal for i=1:4]
 end
@@ -307,6 +308,9 @@ end
 #Gets the normal attribute to a mesh
 function decompose{NT}(T::Type{Normal{3, NT}}, mesh::AbstractMesh)
     n = mesh.normals
+    println(normals(vertices(mesh), faces(mesh), T))
+    println(vertices(mesh))
+    println( faces(mesh))
     eltype(n) == T && return n
     eltype(n) <: Normal{3} && return map(T, n)
     (n == Void[] || isempty(n)) && return normals(vertices(mesh), faces(mesh), T)
@@ -402,18 +406,19 @@ isdecomposable{T<:Point, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
 isdecomposable{T<:Face, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
 isdecomposable{T<:Point, C<:Cylinder}(::Type{T}, ::Type{C}) = true
 isdecomposable{T<:Face, C<:Cylinder}(::Type{T}, ::Type{C}) = true
+#isdecomposable{N<:Normal, C<:Cylinder3}(::Type{N},::Type{C}) = true
 #isdecomposable{T<:UVW, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
 #isdecomposable{T<:Normal, C<:Cylinder3}(::Type{T}, ::Type{C}) = true
 
 # def of resolution + rotation
-
+function decompose{T<:Normal}(::Type{T},c::Cylinder{2,T},resolution=(2,2))
+    fill(T(0,0,1), prod(resolution))
+end
 function decompose{N,T}(PT::Type{Point{3,T}},c::Cylinder{N,T},facets=18)
   if N==2
     Np = facets; resolution = [Np Np]; w,h = resolution
-    we = T[2*c.r,height(c)]; o = T[-c.r,0.] #origin(rect)
-    println("P 2D")
-    return vec(PT[(x,y,0) for x=linspace(o[1],o[1]+we[1],w),
-                              y=linspace(o[2],o[2]+we[2],h)])
+    r = SimpleRectangle{T}(c.origin[1]-c.r/2,c.origin[2],c.r,height(c))
+    return decompose(PT,r,resolution)
   elseif N==3
     isodd(facets) ? facets = 2*div(facets,2) : nothing
     facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
@@ -433,11 +438,8 @@ function decompose{FT<:Face,N,T}(::Type{FT},c::Cylinder{N,T},facets=18)
   #NN = length(c.origin)
   if N==2
     Np = facets; resolution = [Np Np]; w,h = resolution
-    faces = vec([Face{4,Int,0}(sub2ind(resolution,i,j),sub2ind(resolution, i+1,j),
-                               sub2ind(resolution,i+1,j+1), sub2ind(resolution,i,j+1))
-                 for i=1:(w-1), j=1:(h-1)])
-    println("F 2D")
-    return decompose(FT,faces)
+    r = SimpleRectangle{T}(c.origin[1]-c.r/2,c.origin[2],c.r,height(c))
+    return decompose(FT,r,resolution)
   elseif N==3
     isodd(facets) ? facets = 2*div(facets,2) : nothing
     facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
