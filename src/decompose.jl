@@ -406,6 +406,7 @@ isdecomposable{T<:Face, C<:Cylinder2}(::Type{T}, ::Type{C}) = true
 # def of resolution + rotation
 function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{2,T},resolution=(2,2))
   r = SimpleRectangle{T}(c.origin[1]-c.r/2,c.origin[2],c.r,height(c))
+
   M = rotation(c); vertices = decompose(PT,r,resolution)
   vo = length(c.origin)==2 ? [c.origin...,0] : c.origin
   for i = 1:length(vertices)
