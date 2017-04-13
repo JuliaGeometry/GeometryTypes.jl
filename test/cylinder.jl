@@ -1,24 +1,28 @@
 @testset "Cylinder" begin
-    @test Sphere(Point(0,0,0), 4) == HyperSphere{3,Int}(Point{3,Int}((0,0,0)),4)
-    c = Circle(Point(0,0), 1)
-    @test c == HyperSphere(Point(0,0), 1)
-    @test origin(c) == Point(0,0)
-    @test !( isinside(c, 1, 2) )
-    @test isinside(c, 0.5, 0.5)
+@testset "constructors" begin
+    s = Cylinder(Point([1,2]),Point([3,4]),5)
+    @test typeof(s) == Cylinder{2,Int}
+    @test typeof(s) == Cylinder2{Int}
+    @test origin(s) == Point{2,Int}([1,2])
+    @test extremity(s) == Point{2,Int}([3,4])
+    @test radius(s) == 5
+    @test height(s) == norm([1,2]-[3,4])
+    @test norm(direction(s) - [2,2]./norm([1,2]-[3,4]))<1e-10
 
-    centered_rect = centered(HyperSphere)
-    @test centered_rect == HyperSphere{3,Float32}(Point3f0(0), 0.5f0)
-    centered_rect = centered(HyperSphere{2})
-    @test centered_rect == HyperSphere{2,Float32}(Point2f0(0),0.5f0)
+    v1 = rand(Float64,3); v2 = rand(Float64,3); R = rand()
+    s = Cylinder(Point(v1),Point(v2),R)
+    @test typeof(s) == Cylinder{3,Float64}
+    @test typeof(s) == Cylinder3{Float64}
+    @test origin(s) == Point{3,Float64}(v1)
+    @test extremity(s) == Point{3,Float64}(v2)
+    @test radius(s) == R
+    @test height(s) == norm(v2-v1)
+    @test norm(direction(s) - (v2-v1)./norm(v2-v1))<1e-10
+  end
+end
 
-    centered_rect = centered(HyperSphere{2, Float64})
-    @test centered_rect == HyperSphere{2,Float64}(Point(0.,0.), 0.5)
+@testset "decompose" begin
+    s = Cylinder(Point([1,2]),Point([3,4]),5)
 
-    centered_rect = centered(HyperSphere{3, Float32})
-    @test centered_rect == HyperSphere{3,Float32}(Point3f0(0), 0.5f0)
-
-    @test widths(centered_rect) == Vec3f0(1)
-    @test radius(centered_rect) == 0.5f0
-    @test maximum(centered_rect) == Vec3f0(0.5f0)
-    @test minimum(centered_rect) == Vec3f0(-0.5f0)
+  end
 end

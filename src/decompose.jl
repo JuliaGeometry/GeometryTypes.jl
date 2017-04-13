@@ -404,8 +404,7 @@ isdecomposable{T<:Point, C<:Cylinder2}(::Type{T}, ::Type{C}) = true
 isdecomposable{T<:Face, C<:Cylinder2}(::Type{T}, ::Type{C}) = true
 
 # def of resolution + rotation
-function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{2,T},facets=18)
-  Np = facets; resolution = (Np,Np); w,h = resolution
+function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{2,T},resolution=(2,2))
   r = SimpleRectangle{T}(c.origin[1]-c.r/2,c.origin[2],c.r,height(c))
   M = rotation(c); vertices = decompose(PT,r,resolution)
   vo = length(c.origin)==2 ? [c.origin...,0] : c.origin
@@ -414,9 +413,9 @@ function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{2,T},facets=18)
   end
   return vertices
 end
-function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{3,T},facets=18)
-  isodd(facets) ? facets = 2*div(facets,2) : nothing
-  facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
+function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{3,T},resolution=5)
+  isodd(resolution) ? resolution = 2*div(resolution,2) : nothing
+  resolution<8 ? resolution = 8 : nothing; nbv = Int(resolution/2)
   M = rotation(c); h = height(c)
   position = 1; vertices = Array(PT,2*nbv)
   for j = 1:nbv
@@ -428,8 +427,7 @@ function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{3,T},facets=18)
   return vertices
 end
 
-function decompose{FT<:Face,T}(::Type{FT},c::Cylinder{2,T},facets=18)
-  Np = facets; resolution = (Np,Np); w,h = resolution
+function decompose{FT<:Face,T}(::Type{FT},c::Cylinder{2,T},resolution=(2,2))
   r = SimpleRectangle{T}(c.origin[1]-c.r/2,c.origin[2],c.r,height(c))
   return decompose(Face{3,Int,0},r,resolution)
 end
