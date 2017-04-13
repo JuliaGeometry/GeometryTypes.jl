@@ -6,9 +6,10 @@
         @test origin(s) == Point{2,Float32}([1,2])
         @test extremity(s) == Point{2,Float32}([3,4])
         @test radius(s) == 5
-        @test abs(height(s)- norm([1,2]-[3,4]))<1e-5
-        @test norm(direction(s) - Point{2,Float32}([2,2]./norm([1,2]-[3,4])))<1e-5
-
+        #@test abs(height(s)- norm([1,2]-[3,4]))<1e-5
+        @test isapprox(height(s),norm([1,2]-[3,4]))
+        #@test norm(direction(s) - Point{2,Float32}([2,2]./norm([1,2]-[3,4])))<1e-5
+        @test isapprox(direction(s),Point{2,Float32}([2,2]./norm([1,2]-[3,4])))
         v1 = rand(Float64,3); v2 = rand(Float64,3); R = rand()
         s = Cylinder(Point(v1),Point(v2),R)
         @test typeof(s) == Cylinder{3,Float64}
@@ -17,7 +18,8 @@
         @test extremity(s) == Point{3,Float64}(v2)
         @test radius(s) == R
         @test height(s) == norm(v2-v1)
-        @test norm(direction(s) - Point{3,Float64}((v2-v1)./norm(v2-v1)))<1e-10
+        #@test norm(direction(s) - Point{3,Float64}((v2-v1)./norm(v2-v1)))<1e-10
+        @test isapprox(direction(s),Point{3,Float64}((v2-v1)./norm(v2-v1)))
       end
 
     @testset "decompose" begin
@@ -34,6 +36,7 @@
                                                    Face(3,6,5)]
         v1 = Float64[1,2,3]; v2 = Float64[4,5,6]; R = Float64(5)
         s = Cylinder(Point(v1),Point(v2),R)
+        println(decompose(Point3{Float64},s,8))
     @test decompose(Point3{Float64},s,8) == [Point{3,Float64}(4.535533905932738,-1.5355339059327373,3.0),
                                              Point{3,Float64}(7.535533905932738,1.4644660940672627,6.0),
                                              Point{3,Float64}(3.0412414523193148,4.041241452319315,-1.0824829046386295),
