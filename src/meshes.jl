@@ -1,7 +1,10 @@
+
+_eltype{T <: AbstractArray}(::Type{T}) = eltype(T)
+_eltype{T}(::Type{T}) = T
 for (i, field) in enumerate((:vertextype, :facetype, :normaltype,
                        :texturecoordinatetype, :colortype))
     @eval begin
-        $field{T <: HomogenousMesh}(t::Type{T}) = eltype(fieldtype(t, $i))
+        $field{T <: HomogenousMesh}(t::Type{T}) = _eltype(fieldtype(t, $i))
         $field(mesh::HomogenousMesh) = $field(typeof(mesh))
     end
 end

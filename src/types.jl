@@ -21,7 +21,7 @@ Abstract to classify Simplices. The convention for N starts at 1, which means
 a Simplex has 1 point. A 2-simplex has 2 points, and so forth. This convention
 is not the same as most mathematical texts.
 """
-@compat abstract type AbstractSimplex{T} <: StaticVector{T} end
+@compat abstract type AbstractSimplex{S, T} <: StaticVector{S, T} end
 
 
 """
@@ -40,7 +40,7 @@ This is for a simpler implementation.
 It applies to infinite dimensions. The structure of this type is designed
 to allow embedding in higher-order spaces by parameterizing on `T`.
 """
-immutable Simplex{S, T} <: AbstractSimplex{T}
+immutable Simplex{S, T} <: AbstractSimplex{S, T}
     data::NTuple{S, T}
     (::Type{Simplex{S, T}}){S, T}(x::NTuple{S, T}) = new{S, T}(x)
     (::Type{Simplex{S, T}}){S, T}(x::NTuple{S}) = new{S, T}(StaticArrays.convert_ntuple(T, x))
