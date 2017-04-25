@@ -95,7 +95,7 @@ typealias NormalVertexcolorMesh{VT, FT, NT, CT} HMesh{Point{3, VT}, FT, Normal{3
 typealias GLNormalVertexcolorMesh NormalVertexcolorMesh{Float32, GLTriangle, Float32, RGBA{Float32}}
 
 typealias NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, AT, A_ID_T}
-typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBA{U8}}, Float32}
+typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBA{N0f8}}, Float32}
 
 typealias NormalUVWMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UVW{UVT}, Void, Void, Void}
 typealias GLNormalUVWMesh NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
