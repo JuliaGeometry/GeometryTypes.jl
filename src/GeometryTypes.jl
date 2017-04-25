@@ -5,7 +5,6 @@ using StaticArrays
 using StaticArrays.FixedSizeArrays
 using ColorTypes
 
-import Iterators
 import FixedPointNumbers # U8
 
 

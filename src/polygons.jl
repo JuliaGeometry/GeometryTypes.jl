@@ -52,7 +52,7 @@ function snip{N, T}(
         return false
     end
 
-    for p=1:n
+    for p = 1:n
         ((p == u) || (p == v) || (p == w)) && continue;
         P = contour[V[p]]
         if InsideTriangle(A, B, C, P)
@@ -94,8 +94,8 @@ function polygon2faces{P<:Point}(
 
     #=  remove nv-2 Vertices, creating 1 triangle every time =#
     count = 2*nv   #= error detection =#
-    v=nv
-    while nv>2
+    v = nv
+    while nv > 2
         #= if we loop, it is probably a non-simple polygon =#
         if 0 >= count
             return result
