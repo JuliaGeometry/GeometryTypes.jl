@@ -69,7 +69,7 @@ Triangulates a Polygon given as a `contour`::AbstractArray{Point} without holes.
 It will return a Vector{`facetype`}, defining indexes into `contour`
 """
 function polygon2faces{P<:Point}(
-        contour::AbstractArray{P}, facetype=GLTriangle
+        contour::AbstractArray{P}, facetype = GLTriangle
     )
     #= allocate and initialize list of Vertices in polygon =#
     result = facetype[]
@@ -111,7 +111,7 @@ function polygon2faces{P<:Point}(
             #= true names of the vertices =#
             a = V[u]; b = V[v]; c = V[w];
             #= output Triangle =#
-            push!(result, facetype(Triangle{Int}(a, b, c)))
+            push!(result, facetype(a, b, c))
             #= remove v from remaining polygon =#
             s = v; t = v+1
             while t<=nv

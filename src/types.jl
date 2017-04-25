@@ -44,6 +44,7 @@ immutable TextureCoordinate{N, T} <: FixedVector{N, T}
     _::NTuple{N, T}
 end
 
+
 """
 A Face is typically used when constructing subtypes of `AbstractMesh` where
 the `Face` should not reproduce the vertices, but rather index into them.
@@ -51,12 +52,24 @@ Face is parameterized by:
 
 * `N` - The number of vertices in the face.
 * `T` - The type of the indices in the face, a subtype of Integer.
+
+"""
+immutable Face{N, T} <: FixedVector{N, T}
+    _::NTuple{N, T}
+end
+
+"""
+OffsetInteger type mainly for indexing.
 * `O` - The offset relative to Julia arrays. This helps reduce copying when
 communicating with 0-indexed systems such ad OpenGL.
 """
-immutable Face{N, T, IndexOffset} <: FixedVector{N, T}
-    _::NTuple{N, T}
+immutable OffsetInteger{O, T <: Integer} <: Integer
+    i::T
+    function OffsetInteger(x::Integer)
+        new(x - O)
+    end
 end
+raw(x::OffsetInteger) = x.i
 
 """
 A `HyperRectangle` is a generalization of a rectangle into N-dimensions.

@@ -189,6 +189,10 @@ export AABB,
        width,
        widths,
        xwidth,
-       yheight
+       yheight,
+       OffsetInteger,
+       ZeroIndex,
+       OneIndex,
+       GLIndex
 
 end # module
