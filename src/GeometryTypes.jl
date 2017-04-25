@@ -59,6 +59,7 @@ include("convexhulls.jl")
 include("gjk.jl")
 include("polygons.jl")
 include("lines.jl")
+include("cylinder.jl")
 
 export AABB,
        AbstractFlexibleGeometry,
@@ -70,8 +71,13 @@ export AABB,
        Circle,
        centered,
        Cube,
+       Cylinder,
+       Cylinder2,
+       Cylinder3,
        decompose,
+       direction,
        eltype_or,
+       extremity,
        Face,
        FlexibleConvexHull,
        FlexibleSimplex,

@@ -22,5 +22,5 @@ import Base.Test.@inferred
     include("convexhulls.jl")
     include("gjk.jl")
     include("lines.jl")
+    include("cylinder.jl")
 end
-
