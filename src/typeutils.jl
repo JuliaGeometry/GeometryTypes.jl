@@ -1,10 +1,11 @@
 using Compat.TypeUtils
 
-eltype_or(::Type{<: AbstractGeometry{N, T} where N}, or) where T = T
-eltype_or(::Type{<: AbstractGeometry{N, T} where N where T}, or) = or
+eltype_or(::Type{G}, or) where G <: (AbstractGeometry{N, T} where N) where T = T
+eltype_or(::Type{G}, or) where G <: (AbstractGeometry{N, T} where {N, T}) = or
 
-ndims_or(::Type{<: AbstractGeometry{N, T} where T}, or) where N = N
-ndims_or(::Type{<: AbstractGeometry{N, T} where N where T}, or) = or
+ndims_or(::Type{G}, or) where G <: (AbstractGeometry{N, T} where T) where N = N
+ndims_or(::Type{G}, or) where G <: (AbstractGeometry{N, T} where {N, T}) = or
+
 
 Base.eltype(T::Type{<:AbstractGeometry}) = eltype_or(T, Any)
 
