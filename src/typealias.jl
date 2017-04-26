@@ -69,36 +69,36 @@ typealias UVW{T} TextureCoordinate{3, T}
 A `SimpleMesh` is an alias for a `HomogenousMesh` parameterized only by
 vertex and face types.
 """
-typealias SimpleMesh{VT, FT} HMesh{VT, FT, Void, Void, Void, Void, Void}
-typealias PlainMesh{VT, FT} HMesh{Point{3, VT}, FT, Void, Void, Void, Void, Void}
+typealias SimpleMesh{N, T, VT <: FixedVector{N, T}, FT} HMesh{N, T, VT, FT, Void, Void, Void, Void, Void}
+typealias PlainMesh{VT, FT} HMesh{3, VT, Point{3, VT}, FT, Void, Void, Void, Void, Void}
 typealias GLPlainMesh PlainMesh{Float32, GLTriangle}
 
-typealias Mesh2D{VT, FT} HMesh{Point{2, VT}, FT, Void, Void, Void, Void, Void}
+typealias Mesh2D{VT, FT} HMesh{2, VT, Point{2, VT}, FT, Void, Void, Void, Void, Void}
 typealias GLMesh2D Mesh2D{Float32, GLTriangle}
 
-typealias UVMesh{VT, FT, UVT} HMesh{Point{3, VT}, FT, Void, UV{UVT}, Void, Void, Void}
+typealias UVMesh{VT, FT, UVT} HMesh{3, VT, Point{3, VT}, FT, Void, UV{UVT}, Void, Void, Void}
 typealias GLUVMesh UVMesh{Float32, GLTriangle, Float32}
 
-typealias UVWMesh{VT, FT, UVT} HMesh{Point{3, VT}, FT, Void, UVW{UVT}, Void, Void, Void}
+typealias UVWMesh{VT, FT, UVT} HMesh{3, VT, Point{3, VT}, FT, Void, UVW{UVT}, Void, Void, Void}
 typealias GLUVWMesh UVWMesh{Float32, GLTriangle, Float32}
 
-typealias NormalMesh{VT, FT, NT} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, Void, Void}
+typealias NormalMesh{VT, FT, NT} HMesh{3, VT, Point{3, VT}, FT, Normal{3, NT}, Void, Void, Void, Void}
 typealias GLNormalMesh NormalMesh{Float32, GLTriangle, Float32}
 
-typealias UVMesh2D{VT, FT, UVT} HMesh{Point{2, VT}, FT, Void, UV{UVT}, Void, Void, Void}
+typealias UVMesh2D{VT, FT, UVT} HMesh{2, VT, Point{2, VT}, FT, Void, UV{UVT}, Void, Void, Void}
 typealias GLUVMesh2D UVMesh2D{Float32, GLTriangle, Float32}
 
-typealias NormalColorMesh{VT, FT, NT, CT} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, CT, Void, Void}
+typealias NormalColorMesh{VT, FT, NT, CT} HMesh{3, VT, Point{3, VT}, FT, Normal{3, NT}, Void, CT, Void, Void}
 typealias GLNormalColorMesh NormalColorMesh{Float32, GLTriangle, Float32, RGBA{Float32}}
 
-typealias NormalVertexcolorMesh{VT, FT, NT, CT} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Vector{CT}, Void, Void}
+typealias NormalVertexcolorMesh{VT, FT, NT, CT} HMesh{3, VT, Point{3, VT}, FT, Normal{3, NT}, Void, Vector{CT}, Void, Void}
 typealias GLNormalVertexcolorMesh NormalVertexcolorMesh{Float32, GLTriangle, Float32, RGBA{Float32}}
 
-typealias NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, AT, A_ID_T}
-typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBA{U8}}, Float32}
+typealias NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} HMesh{3, VT, Point{3, VT}, FT, Normal{3, NT}, Void, Void, AT, A_ID_T}
+typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBA{Normed{UInt8, 8}}}, Float32}
 
-typealias NormalUVWMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UVW{UVT}, Void, Void, Void}
+typealias NormalUVWMesh{VT, FT, NT, UVT} HMesh{3, VT, Point{3, VT}, FT, Normal{3, NT}, UVW{UVT}, Void, Void, Void}
 typealias GLNormalUVWMesh NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
 
-typealias NormalUVMesh{VT, FT, NT, UVT} HMesh{Point{3, VT}, FT, Normal{3, NT}, UV{UVT}, Void, Void, Void}
+typealias NormalUVMesh{VT, FT, NT, UVT} HMesh{3, VT, Point{3, VT}, FT, Normal{3, NT}, UV{UVT}, Void, Void, Void}
 typealias GLNormalUVMesh NormalUVMesh{Float32, GLTriangle, Float32, Float32}

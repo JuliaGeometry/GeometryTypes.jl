@@ -3,6 +3,7 @@ module GeometryTypes
 
 using FixedSizeArrays
 using ColorTypes
+using FixedPointNumbers: Normed
 import Iterators
 
 import FixedSizeArrays: eltype_or, ndims_or
@@ -10,7 +11,6 @@ using Compat
 
 import Base: ==,
              *,
-             call,
              contains,
              convert,
              diff,
@@ -174,6 +174,7 @@ export AABB,
        row,
        radius,
        setindex,
+       slice,
        spacedim,
        starts,
        texturecoordinates,
