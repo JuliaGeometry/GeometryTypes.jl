@@ -12,7 +12,11 @@ function rotation{T}(c::Cylinder{2,T})
 end
 function rotation{T}(c::Cylinder{3,T})
     d3 = direction(c); u = @SVector [d3[1],d3[2],d3[3]]
-    v = abs(u[1])>0 || abs(u[2])>0 ? @SVector [u[2],-u[1],T(0)] : @SVector [T(0),-u[3],u[2]]
+    if (abs(u[1])>0 || abs(u[2])>0)
+        v = @SVector [u[2],-u[1],T(0)]
+    else
+        v = @SVector [T(0),-u[3],u[2]]
+    end
     v = normalize(v)
     w = @SVector [u[2]*v[3]-u[3]*v[2],-u[1]*v[3]+u[3]*v[1],u[1]*v[2]-u[2]*v[1]]
     return hcat(v,w,u)

@@ -1,7 +1,7 @@
 __precompile__()
 module GeometryTypes
 
-using FixedSizeArrays
+using FixedSizeArrays, StaticArrays
 using ColorTypes
 import Iterators
 
