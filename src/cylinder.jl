@@ -5,14 +5,15 @@ height{N,T}(c::Cylinder{N,T}) = norm(c.extremity-c.origin)
 direction{N,T}(c::Cylinder{N,T}) = (c.extremity.-c.origin)./height(c)
 
 function rotation{T}(c::Cylinder{2,T})
-    u = [direction(c)...,0]; v = [u[2],-u[1],0]
-    v ./= norm(v)
-    return hcat(v,u,[0,0,1])
+    d2 = direction(c); u = @SVector [d2[1],d2[2],T(0)]
+    v = @SVector [u[2],-u[1],T(0)]
+    v = normalize(v)
+    return hcat(v,u,@SVector T[0,0,1])
 end
 function rotation{T}(c::Cylinder{3,T})
-    u = [direction(c)...]
-    v = abs(u[1])>0 || abs(u[2])>0 ? [u[2],-u[1],0] : [0,-u[3],u[2]]
-    v ./= norm(v)
-    w = [u[2]*v[3]-u[3]*v[2],-u[1]*v[3]+u[3]*v[1],u[1]*v[2]-u[2]*v[1]]
+    d3 = direction(c); u = @SVector [d3[1],d3[2],d3[3]]
+    v = abs(u[1])>0 || abs(u[2])>0 ? @SVector [u[2],-u[1],T(0)] : @SVector [T(0),-u[3],u[2]]
+    v = normalize(v)
+    w = @SVector [u[2]*v[3]-u[3]*v[2],-u[1]*v[3]+u[3]*v[1],u[1]*v[2]-u[2]*v[1]]
     return hcat(v,w,u)
 end
