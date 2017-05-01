@@ -407,7 +407,7 @@ isdecomposable{T<:Face, C<:Cylinder2}(::Type{T}, ::Type{C}) = true
 function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{2,T},resolution=(2,2))
     r = SimpleRectangle{T}(c.origin[1]-c.r/2,c.origin[2],c.r,height(c))
     M = rotation(c); vertices = decompose(PT,r,resolution)
-    vo = length(c.origin)==2 ? [c.origin...,0] : c.origin
+    vo = length(c.origin)==2 ? Point{3,T}(c.origin[1],c.origin[2],0) : c.origin
     for i = 1:length(vertices)
         vertices[i] = PT(M*(vertices[i]-vo)+vo)
     end
@@ -420,8 +420,8 @@ function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{3,T},resolution=5)
     position = 1; vertices = Array(PT,2*nbv)
     for j = 1:nbv
         phi = T((2*pi*(j-1))/nbv)
-        vertices[position] = PT(M*[c.r*cos(phi);c.r*sin(phi);0])+PT(c.origin)
-        vertices[position+1] = PT(M*[c.r*cos(phi);c.r*sin(phi);h])+PT(c.origin)
+        vertices[position] = PT(M*Point{3,T}(c.r*cos(phi),c.r*sin(phi),0))+PT(c.origin)
+        vertices[position+1] = PT(M*Point{3,T}(c.r*cos(phi),c.r*sin(phi),h))+PT(c.origin)
         position += 2
     end
     return vertices
