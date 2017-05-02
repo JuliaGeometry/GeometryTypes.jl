@@ -1,6 +1,3 @@
-# StaticArrays needs to get tagged first!
-Pkg.checkout("StaticArrays", "sd/fixedsizearrays")
-
 using GeometryTypes, ColorTypes
 using Base.Test
 import Base.Test.@inferred
@@ -22,4 +19,5 @@ import Base.Test.@inferred
     include("polygons.jl")
     #include("convexhulls.jl")
     #include("gjk.jl")
+    include("cylinder.jl")
 end
