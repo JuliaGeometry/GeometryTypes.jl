@@ -1,51 +1,72 @@
-"""
-Given an Array, `a`, and a face, `f`, return a tuple of numbers
-interpreting the values and offset of the face as indices into `A`.
+import Base: +, -, abs, *, /, div, convert, ==, <=, >=, show, to_index
 
-Note: This is not bounds checked. It is recommended that you use
-`checkbounds` to confirm the indices are safe for loops.
-Also be aware when writing generic code that faces may be of more than
-3 vertices.
-"""
-@generated function Base.getindex{T,N,FD,FT,Offset}(a::Array{T,N},
-                                               f::Face{FD, FT, Offset})
+
+to_index(I::AbstractArray{<:Face}) = I
+
+function show{O, T}(io::IO, oi::OffsetInteger{O, T})
+    i = T(oi)
+    print(io, "|$(i)-$(O)|")
+end
+
+# constructors and conversion
+
+(::Type{T}){T <: OffsetInteger}(x::T) = x
+
+function (::Type{OffsetInteger{O1}}){O1, O2, T}(x::OffsetInteger{O2, T})
+    OffsetInteger{O1}(T(x))
+end
+for IT in (Int64, Int32, UInt64, UInt32)
+    @eval begin
+        function (::Type{OffsetInteger{O}}){O}(x::$(IT))
+            OffsetInteger{O, $(IT)}(x)
+        end
+        convert{O, T <: Integer}(::Type{$(IT)}, x::OffsetInteger{O, T}) = $(IT)(x.i + O)
+        convert{O, T <: Integer}(::Type{OffsetInteger{O, T}}, x::$(IT)) = OffsetInteger{O, T}(T(x))
+        function convert{O1, O2, T <: Integer}(::Type{OffsetInteger{O1, T}}, x::OffsetInteger{O2, $(IT)})
+            OffsetInteger{O1, T}(T(x))
+        end
+    end
+end
+#convert{O, T <: Integer}(::Type{OffsetInteger{O, T}}, x::T) = OffsetInteger{O, T}(x)
+
+
+# basic operators
+for op in (:(-), :abs)
+    @eval $(op){T <: OffsetInteger}(x::T) = T($(op)(x.i))
+end
+for op in (:(+), :(-), :(*), :(/), :div)
+    @eval begin
+        @inline function $(op){O}(x::OffsetInteger{O}, y::OffsetInteger{O})
+            OffsetInteger{O}($op(x.i, y.i))
+        end
+    end
+end
+for op in (:(==), :(>=), :(<=))
+    @eval begin
+        @inline function $(op){O}(x::OffsetInteger{O}, y::OffsetInteger{O})
+            $op(x.i, y.i)
+        end
+    end
+end
+
+
+Base.promote_type{T <: Int, OI <: OffsetInteger}(::Type{T}, ::Type{OI}) = T
+Base.promote_type{T <: Int, OI <: OffsetInteger}(::Type{OI}, ::Type{T}) = T
+
+
+@generated function Base.getindex{N}(
+        A::AbstractArray, f::Face{N}
+    )
     v = Expr(:tuple)
-    for i = 1:FD
-        push!(v.args, Expr(:call, Base.unsafe_getindex, :a, :(Int(f[$i])-Int(Offset))))
+    for i = 1:N
+        push!(v.args, :(A[f[$i]]))
     end
-    :($(v)::NTuple{FD,T})
+    :($(v))
 end
 
-function setindex!{T,N,FD,FT,Offset}(a::Array{T,N}, b::Array{T,N}, f::Face{FD, FT, Offset})
-	for i=1:FD
-    	a[onebased(f,i)] = b[i]
-    end
-end
-
-convert{T1<:Face}(::Type{T1}, f::T1) = f
-convert{T1<:Face, T2<:Face}(::Type{T1}, f::T2) = T1(f)
-
-# Silly duplication, but call(::FixedVector, ::Any) = convert is overloaded in FixedSizeArrays
-@compat (::Type{F}){F<:Face}(f::F) = f
-
-@compat function (::Type{Face{N, T, O}}){T, T2, O, N}(f::Face{N, T2, O})
-    Face{N, T, O}(convert(NTuple{N, T}, getfield(f, 1)))
-end
-immutable IndexConvertFunc{T1, T2}
-	f::T2
-end
-@compat function (ifunc::IndexConvertFunc{Face{N,T1,O1}, Face{N,T2,O2}}){N,T1,T2,O1,O2}(i)
-	Int(ifunc.f[i])+Int(O1)-Int(O2)
-end
-@compat function (T::Type{Face{N, T1, O1}}){N, T1, O1, F<:Face}(f::F)
-	map(IndexConvertFunc{T,F}(f), T)
-end
-
-function Face{T<:Number}(vals::T...)
-    Face{length(vals), T, 0}(vals...)
-end
-onebased{N,T,Offset}(face::Face{N,T,Offset}, i) = T(Int(face[i]) - Int(Offset))
-zerobased{N,T,Offset}(face::Face{N,T,Offset}, i) = T(Int(face[i]) - Int(Offset) - 1)
-offsetbased{N,T,Offset}(face::Face{N,T,Offset}, i, offset) = T(Int(face[i]) - Int(Offset) + Int(offset))
-
-export onebased, zerobased
+# function setindex!{N}(a::AbstractArray, b::AbstractArray, f::Face{N})
+#     for i = 1:N
+#         a[f[i]] = b[i]
+#     end
+#     b
+# end

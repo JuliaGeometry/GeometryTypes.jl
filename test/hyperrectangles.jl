@@ -19,7 +19,7 @@ end
     @test b == HyperRectangle{3,Int}(Vec(0,0,1),Vec(1,1,2))
 
     a = AABB(0,0,0,1,1,1)
-    b = AABB(Vec(0,0,0),Vec(1,1,1))
+    b = AABB(Vec(0,0,0), Vec(1,1,1))
     @test a == HyperRectangle(0,0,0,1,1,1)
     @test a == b
 
@@ -187,19 +187,24 @@ end
 
 @testset "from Points" begin
     a = HyperRectangle([Point(1,1), Point(2,3), Point(4,5), Point(0,-1)])
-    @test a == HyperRectangle(0,-1,4,6)
+    @test a == HyperRectangle(0, -1, 4, 6)
     a = HyperRectangle{3,Int}([Point(1,1), Point(2,3), Point(4,5), Point(0,-1)])
     @test a == HyperRectangle(0,-1,0,4,6,0)
 end
 
 @testset "transforms" begin
-    t = Mat((1,0,0),(0,1,0),(1,2,0))
-    h = t*HyperRectangle(0,0,1,1)
-    @test h == HyperRectangle(1,2,1,1)
-    t = Mat((0,1),(1,0))
-    h = t*HyperRectangle(0,0,1,2)
+    t = Mat3(
+        1, 0, 0,
+        0, 1, 0,
+        1, 2, 0
+    )
+        
+    h = t * HyperRectangle(0, 0, 1, 1)
+    @test h == HyperRectangle(1, 2, 1, 1)
+    t = Mat{2, 2}(0, 1, 1, 0)
+    h = t * HyperRectangle(0, 0, 1, 2)
 
-    @test h == HyperRectangle(0,0,2,1)
+    @test h == HyperRectangle(0, 0, 2, 1)
     m = eye(Mat4f0)
     h = centered(HyperRectangle{3, Float32})
     @test h == h

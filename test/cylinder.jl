@@ -27,7 +27,7 @@
     @testset "decompose" begin
         o, extr, r = Point2f0(1, 2), Point2f0(3, 4), 5f0
         s = Cylinder(o, extr, r)
-        positions = Point{3,Float32}[
+        positions = Point{3, Float32}[
             (-0.7677671, 3.767767, 0.0),
             (2.767767, 0.23223293, 0.0),
             (0.23223293, 4.767767, 0.0),
@@ -36,7 +36,7 @@
             (4.767767, 2.232233, 0.0)
         ]
         @test all(map(isapprox, decompose(Point3f0, s, (2, 3)), positions))
-        FT = Face{3,Int,0}
+        FT = Face{3, Int}
         faces = FT[
             (1,2,4),
             (1,4,3),
@@ -58,16 +58,16 @@
             (1.9587585476806848,2.9587585476806857,10.08248290463863)
         ]
         @test all(map(isapprox, decompose(Point3{Float64},s,8), positions))
-        faces = [
-            Face(1,2,3),
-            Face(3,2,4),
-            Face(3,4,5),
-            Face(5,4,6),
-            Face(5,6,7),
-            Face(7,6,8),
-            Face(7,8,1),
-            Face(1,8,2)
+        faces = Face[
+            (1,2,3),
+            (3,2,4),
+            (3,4,5),
+            (5,4,6),
+            (5,6,7),
+            (7,6,8),
+            (7,8,1),
+            (1,8,2)
         ]
-        @test all(map(isapprox, decompose(Face{3, Int, 0}, s, 6), faces))
+        @test all(map(isapprox, decompose(Face{3, Int}, s, 6), faces))
     end
 end

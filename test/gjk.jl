@@ -82,7 +82,7 @@ import GeometryTypes: type_immutable, with_immutable, make_immutable
 
 
     @testset "make immutable" begin
-        T = FixedSizeArrays.Vec{2,Float64}
+        T = Vec{2, Float64}
         n = 3
         S = Simplex{n, T}
         FS = FlexibleSimplex{T}

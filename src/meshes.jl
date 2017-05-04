@@ -1,8 +1,11 @@
-for s in enumerate((:vertextype, :facetype, :normaltype,
+
+_eltype{T <: AbstractArray}(::Type{T}) = eltype(T)
+_eltype{T}(::Type{T}) = T
+for (i, field) in enumerate((:vertextype, :facetype, :normaltype,
                        :texturecoordinatetype, :colortype))
     @eval begin
-        $(s[2]){T<:HomogenousMesh}(t::Type{T}) = t.parameters[$(s[1])]
-        $(s[2])(mesh::HomogenousMesh) = $(s[2])(typeof(mesh))
+        $field{T <: HomogenousMesh}(t::Type{T}) = _eltype(fieldtype(t, $i))
+        $field(mesh::HomogenousMesh) = $field(typeof(mesh))
     end
 end
 
@@ -12,8 +15,6 @@ hasnormals(msh) = normaltype(msh) != Void
 hastexturecoordinates(msh) = texturecoordinatetype(msh) != Void
 hascolors(msh) = colortype(msh) != Void
 
-
-
 vertices(msh) = msh.vertices
 faces(msh) = msh.faces
 normals(msh) = msh.normals
@@ -22,7 +23,7 @@ colors(msh) = msh.color
 
 
 # Bad, bad name! But it's a little tricky to filter out faces and verts from the attributes, after get_attribute
-function attributes_noVF{T<:AbstractMesh}(m::T)
+function attributes_noVF{T <: AbstractMesh}(m::T)
     fielddict = Dict{Symbol, Any}(map(fieldnames(T)[3:end]) do field
         field => getfield(m, field)
     end)
@@ -48,7 +49,8 @@ end
 
 # Needed to not get into an stack overflow
 convert{M <: AbstractMesh}(::Type{M}, mesh::AbstractGeometry) = M(mesh)
-@compat (::Type{HM1}){HM1 <: AbstractMesh}(mesh::HM1) = mesh
+convert(::Type{T}, mesh::T) where T <: AbstractMesh = mesh
+#@compat (::Type{HM1}){HM1 <: AbstractMesh}(mesh::HM1) = mesh
 
 """
 Uses decompose to get all the converted attributes from the meshtype and
@@ -57,7 +59,7 @@ Getindex can be defined for any arbitrary geometric type or exotic mesh type.
 This way, we can make sure, that you can convert most of the meshes from one type to the other
 with minimal code.
 """
-@compat function (::Type{HM1}){HM1 <: AbstractMesh}(primitive::Union{AbstractMesh, GeometryPrimitive})
+function (::Type{HM1}){HM1 <: AbstractMesh}(primitive::GeometryPrimitive)
     result = Dict{Symbol, Any}()
     for (field, target_type) in zip(fieldnames(HM1), HM1.parameters)
         if target_type != Void
@@ -77,12 +79,12 @@ end
 isvoid{T}(::Type{T}) = false
 isvoid(::Type{Void}) = true
 isvoid{T}(::Type{Vector{T}}) = isvoid(T)
-@compat function (::Type{HM1}){HM1 <: HomogenousMesh}(primitive::HomogenousMesh)
+function (::Type{HM1}){HM1 <: HomogenousMesh}(primitive::HomogenousMesh)
     fnames = fieldnames(HM1)
     args = ntuple(nfields(HM1)) do i
         field, target_type = fnames[i], fieldtype(HM1, i)
         soure_type = fieldtype(typeof(primitive), i)
-        isa(HM1.parameters[i], TypeVar) && return getfield(primitive, field) # target is not defined
+        isleaftype(fieldtype(HM1, i)) || return getfield(primitive, field) # target is not defined
         if !isvoid(target_type) && isvoid(soure_type) # target not there yet, maybe we can decompose though (e.g. normals)
             return decompose(HM1.parameters[i], primitive)
         elseif isvoid(target_type)
@@ -98,10 +100,10 @@ end
 #Should be:
 #function call{M <: HMesh, VT <: Point, FT <: Face}(::Type{M}, vertices::Vector{VT}, faces::Vector{FT})
 # Haven't gotten around to implement the types correctly with abstract types in FixedSizeArrays
-@compat function (::Type{M}){M <: HMesh, VT, FT <: Face}(
+function (::Type{M}){M <: HMesh, VT, FT <: Face}(
         vertices::Vector{Point{3, VT}}, faces::Vector{FT}
     )
-    msh = PlainMesh{VT, FT}(vertices=vertices, faces=faces)
+    msh = PlainMesh{VT, FT}(vertices = vertices, faces = faces)
     convert(M, msh)
 end
 get_default(x::Union{Type, TypeVar}) = nothing
@@ -122,14 +124,14 @@ end
 """
 Creates a mesh from keyword arguments, which have to match the field types of the given concrete mesh
 """
-@compat (::Type{M}){M <: HMesh}(; kw_args...) = M(Dict{Symbol, Any}(kw_args))
+(::Type{M}){M <: HMesh}(; kw_args...) = M(Dict{Symbol, Any}(kw_args))
 
 """
 Creates a new mesh from a dict of `fieldname => value` and converts the types to the given meshtype
 """
-@compat function (::Type{M}){M <: HMesh}(attribs::Dict{Symbol, Any})
-    newfields = map(zip(fieldnames(HomogenousMesh), M.parameters)) do field_target_type
-        field, target_type = field_target_type
+function (::Type{M}){M <: HMesh}(attribs::Dict{Symbol, Any})
+    newfields = map(fieldnames(HomogenousMesh)) do field
+        target_type = fieldtype(M, field)
         default = fieldtype(HomogenousMesh, field) <: Vector ? Void[] : nothing
         get(attribs, field, default)
     end
@@ -139,7 +141,7 @@ end
 """
 Creates a new mesh from an old one, with changed attributes given by the keyword arguments
 """
-@compat function (::Type{M}){M <: HMesh}(mesh::AbstractMesh, attributes::Dict{Symbol, Any})
+function (::Type{M}){M <: HMesh}(mesh::AbstractMesh, attributes::Dict{Symbol, Any})
     newfields = map(fieldnames(HomogenousMesh)) do field
         get(attributes, field, getfield(mesh, field))
     end
@@ -148,7 +150,7 @@ end
 """
 Creates a new mesh from an old one, with a new constant attribute (like a color)
 """
-@compat function (::Type{HM}){HM <: HMesh, ConstAttrib}(mesh::AbstractMesh, constattrib::ConstAttrib)
+function (::Type{HM}){HM <: HMesh, ConstAttrib}(mesh::AbstractMesh, constattrib::ConstAttrib)
     result = Dict{Symbol, Any}()
     for (field, target_type) in zip(fieldnames(HM), HM.parameters)
         if target_type <: ConstAttrib
@@ -168,7 +170,7 @@ end
 """
 Creates a new mesh from a tuple of a geometry type and a constant attribute
 """
-@compat function (::Type{HM}){HM <: HMesh, ConstAttrib, P<:AbstractGeometry}(x::Tuple{P, ConstAttrib})
+function (::Type{HM}){HM <: HMesh, ConstAttrib, P<:AbstractGeometry}(x::Tuple{P, ConstAttrib})
     any, const_attribute = x
     add_attribute(HM(any), const_attribute)
 end
@@ -235,7 +237,7 @@ end
 immutable MeshMulFunctor{T}
     matrix::Mat{4,4,T}
 end
-@compat (m::MeshMulFunctor{T}){T}(vert) = Vec{3, T}(m.matrix*Vec{4, T}(vert..., 1))
+(m::MeshMulFunctor{T}){T}(vert) = Vec{3, T}(m.matrix*Vec{4, T}(vert..., 1))
 function *{T}(m::Mat{4,4,T}, mesh::AbstractMesh)
     msh = deepcopy(mesh)
     map!(MeshMulFunctor(m), msh.vertices)

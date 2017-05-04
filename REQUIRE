@@ -1,5 +1,5 @@
-julia 0.4
-FixedSizeArrays
+julia 0.6-
+StaticArrays
 ColorTypes
-Compat 0.7.15
-Iterators
+Compat 0.18
+FixedPointNumbers

@@ -3,18 +3,8 @@ os:
   - linux
   - osx
 julia:
-  - 0.4
-  - 0.5
+  - 0.6
   - nightly
-matrix:
-  allow_failures:
-      - julia: nightly
-
 notifications:
   email: false
 sudo: false
-script:
-    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia --inline=no -e 'Pkg.clone(pwd()); Pkg.build("GeometryTypes"); Pkg.test("GeometryTypes"; coverage=true)'
-after_success:
-  - julia -e 'cd(Pkg.dir("GeometryTypes")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'

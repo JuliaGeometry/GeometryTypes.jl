@@ -52,7 +52,7 @@ function snip{N, T}(
         return false
     end
 
-    for p=1:n
+    for p = 1:n
         ((p == u) || (p == v) || (p == w)) && continue;
         P = contour[V[p]]
         if InsideTriangle(A, B, C, P)
@@ -69,7 +69,7 @@ Triangulates a Polygon given as a `contour`::AbstractArray{Point} without holes.
 It will return a Vector{`facetype`}, defining indexes into `contour`
 """
 function polygon2faces{P<:Point}(
-        contour::AbstractArray{P}, facetype=GLTriangle
+        contour::AbstractArray{P}, facetype = GLTriangle
     )
     #= allocate and initialize list of Vertices in polygon =#
     result = facetype[]
@@ -94,8 +94,8 @@ function polygon2faces{P<:Point}(
 
     #=  remove nv-2 Vertices, creating 1 triangle every time =#
     count = 2*nv   #= error detection =#
-    v=nv
-    while nv>2
+    v = nv
+    while nv > 2
         #= if we loop, it is probably a non-simple polygon =#
         if 0 >= count
             return result
@@ -111,7 +111,7 @@ function polygon2faces{P<:Point}(
             #= true names of the vertices =#
             a = V[u]; b = V[v]; c = V[w];
             #= output Triangle =#
-            push!(result, facetype(Triangle{Int}(a, b, c)))
+            push!(result, facetype(a, b, c))
             #= remove v from remaining polygon =#
             s = v; t = v+1
             while t<=nv
@@ -137,7 +137,7 @@ function topoint{T}(::Type{Point{2, T}}, p::Point{3, T})
     Point{2, T}(p[1], p[2])
 end
 
-@compat function (::Type{M}){M <: AbstractMesh, P <: Point}(
+function (::Type{M}){M <: AbstractMesh, P <: Point}(
         points::AbstractArray{P}
     )
     faces = polygon2faces(points, facetype(M))

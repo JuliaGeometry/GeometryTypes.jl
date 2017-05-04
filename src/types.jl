@@ -1,20 +1,27 @@
-abstract AbstractDistanceField
-abstract AbstractUnsignedDistanceField <: AbstractDistanceField
-abstract AbstractSignedDistanceField <: AbstractDistanceField
+using StaticArrays.FixedSizeArrays
+import StaticArrays.FixedSizeArrays: @fixed_vector
+
+@compat abstract type AbstractDistanceField end
+@compat abstract type AbstractUnsignedDistanceField <: AbstractDistanceField end
+@compat abstract type AbstractSignedDistanceField <: AbstractDistanceField end
 """
 Abstract to categorize geometry primitives of dimensionality `N` and
 the numeric element type `T`.
 """
-abstract AbstractGeometry{N, T}
-abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry
-abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
+# abstract AbstractGeometry{N, T}
+# abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry{3, Float32}
+# abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
+@compat abstract type AbstractGeometry{N, T} end
+@compat abstract type AbstractMesh{VertT, FaceT}  end # <: AbstractGeometry
+@compat abstract type GeometryPrimitive{N, T} <: AbstractGeometry{N, T} end
+
 
 """
 Abstract to classify Simplices. The convention for N starts at 1, which means
 a Simplex has 1 point. A 2-simplex has 2 points, and so forth. This convention
 is not the same as most mathematical texts.
 """
-abstract AbstractSimplex{N,T} <: FixedVector{N,T}
+@compat abstract type AbstractSimplex{S, T} <: StaticVector{S, T} end
 
 
 """
@@ -33,16 +40,21 @@ This is for a simpler implementation.
 It applies to infinite dimensions. The structure of this type is designed
 to allow embedding in higher-order spaces by parameterizing on `T`.
 """
-immutable Simplex{N,T} <: AbstractSimplex{N,T}
-    _::NTuple{N,T}
+immutable Simplex{S, T} <: AbstractSimplex{S, T}
+    data::NTuple{S, T}
+    (::Type{Simplex{S, T}}){S, T}(x::NTuple{S, T}) = new{S, T}(x)
+    (::Type{Simplex{S, T}}){S, T}(x::NTuple{S}) = new{S, T}(StaticArrays.convert_ntuple(T, x))
 end
 
-immutable Normal{N, T} <: FixedVector{N, T}
-    _::NTuple{N, T}
-end
-immutable TextureCoordinate{N, T} <: FixedVector{N, T}
-    _::NTuple{N, T}
-end
+@fixed_vector Vec StaticVector
+
+@fixed_vector Point StaticVector
+
+@fixed_vector Normal StaticVector
+
+@fixed_vector TextureCoordinate StaticVector
+
+@fixed_vector Face StaticVector
 
 """
 A Face is typically used when constructing subtypes of `AbstractMesh` where
@@ -51,12 +63,25 @@ Face is parameterized by:
 
 * `N` - The number of vertices in the face.
 * `T` - The type of the indices in the face, a subtype of Integer.
+
+"""
+Face
+
+"""
+OffsetInteger type mainly for indexing.
 * `O` - The offset relative to Julia arrays. This helps reduce copying when
 communicating with 0-indexed systems such ad OpenGL.
 """
-immutable Face{N, T, IndexOffset} <: FixedVector{N, T}
-    _::NTuple{N, T}
+immutable OffsetInteger{O, T <: Integer} <: Integer
+    i::T
+    function (::Type{OffsetInteger{O, T}}){O, T}(x::T)
+        new{O, T}(x - O)
+    end
 end
+
+
+raw(x::OffsetInteger) = x.i
+raw(x::Integer) = x
 
 """
 A `HyperRectangle` is a generalization of a rectangle into N-dimensions.
@@ -157,8 +182,8 @@ AbstractFlexibleGeometry{T}
 
 AbstractFlexibleGeometry refers to shapes, which are somewhat mutable.
 """
-abstract AbstractFlexibleGeometry{T}
-typealias AFG AbstractFlexibleGeometry
+@compat abstract type AbstractFlexibleGeometry{T} end
+const AFG = AbstractFlexibleGeometry
 
 """
 FlexibleConvexHull{T}
@@ -194,5 +219,7 @@ AbstractConvexHull
 Groups all geometry types, that can be described as the convex hull of finitely
 many points.
 """
-typealias AbstractConvexHull Union{Simplex, FlexibleConvexHull, FlexibleSimplex,
-HyperCube, HyperRectangle} # should we parametrize ACH by the type of points T?
+const AbstractConvexHull = Union{
+    Simplex, FlexibleConvexHull, FlexibleSimplex,
+    HyperCube, HyperRectangle
+} # should we parametrize ACH by the type of points T?

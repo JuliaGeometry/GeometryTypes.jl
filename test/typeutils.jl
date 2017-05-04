@@ -21,5 +21,5 @@ end
     @test ndims(SimpleRectangle) == 2
     @test ndims(HyperCube{2}) == 2
     @test ndims(HyperCube{2, Float32}) == 2
-    @test_throws Exception ndims(HyperCube)
+    #@test_throws Exception ndims(HyperCube)
 end

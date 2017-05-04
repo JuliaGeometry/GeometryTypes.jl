@@ -1,3 +1,4 @@
+using GeometryTypes: slice
 @testset "Mesh Types" begin
 
 @testset "Merging Mesh" begin
@@ -20,12 +21,12 @@
 
     @test vertextype(axis) == Point{3, Float32}
     @test normaltype(axis) == Normal{3, Float32}
-    @test facetype(axis) == Face{3, Cuint, -1}
+    @test facetype(axis) == Face{3, GLIndex}
     @test hasvertices(axis)
     @test hasfaces(axis)
     @test hasnormals(axis)
-    @test !( hascolors(axis) )
-    end
+    @test !hascolors(axis)
+end
 
 @testset "Show" begin
     baselen = 0.4f0
@@ -43,36 +44,38 @@ end
 
 @testset "Primitives" begin
     # issue #16
-    #m = HomogenousMesh{Point{3,Float64},Face{3,Int,0}}(Sphere(Point(0,0,0), 1))
+    #m = HomogenousMesh{Point{3,Float64},Face{3, Int}}(Sphere(Point(0,0,0), 1))
     #@fact length(vertices(m)) --> 145
     #@fact length(faces(m)) --> 288
 end
 
 
 @testset "Slice" begin
-    test_mesh = HomogenousMesh(Point{3,Float64}[
-     Point{3,Float64}(0.0,0.0,10.0),
-     Point{3,Float64}(0.0,10.0,10.0),
-     Point{3,Float64}(0.0,0.0,0.0),
-     Point{3,Float64}(0.0,10.0,0.0),
-     Point{3,Float64}(10.0,0.0,10.0),
-     Point{3,Float64}(10.0,10.0,10.0),
-     Point{3,Float64}(10.0,0.0,0.0),
-     Point{3,Float64}(10.0,10.0,0.0),
-    ],Face{3,Int,0}[
-     Face{3,Int,0}(3,7,5)
-     Face{3,Int,0}(1,3,5)
-     Face{3,Int,0}(1,2,3)
-     Face{3,Int,0}(2,4,3)
-     Face{3,Int,0}(1,5,6)
-     Face{3,Int,0}(2,1,6)
-     Face{3,Int,0}(4,8,3)
-     Face{3,Int,0}(3,8,7)
-     Face{3,Int,0}(7,8,6)
-     Face{3,Int,0}(7,6,5)
-     Face{3,Int,0}(2,6,4)
-     Face{3,Int,0}(4,6,8)]
-    )
+    test_mesh = HomogenousMesh(
+        Point{3, Float64}[
+            (0.0,0.0,10.0),
+            (0.0,10.0,10.0),
+            (0.0,0.0,0.0),
+            (0.0,10.0,0.0),
+            (10.0,0.0,10.0),
+            (10.0,10.0,10.0),
+            (10.0,0.0,0.0),
+            (10.0,10.0,0.0)
+        ],
+        Face{3, Int}[
+            (3,7,5),
+            (1,3,5),
+            (1,2,3),
+            (2,4,3),
+            (1,5,6),
+            (2,1,6),
+            (4,8,3),
+            (3,8,7),
+            (7,8,6),
+            (7,6,5),
+            (2,6,4),
+            (4,6,8)
+    ])
     s1 = slice(test_mesh, 1.0)
     s2 = slice(test_mesh, 2.0)
     s3 = slice(test_mesh, 0.0)
@@ -93,58 +96,82 @@ end
 end
 
 @testset "checkbounds" begin
-    m1 = HomogenousMesh([Point{3,Float64}(0.0,0.0,10.0),
-                         Point{3,Float64}(0.0,10.0,10.0),
-                         Point{3,Float64}(0.0,0.0,0.0)],
-                        [Face{3,Int,0}(1,2,3)])
+    m1 = HomogenousMesh([Point{3, Float64}(0.0,0.0,10.0),
+                         Point{3, Float64}(0.0,10.0,10.0),
+                         Point{3, Float64}(0.0,0.0,0.0)],
+                        [Face{3, Int}(1,2,3)])
     @test checkbounds(m1)
-    m2 = HomogenousMesh([Point{3,Float64}(0.0,0.0,10.0),
-                         Point{3,Float64}(0.0,10.0,10.0),
-                         Point{3,Float64}(0.0,0.0,0.0)],
-                        [Face{3,Int,-1}(1,2,3)])
-    @test !( checkbounds(m2) )
+
+    m2 = HomogenousMesh([Point{3, Float64}(0.0,0.0,10.0),
+                         Point{3, Float64}(0.0,10.0,10.0),
+                         Point{3, Float64}(0.0,0.0,0.0)],
+                        [Face{3, GLIndex}(5,1,2)])
+    @test !checkbounds(m2)
+
     # empty case
-    m3 = HomogenousMesh([Point{3,Float64}(0.0,0.0,10.0),
-                         Point{3,Float64}(0.0,10.0,10.0),
-                         Point{3,Float64}(0.0,0.0,0.0)],
-                        Face{3,Int,-1}[])
+    m3 = HomogenousMesh([Point{3, Float64}(0.0,0.0,10.0),
+                         Point{3, Float64}(0.0,10.0,10.0),
+                         Point{3, Float64}(0.0,0.0,0.0)],
+                        Face{3, GLIndex}[])
     @test checkbounds(m3)
 end
 
 @testset "vertex normals" begin
-    test_mesh = HomogenousMesh(Point{3,Float64}[Point{3,Float64}(0.0,0.0,10.0),
-     Point{3,Float64}(0.0,10.0,10.0),
-     Point{3,Float64}(0.0,0.0,0.0),
-     Point{3,Float64}(0.0,10.0,0.0),
-     Point{3,Float64}(10.0,0.0,10.0),
-     Point{3,Float64}(10.0,10.0,10.0),
-     Point{3,Float64}(10.0,0.0,0.0),
-     Point{3,Float64}(10.0,10.0,0.0),
-    ],Face{3,Int,0}[
-     Face{3,Int,0}(3,7,5)
-     Face{3,Int,0}(1,3,5)
-     Face{3,Int,0}(1,2,3)
-     Face{3,Int,0}(3,2,4)
-     Face{3,Int,0}(1,5,6)
-     Face{3,Int,0}(2,1,6)
-     Face{3,Int,0}(4,8,3)
-     Face{3,Int,0}(3,8,7)
-     Face{3,Int,0}(7,8,6)
-     Face{3,Int,0}(5,7,6)
-     Face{3,Int,0}(2,6,4)
-     Face{3,Int,0}(4,6,8)]
-    )
-    ns = normals(test_mesh.vertices, test_mesh.faces)
+    test_mesh = HomogenousMesh(
+    Point{3,Float64}[
+        (0.0,0.0,10.0),
+        (0.0,10.0,10.0),
+        (0.0,0.0,0.0),
+        (0.0,10.0,0.0),
+        (10.0,0.0,10.0),
+        (10.0,10.0,10.0),
+        (10.0,0.0,0.0),
+        (10.0,10.0,0.0),
+    ], Face{3, Int}[
+        (3,7,5),
+        (1,3,5),
+        (1,2,3),
+        (3,2,4),
+        (1,5,6),
+        (2,1,6),
+        (4,8,3),
+        (3,8,7),
+        (7,8,6),
+        (5,7,6),
+        (2,6,4),
+        (4,6,8)
+    ])
+    ns = normals(test_mesh.vertices, test_mesh.faces, Normal{3, Float32})
     @test length(ns) == length(test_mesh.vertices)
-    expect = [Normal(-0.408248290463863,-0.408248290463863,0.816496580927726),
-              Normal(-0.816496580927726,0.408248290463863,0.408248290463863),
-              Normal(-0.5773502691896257,-0.5773502691896257,-0.5773502691896257),
-              Normal(-0.408248290463863,0.816496580927726,-0.408248290463863),
-              Normal(0.408248290463863,-0.816496580927726,0.408248290463863),
-              Normal(0.5773502691896257,0.5773502691896257,0.5773502691896257),
-              Normal(0.816496580927726,-0.408248290463863,-0.408248290463863),
-              Normal(0.408248290463863,0.408248290463863,-0.816496580927726)]
-    @test ns == expect
+    expect = Normal{3, Float32}[
+        (-0.408248,-0.408248,0.816497),
+        (-0.816497,0.408248,0.408248),
+        (-0.57735,-0.57735,-0.57735),
+        (-0.408248,0.816497,-0.408248),
+        (0.408248,-0.816497,0.408248),
+        (0.57735,0.57735,0.57735),
+        (0.816497,-0.408248,-0.408248),
+        (0.408248,0.408248,-0.816497)
+    ]
+    @test all(isapprox.(ns, expect))
 end
 
 end
+
+
+using GeometryTypes
+attributes = Dict{Symbol, Any}()
+attributes[:faces] = GLTriangle[(1,2,3), (3, 2, 1)]
+attributes[:vertices] = rand(Point3f0, 3)
+attributes[:normals] = rand(Normal{3, Float32}, 3)
+@which HomogenousMesh(attributes)
+# M = HomogenousMesh
+# attribs = attributes
+# newfields = map(fieldnames(HomogenousMesh)) do field
+#     target_type = fieldtype(M, field)
+#     default = fieldtype(HomogenousMesh, field) <: Vector ? Void[] : nothing
+#     get(attribs, field, default)
+# end
+
+x = GeometryTypes.homogenousmesh(attributes)
+GLNormalMesh(x)

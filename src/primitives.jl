@@ -1,5 +1,5 @@
 
-@compat function (meshtype::Type{T}){T <: AbstractMesh}(c::Pyramid)
+function (meshtype::Type{T}){T <: AbstractMesh}(c::Pyramid)
     T(decompose(vertextype(T), c), decompose(facetype(T), c))
 end
 
@@ -10,7 +10,7 @@ Just walk through all attributes of the mesh and try to decompose it.
 If there are attributes missing, just hope it will get managed by the mesh constructor.
 (E.g. normal calculation, which needs to have vertices and faces present)
 """
-@compat function (meshtype::Type{T}){T <: AbstractMesh}(c::GeometryPrimitive, args...)
+function (meshtype::Type{T}){T <: AbstractMesh}(c::GeometryPrimitive, args...)
     attribs = attributes(T)
     newattribs = Dict{Symbol, Any}()
     for (fieldname, typ) in attribs
@@ -22,7 +22,7 @@ If there are attributes missing, just hope it will get managed by the mesh const
 end
 
 
-@compat function (meshtype::Type{T}){T <: HMesh,HT}(
+function (meshtype::Type{T}){T <: HMesh,HT}(
         c::Union{HyperCube{3,T}, HyperRectangle{3,HT}}
     )
     xdir = Vec{3, HT}(1, 0, 0)
