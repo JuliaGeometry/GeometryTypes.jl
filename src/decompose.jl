@@ -407,7 +407,7 @@ function decompose{T}(PT::Type{Point{3,T}},c::Cylinder{3,T},resolution=5)
     isodd(resolution) ? resolution = 2*div(resolution,2) : nothing
     resolution<8 ? resolution = 8 : nothing; nbv = Int(resolution/2)
     M = rotation(c); h = height(c)
-    position = 1; vertices = Array(PT,2*nbv)
+    position = 1; vertices = Array{PT}(2*nbv)
     for j = 1:nbv
         phi = T((2*pi*(j-1))/nbv)
         vertices[position] = PT(M*Point{3,T}(c.r*cos(phi),c.r*sin(phi),0))+PT(c.origin)
@@ -419,12 +419,12 @@ end
 
 function decompose{FT<:Face,T}(::Type{FT},c::Cylinder{2,T},resolution=(2,2))
     r = SimpleRectangle{T}(c.origin[1]-c.r/2,c.origin[2],c.r,height(c))
-    return decompose(Face{3,Int,0},r,resolution)
+    return decompose(Face{3,Int},r,resolution)
 end
 function decompose{FT<:Face,T}(::Type{FT},c::Cylinder{3,T},facets=18)
     isodd(facets) ? facets = 2*div(facets,2) : nothing
     facets<8 ? facets = 8 : nothing; nbv = Int(facets/2)
-    indexes = Array(Face{3,Int,0},facets); index = 1
+    indexes = Array{Face{3,Int}}(facets); index = 1
     for j = 1:(nbv-1)
         indexes[index] = (index,index+1,index+2)
         indexes[index+1] = (index+2,index+1,index+3)
