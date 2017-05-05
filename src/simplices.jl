@@ -94,7 +94,7 @@ translation(s::Simplex) = first(vertices(s))
         v1 = vert[1]
     end
     tupl = Expr(:tuple)
-    @inbounds for i = 2:m
+    for i = 2:m
         sym = Symbol("diff$i")
         push!(init.args, :($sym = vert[$i]-v1))
         append!(tupl.args, (:($sym[$j]) for j = 1:N))
@@ -152,7 +152,7 @@ function proj_sqdist{nv,T}(pt::T, s::Simplex{nv,T}, best_sqd=Inf)
     if sqd >= best_sqd  # pt is far away even from the subspace spanned by s
         return best_proj, best_sqd
     elseif any(w .< 0)  # pt is closest to point inside a face of s
-        for i in 1:length(w)
+        @inbounds for i in 1:length(w)
             if w[i] < 0
                 proj, sqd = proj_sqdist(pt, simplex_face(s, i), best_sqd)
                 if sqd < best_sqd
