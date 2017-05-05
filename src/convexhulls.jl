@@ -68,6 +68,7 @@ convert(F::Type{<:FlexibleConvexHull}, s::Simplex) = F(collect(vertices(s)))
 convert(F::Type{<:FlexibleConvexHull}, s::FlexibleSimplex) = F(vertices(s))
 convert(F::Type{FlexibleConvexHull}, c::FlexibleConvexHull) = c
 convert(F::Type{<:FlexibleConvexHull}, c::FlexibleConvexHull) = F(vertices(c))
+convert(::Type{F}, x::F) where {F <: FlexibleConvexHull} = x
 convert(F::Type{<:FlexibleConvexHull}, c) = F(collect(vertices(c)))
 
 function Base.isapprox(s1::AbstractConvexHull, s2::AbstractConvexHull;kw...)

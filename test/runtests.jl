@@ -16,8 +16,8 @@ import Base.Test.@inferred
     include("hypersphere.jl")
     include("typeutils.jl")
     include("simplices.jl")
+    include("gjk.jl")
     include("lines.jl")
     include("polygons.jl")
-    #include("gjk.jl")
     include("cylinder.jl")
 end

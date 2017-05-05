@@ -94,7 +94,7 @@ translation(s::Simplex) = first(vertices(s))
         v1 = vert[1]
     end
     tupl = Expr(:tuple)
-    for i = 2:m
+    @inbounds for i = 2:m
         sym = Symbol("diff$i")
         push!(init.args, :($sym = vert[$i]-v1))
         append!(tupl.args, (:($sym[$j]) for j = 1:N))
@@ -115,7 +115,7 @@ simplex_face(s::Simplex, i::Int) = Simplex(deleteat(vertices(s), i))
 """
 proj_sqdist{T}(pt::T, s::LineSegment{T}, best_sqd=eltype(T)(Inf))
 """
-function proj_sqdist{T}(pt::T, s::LineSegment{T}, best_sqd=eltype(T)(Inf))
+function proj_sqdist{T}(pt::T, s::LineSegment{T}, best_sqd=Inf)
     v0, v1 = vertices(s)
     pt = pt - v0
     v = v1 - v0
@@ -143,7 +143,7 @@ distance is greater then best_sqd, the behaviour of pt_proj is not defined.
 distance is greater then best_sqd is returned instead.
 
 """
-function proj_sqdist{nv,T}(pt::T, s::Simplex{nv,T}, best_sqd = eltype(T)(Inf))
+function proj_sqdist{nv,T}(pt::T, s::Simplex{nv,T}, best_sqd=Inf)
     w = weights(pt, s)
     best_proj = Vec(vertexmat(s) * w)
     # at this point best_proj lies in the subspace spanned by s,
@@ -152,7 +152,7 @@ function proj_sqdist{nv,T}(pt::T, s::Simplex{nv,T}, best_sqd = eltype(T)(Inf))
     if sqd >= best_sqd  # pt is far away even from the subspace spanned by s
         return best_proj, best_sqd
     elseif any(w .< 0)  # pt is closest to point inside a face of s
-        @inbounds for i in 1:length(w)
+        for i in 1:length(w)
             if w[i] < 0
                 proj, sqd = proj_sqdist(pt, simplex_face(s, i), best_sqd)
                 if sqd < best_sqd
@@ -167,17 +167,17 @@ function proj_sqdist{nv,T}(pt::T, s::Simplex{nv,T}, best_sqd = eltype(T)(Inf))
     end
 end
 
-sqdist(pt, s, best = Inf) = proj_sqdist(pt, s, best)[2]
+sqdist(pt, s, best=Inf) = proj_sqdist(pt, s, best)[2]
 
 """
 proj_sqdist(p::Vec, q::Vec, best_sqd=eltype(p)(Inf))
 """
-@inline function proj_sqdist(p::Vec, q::Vec, best_sqd = eltype(p)(Inf))
+@inline function proj_sqdist(p::Vec, q::Vec, best_sqd=Inf)
     q, min(best_sqd, sqnorm(p-q))
 end
 """
 proj_sqdist{T}(pt::T, s::Simplex{1, T}, best_sqd=eltype(T)(Inf))
 """
-@inline function proj_sqdist{T}(pt::T, s::Simplex{1, T}, best_sqd=eltype(T)(Inf))
+@inline function proj_sqdist{T}(pt::T, s::Simplex{1, T}, best_sqd=Inf)
     proj_sqdist(pt, translation(s), best_sqd)
 end
