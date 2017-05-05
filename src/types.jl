@@ -191,7 +191,7 @@ FlexibleConvexHull{T}
 Represents the convex hull of finitely many points. The number of points is not fixed.
 """
 immutable FlexibleConvexHull{T} <: AFG{T}
-    _::Vector{T}
+    vertices::Vector{T}
 end
 
 """
@@ -200,7 +200,7 @@ FlexibleSimplex{T}
 Represents a Simplex whos number of vertices is not fixed.
 """
 immutable FlexibleSimplex{T} <: AFG{T}
-    _::Vector{T}
+    vertices::Vector{T}
 end
 
 """

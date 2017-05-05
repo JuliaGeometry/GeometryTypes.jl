@@ -17,7 +17,7 @@ Base.deleteat!(c::AbstractFlexibleGeometry, i) = (deleteat!(vertices(c), i); c)
 Base.copy{FG <: AFG}(fl::FG) = FG(copy(vertices(fl)))
 push(fl::AFG, pt) = push!(copy(fl), pt)
 
-vertices(x::AbstractFlexibleGeometry) = x._
+vertices(x::AbstractFlexibleGeometry) = x.vertices
 vertices(s::Simplex) = Tuple(s)
 
 standard_cube_vertices(::Type{Val{1}}) = [Vec(0), Vec(1)]
