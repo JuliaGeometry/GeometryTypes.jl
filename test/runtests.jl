@@ -4,6 +4,7 @@ import Base.Test.@inferred
 
 
 @testset "GeometryTypes" begin
+    include("convexhulls.jl")
     include("polygons.jl")
     include("hyperrectangles.jl")
     include("faces.jl")
@@ -17,7 +18,6 @@ import Base.Test.@inferred
     include("simplices.jl")
     include("lines.jl")
     include("polygons.jl")
-    #include("convexhulls.jl")
     #include("gjk.jl")
     include("cylinder.jl")
 end
