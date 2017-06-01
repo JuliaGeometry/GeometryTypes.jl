@@ -50,8 +50,7 @@ for op in (:(==), :(>=), :(<=))
 end
 
 
-Base.promote_type{T <: Int, OI <: OffsetInteger}(::Type{T}, ::Type{OI}) = T
-Base.promote_type{T <: Int, OI <: OffsetInteger}(::Type{OI}, ::Type{T}) = T
+Base.promote_rule{T <: Int, OI <: OffsetInteger}(::Type{T}, ::Type{OI}) = T
 
 
 @generated function Base.getindex{N}(
