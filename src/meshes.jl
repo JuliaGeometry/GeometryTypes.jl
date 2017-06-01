@@ -86,10 +86,10 @@ isvoid{T}(::Type{Vector{T}}) = isvoid(T)
     for i in 1:nfields(HM1)
         field = fnames[i]
         target_type = fieldtype(HM1, i)
-        soure_type = fieldtype(HM2, i)
-        if isleaftype(fieldtype(HM1, i))  # target is not defined
+        source_type = fieldtype(HM2, i)
+        if !isleaftype(fieldtype(HM1, i))  # target is not defined
             push!(expr.args, :(getfield(primitive, $(QuoteNode(field)))))
-        elseif !isvoid(target_type) && isvoid(soure_type) # target not there yet, maybe we can decompose though (e.g. normals)
+        elseif !isvoid(target_type) && isvoid(source_type) # target not there yet, maybe we can decompose though (e.g. normals)
             push!(expr.args, :(decompose($(HM1.parameters[i]), primitive)))
         elseif isvoid(target_type)
             push!(expr.args, :($(target_type())))
