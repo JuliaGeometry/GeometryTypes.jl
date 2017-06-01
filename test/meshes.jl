@@ -156,6 +156,12 @@ end
     @test all(isapprox.(ns, expect))
 end
 
+@testset "construction" begin
+    # test for https://github.com/JuliaGeometry/GeometryTypes.jl/issues/92
+    m = HomogenousMesh(vs, fs)
+    @test HomogenousMesh(m) == m
+end
+
 end
 
 
