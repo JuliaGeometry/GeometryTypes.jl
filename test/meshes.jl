@@ -173,7 +173,10 @@ end
     mesh = PlainMesh{eltype(VT), FT}(vertices=vs, faces=fs)
     @test convert(GLNormalMesh, mesh) == GLNormalMesh(vs, fs)
 end
-
+@testset "construction" begin
+    # test for https://github.com/JuliaGeometry/GeometryTypes.jl/issues/92
+    m = HomogenousMesh(vs, fs)
+    @test HomogenousMesh(m) == m
 end
 
 
