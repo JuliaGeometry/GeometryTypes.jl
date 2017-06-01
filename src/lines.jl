@@ -59,7 +59,7 @@ end
 
 # Taken from Iterators.jl, since it's not possible to use Iterators.jl on 0.6 with precompilation
 
-immutable Partition{I, N}
+struct Partition{I, N}
     xs::I
     step::Int
 end

@@ -50,7 +50,7 @@ end
 # Needed to not get into an stack overflow
 convert{M <: AbstractMesh}(::Type{M}, mesh::AbstractGeometry) = M(mesh)
 convert(::Type{T}, mesh::T) where T <: AbstractMesh = mesh
-#@compat (::Type{HM1}){HM1 <: AbstractMesh}(mesh::HM1) = mesh
+# (::Type{HM1}){HM1 <: AbstractMesh}(mesh::HM1) = mesh
 
 """
 Uses decompose to get all the converted attributes from the meshtype and
@@ -234,7 +234,7 @@ end
 
 # Fast but slightly ugly way to implement mesh multiplication
 # This should probably go into FixedSizeArrays.jl, Vector{FSA} * FSA
-immutable MeshMulFunctor{T}
+struct MeshMulFunctor{T}
     matrix::Mat{4,4,T}
 end
 (m::MeshMulFunctor{T}){T}(vert) = Vec{3, T}(m.matrix*Vec{4, T}(vert..., 1))

@@ -1,5 +1,3 @@
-using Compat.TypeUtils
-
 eltype_or(::Type{G}, or) where G <: (AbstractGeometry{N, T} where N) where T = T
 eltype_or(::Type{G}, or) where G <: (AbstractGeometry{N, T} where {N, T}) = or
 

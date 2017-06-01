@@ -36,7 +36,7 @@ MinkowskiDifference(c1, c2)
 
 Represents the Minkowski difference of c1, c2.
 """
-immutable MinkowskiDifference{S,T}
+struct MinkowskiDifference{S,T}
     c1::S
     c2::T
 end
