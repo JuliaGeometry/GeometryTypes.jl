@@ -20,7 +20,7 @@ Base.@pure pure_max(x1, x2) = x1 > x2 ? x1 : x2
 Base.promote_rule(::Type{T1}, ::Type{OffsetInteger{O, T2}}) where {T1 <: Integer, O, T2} = T1
 Base.promote_rule(::Type{OffsetInteger{O1, T1}}, ::Type{OffsetInteger{O2, T2}}) where {O1, O2, T1, T2} = OffsetInteger{pure_max(O1, O2), promote_type(T1, T2)}
 
-to_index(I::OffsetInteger) = OneIndex(I)
+to_index(I::OffsetInteger) = raw(OneIndex(I))
 to_index(I::OffsetInteger{0}) = raw(I)
 
 # basic operators
