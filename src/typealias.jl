@@ -28,8 +28,8 @@ An alias for a one-simplex, corresponding to LineSegment{T} -> Simplex{2,T}.
 """
 @compat const LineSegment{T} = Simplex{2,T}
 
-@compat const ZeroIndex{T} = OffsetInteger{1, T}
-@compat const OneIndex{T} = OffsetInteger{0, T}
+@compat const ZeroIndex{T <: Integer} = OffsetInteger{-1, T}
+@compat const OneIndex{T <: Integer} = OffsetInteger{0, T}
 const GLIndex = ZeroIndex{Cuint}
 
 @compat const Triangle{T} = Face{3, T}
