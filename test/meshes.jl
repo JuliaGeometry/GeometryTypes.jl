@@ -40,7 +40,16 @@ end
     #@fact readall(io) --> s #Win32 and Win64 have different ordering it seems.
 end
 
+@testset "construction" begin
+    VT = vertextype(GLNormalMesh)
+    FT = facetype(GLNormalMesh)
+    vs = [VT(0., 0, 0), VT(1., 0, 0), VT(0., 1, 0)]
+    fs = [FT(1, 2, 3)]
 
+    # test for https://github.com/JuliaGeometry/GeometryTypes.jl/issues/92
+    m = HomogenousMesh(vs, fs)
+    @test HomogenousMesh(m) == m
+end
 
 @testset "Primitives" begin
     # issue #16
@@ -154,17 +163,6 @@ end
         (0.408248,0.408248,-0.816497)
     ]
     @test all(isapprox.(ns, expect))
-end
-
-@testset "construction" begin
-    VT = vertextype(GLNormalMesh)
-    FT = facetype(GLNormalMesh)
-    vs = [VT(0., 0, 0), VT(1., 0, 0), VT(0., 1, 0)]
-    fs = [FT(1, 2, 3)]
-
-    # test for https://github.com/JuliaGeometry/GeometryTypes.jl/issues/92
-    m = HomogenousMesh(vs, fs)
-    @test HomogenousMesh(m) == m
 end
 
 end
