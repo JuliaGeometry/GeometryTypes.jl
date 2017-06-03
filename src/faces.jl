@@ -1,34 +1,27 @@
 import Base: +, -, abs, *, /, div, convert, ==, <=, >=, show, to_index
 
-
-to_index(I::AbstractArray{<:Face}) = I
-
 function show{O, T}(io::IO, oi::OffsetInteger{O, T})
-    i = T(oi)
-    print(io, "|$(i)-$(O)|")
+    print(io, "|$(raw(oi)) (indexes as $(raw(oi) + -O))|")
 end
+
+Base.eltype(::Type{OffsetInteger{O, T}}) where {O, T} = T
+Base.eltype(oi::OffsetInteger) = eltype(typeof(oi))
 
 # constructors and conversion
+convert(::Type{OffsetInteger{O1, T1}}, x::OffsetInteger{O2, T2}) where {O1, O2, T1 <: Integer, T2 <: Integer} = 
+    OffsetInteger{O1, T1}(T2(x))
+convert(::Type{OffsetInteger{O}}, x::Integer) where {O} = convert(OffsetInteger{O, eltype(x)}, x)
+convert(::Type{OffsetInteger{O}}, x::OffsetInteger) where {O} = convert(OffsetInteger{O, eltype(x)}, x)
+convert(::Type{OffsetInteger{O, T}}, x::Integer) where {O, T <: Integer} = convert(OffsetInteger{O, T}, OneIndex{eltype(x)}(x))
 
-(::Type{T}){T <: OffsetInteger}(x::T) = x
+convert(::Type{IT}, x::OffsetInteger{O, T}) where {IT <: Integer, O, T <: Integer} = IT(raw(x) + -O)
 
-function (::Type{OffsetInteger{O1}}){O1, O2, T}(x::OffsetInteger{O2, T})
-    OffsetInteger{O1}(T(x))
-end
-for IT in (Int64, Int32, UInt64, UInt32)
-    @eval begin
-        function (::Type{OffsetInteger{O}}){O}(x::$(IT))
-            OffsetInteger{O, $(IT)}(x)
-        end
-        convert{O, T <: Integer}(::Type{$(IT)}, x::OffsetInteger{O, T}) = $(IT)(x.i + O)
-        convert{O, T <: Integer}(::Type{OffsetInteger{O, T}}, x::$(IT)) = OffsetInteger{O, T}(T(x))
-        function convert{O1, O2, T <: Integer}(::Type{OffsetInteger{O1, T}}, x::OffsetInteger{O2, $(IT)})
-            OffsetInteger{O1, T}(T(x))
-        end
-    end
-end
-#convert{O, T <: Integer}(::Type{OffsetInteger{O, T}}, x::T) = OffsetInteger{O, T}(x)
+Base.@pure pure_max(x1, x2) = x1 > x2 ? x1 : x2
+Base.promote_rule(::Type{T1}, ::Type{OffsetInteger{O, T2}}) where {T1 <: Integer, O, T2} = T1
+Base.promote_rule(::Type{OffsetInteger{O1, T1}}, ::Type{OffsetInteger{O2, T2}}) where {O1, O2, T1, T2} = OffsetInteger{pure_max(O1, O2), promote_type(T1, T2)}
 
+to_index(I::OffsetInteger) = raw(OneIndex(I))
+to_index(I::OffsetInteger{0}) = raw(I)
 
 # basic operators
 for op in (:(-), :abs)
@@ -49,11 +42,6 @@ for op in (:(==), :(>=), :(<=))
     end
 end
 
-
-Base.promote_type{T <: Int, OI <: OffsetInteger}(::Type{T}, ::Type{OI}) = T
-Base.promote_type{T <: Int, OI <: OffsetInteger}(::Type{OI}, ::Type{T}) = T
-
-
 @generated function Base.getindex{N}(
         A::AbstractArray, f::Face{N}
     )
@@ -64,9 +52,3 @@ Base.promote_type{T <: Int, OI <: OffsetInteger}(::Type{OI}, ::Type{T}) = T
     :($(v))
 end
 
-# function setindex!{N}(a::AbstractArray, b::AbstractArray, f::Face{N})
-#     for i = 1:N
-#         a[f[i]] = b[i]
-#     end
-#     b
-# end

@@ -74,9 +74,8 @@ communicating with 0-indexed systems such ad OpenGL.
 """
 immutable OffsetInteger{O, T <: Integer} <: Integer
     i::T
-    function (::Type{OffsetInteger{O, T}}){O, T}(x::T)
-        new{O, T}(x - O)
-    end
+    
+    OffsetInteger{O, T}(x::Integer) where {O, T <: Integer} = new{O, T}(T(x + O))
 end
 
 
