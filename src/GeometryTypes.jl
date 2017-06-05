@@ -7,9 +7,6 @@ using ColorTypes
 
 import FixedPointNumbers # U8
 
-
-using Compat
-
 import Base: ==,
              *,
              contains,
