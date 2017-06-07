@@ -7,6 +7,8 @@ using ColorTypes
 
 import FixedPointNumbers # U8
 
+using Iterators.partition
+
 import Base: ==,
              *,
              contains,
