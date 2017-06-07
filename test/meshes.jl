@@ -52,10 +52,10 @@ end
 end
 
 @testset "Primitives" begin
-    # issue #16
-    #m = HomogenousMesh{Point{3,Float64},Face{3, Int}}(Sphere(Point(0,0,0), 1))
-    #@fact length(vertices(m)) --> 145
-    #@fact length(faces(m)) --> 288
+    m = GLNormalMesh(Sphere(Point3f0(0), 1f0))
+    @test length(vertices(m)) == 145
+    @test length(faces(m)) == 288
+
 end
 
 

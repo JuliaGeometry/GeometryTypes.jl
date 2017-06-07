@@ -39,8 +39,8 @@ end
 # function StaticArrays.similar_type{SV <: Simplex}(::Union{SV, Type{SV}}, s::Tuple{Int})
 #     Simplex{s[1], eltype(SV)}
 # end
-function StaticArrays.similar_type{T}(::Union{Simplex, Type{Simplex}}, ::Type{T}, s::Tuple{Int})
-    Simplex{s[1], T}
+function StaticArrays.similar_type{T, S}(::Union{Simplex, Type{Simplex}}, ::Type{T}, s::Size{S})
+    Simplex{S[1], T}
 end
 
 # (::Type{S}){S <: Simplex}(fs::FlexibleSimplex) = convert(S, fs)
