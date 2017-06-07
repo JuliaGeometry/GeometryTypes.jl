@@ -56,23 +56,26 @@ convert(::Type{T}, mesh::T) where T <: AbstractMesh = mesh
 isvoid{T}(::Type{T}) = false
 isvoid(::Type{Void}) = true
 isvoid{T}(::Type{Vector{T}}) = isvoid(T)
-function (::Type{HM1}){HM1 <: HomogenousMesh}(primitive::HomogenousMesh)
+
+@generated function (::Type{HM1})(primitive::HM2) where {HM1 <: HomogenousMesh, HM2 <: HomogenousMesh}
     fnames = fieldnames(HM1)
-    args = ntuple(nfields(HM1)) do i
-        field, target_type = fnames[i], fieldtype(HM1, i)
-        soure_type = fieldtype(typeof(primitive), i)
-        isleaftype(fieldtype(HM1, i)) || return getfield(primitive, field) # target is not defined
-        if !isvoid(target_type) && isvoid(soure_type) # target not there yet, maybe we can decompose though (e.g. normals)
-            return decompose(HM1.parameters[i], primitive)
+    expr = Expr(:call, HM1)
+    for i in 1:nfields(HM1)
+        field = fnames[i]
+        target_type = fieldtype(HM1, i)
+        source_type = fieldtype(HM2, i)
+        if !isleaftype(fieldtype(HM1, i))  # target is not defined
+            push!(expr.args, :(getfield(primitive, $(QuoteNode(field)))))
+        elseif !isvoid(target_type) && isvoid(source_type) # target not there yet, maybe we can decompose though (e.g. normals)
+            push!(expr.args, :(decompose($(HM1.parameters[i]), primitive)))
         elseif isvoid(target_type)
-            return target_type()
+            push!(expr.args, :($(target_type())))
         else
-            return convert(target_type, getfield(primitive, field))
+            push!(expr.args, :(convert($target_type, getfield(primitive, $(QuoteNode(field))))))
         end
     end
-    HM1(args...)
+    expr
 end
-
 
 #Should be:
 #function call{M <: HMesh, VT <: Point, FT <: Face}(::Type{M}, vertices::Vector{VT}, faces::Vector{FT})
