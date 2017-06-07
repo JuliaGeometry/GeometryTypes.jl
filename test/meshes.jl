@@ -156,6 +156,15 @@ end
     @test all(isapprox.(ns, expect))
 end
 
+@testset "conversion" begin
+    VT = vertextype(GLNormalMesh)
+    FT = facetype(GLNormalMesh)
+    vs = [VT(0., 0, 0), VT(1., 0, 0), VT(0., 1, 0)]
+    fs = [FT(1, 2, 3)]
+    mesh = PlainMesh{eltype(VT), FT}(vertices=vs, faces=fs)
+    @test convert(GLNormalMesh, mesh) == GLNormalMesh(vs, fs)
+end
+
 end
 
 
