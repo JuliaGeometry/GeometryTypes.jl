@@ -74,7 +74,7 @@ communicating with 0-indexed systems such ad OpenGL.
 """
 struct OffsetInteger{O, T <: Integer} <: Integer
     i::T
-    
+
     OffsetInteger{O, T}(x::Integer) where {O, T <: Integer} = new{O, T}(T(x + O))
 end
 
@@ -190,7 +190,7 @@ FlexibleConvexHull{T}
 Represents the convex hull of finitely many points. The number of points is not fixed.
 """
 struct FlexibleConvexHull{T} <: AFG{T}
-    _::Vector{T}
+    vertices::Vector{T}
 end
 
 """
@@ -199,7 +199,7 @@ FlexibleSimplex{T}
 Represents a Simplex whos number of vertices is not fixed.
 """
 struct FlexibleSimplex{T} <: AFG{T}
-    _::Vector{T}
+    vertices::Vector{T}
 end
 
 """

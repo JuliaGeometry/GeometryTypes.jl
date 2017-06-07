@@ -1,5 +1,3 @@
-
-
 Base.eltype(fg::AFG) = eltype(typeof(fg))
 Base.length(fg::AFG) = length(vertices(fg))
 nvertices(fg::AFG) = length(fg)
@@ -19,7 +17,7 @@ Base.deleteat!(c::AbstractFlexibleGeometry, i) = (deleteat!(vertices(c), i); c)
 Base.copy{FG <: AFG}(fl::FG) = FG(copy(vertices(fl)))
 push(fl::AFG, pt) = push!(copy(fl), pt)
 
-vertices{T}(x::AbstractFlexibleGeometry{T}) = x._
+vertices(x::AbstractFlexibleGeometry) = x.vertices
 vertices(s::Simplex) = Tuple(s)
 
 standard_cube_vertices(::Type{Val{1}}) = [Vec(0), Vec(1)]
@@ -41,37 +39,37 @@ end
         _combine_vcat(vert_1, vert_last)
     end
 end
+@generated function vertices_rettype(r::HyperRectangle)
+    N = ndims(r)
+    T = eltype(r)
+    RET = NTuple{(2^N), Vec{N,T}}
+    :($RET)
+end
 
-@generated function vertices{N,T}(r::HyperRectangle{N,T})
-    ret_type = NTuple{(2^N), Vec{N,T}}
-    quote
-        o = origin(r)
-        v = widths(r)
-        f(sv) = o + sv .* v
-        tuple(map(f, standard_cube_vertices(Val{N}))...)::$ret_type
-    end
+function vertices(r::HyperRectangle)
+    N = ndims(r)
+    ret_type = vertices_rettype(r)
+    o = origin(r)
+    v = widths(r)
+    f(sv) = o + sv .* v
+    tuple(map(f, standard_cube_vertices(Val{N}))...)::ret_type
 end
 
 vertices(c::HyperCube) = vertices(convert(HyperRectangle, c))
-#vertices(s::AbstractConvexHull) = Tuple(s)
 
-vertexmat{M, T}(s::Simplex{M, T}) = Mat{length(T)}(vcat(vertices(s)...))
-vertexmat{M}(s::AbstractGeometry{M}) = Mat{M}(vcat(vertices(s)...))
-
-function vertexmat(s::AbstractFlexibleGeometry)
-    verts = vcat(vertices(s)...)
-    M, N = spacedim(s), nvertices(s)
-    Mat{M, N}(verts)
-end
+vertexmat(s) = hcat(vertices(s)...)
 vertexmatrix(s::AbstractConvexHull) = Matrix(vertexmat(s))::Matrix{numtype(s)}
 
-convert{S <: Simplex}(::Type{S}, fs::FlexibleSimplex) = S(tuple(vertices(fs)...))
-convert{F <: AFG}(::Type{F}, s::Simplex) = F(collect(vertices(s)))
-convert{FS <: FlexibleSimplex}(::Type{FS}, f::FS) = f
-convert{FG <: AFG, FS <: FlexibleSimplex}(::Type{FG}, f::FS) = FG(vertices(f))
-convert{R <: HyperRectangle}(::Type{R}, c::HyperCube) = R(origin(c), widths(c))
-convert{F <: FlexibleConvexHull}(::Type{F}, s::Simplex) = F(collect(vertices(s)))
-convert{F <: FlexibleConvexHull}(::Type{F}, c) = F(collect(vertices(c)))
+convert(S::Type{<: Simplex}, fs::FlexibleSimplex) = S(tuple(vertices(fs)...))
+convert(F::Type{<: AFG}, s::Simplex) = F(collect(vertices(s)))
+convert(FG::Type{<: AFG}, f::FlexibleSimplex) = FG(vertices(f))
+convert(R::Type{<: HyperRectangle}, c::HyperCube) = R(origin(c), widths(c))
+convert(F::Type{<:FlexibleConvexHull}, s::Simplex) = F(collect(vertices(s)))
+convert(F::Type{<:FlexibleConvexHull}, s::FlexibleSimplex) = F(vertices(s))
+convert(F::Type{FlexibleConvexHull}, c::FlexibleConvexHull) = c
+convert(F::Type{<:FlexibleConvexHull}, c::FlexibleConvexHull) = F(vertices(c))
+convert(::Type{F}, x::F) where {F <: FlexibleConvexHull} = x
+convert(F::Type{<:FlexibleConvexHull}, c) = F(collect(vertices(c)))
 
 function Base.isapprox(s1::AbstractConvexHull, s2::AbstractConvexHull;kw...)
     isapprox(vertexmat(s1), vertexmat(s2); kw...)

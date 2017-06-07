@@ -115,7 +115,7 @@ simplex_face(s::Simplex, i::Int) = Simplex(deleteat(vertices(s), i))
 """
 proj_sqdist{T}(pt::T, s::LineSegment{T}, best_sqd=eltype(T)(Inf))
 """
-function proj_sqdist{T}(pt::T, s::LineSegment{T}, best_sqd=eltype(T)(Inf))
+function proj_sqdist{T}(pt::T, s::LineSegment{T}, best_sqd=Inf)
     v0, v1 = vertices(s)
     pt = pt - v0
     v = v1 - v0
@@ -143,7 +143,7 @@ distance is greater then best_sqd, the behaviour of pt_proj is not defined.
 distance is greater then best_sqd is returned instead.
 
 """
-function proj_sqdist{nv,T}(pt::T, s::Simplex{nv,T}, best_sqd = eltype(T)(Inf))
+function proj_sqdist{nv,T}(pt::T, s::Simplex{nv,T}, best_sqd=Inf)
     w = weights(pt, s)
     best_proj = Vec(vertexmat(s) * w)
     # at this point best_proj lies in the subspace spanned by s,
@@ -167,17 +167,17 @@ function proj_sqdist{nv,T}(pt::T, s::Simplex{nv,T}, best_sqd = eltype(T)(Inf))
     end
 end
 
-sqdist(pt, s, best = Inf) = proj_sqdist(pt, s, best)[2]
+sqdist(pt, s, best=Inf) = proj_sqdist(pt, s, best)[2]
 
 """
 proj_sqdist(p::Vec, q::Vec, best_sqd=eltype(p)(Inf))
 """
-@inline function proj_sqdist(p::Vec, q::Vec, best_sqd = eltype(p)(Inf))
+@inline function proj_sqdist(p::Vec, q::Vec, best_sqd=Inf)
     q, min(best_sqd, sqnorm(p-q))
 end
 """
 proj_sqdist{T}(pt::T, s::Simplex{1, T}, best_sqd=eltype(T)(Inf))
 """
-@inline function proj_sqdist{T}(pt::T, s::Simplex{1, T}, best_sqd=eltype(T)(Inf))
+@inline function proj_sqdist{T}(pt::T, s::Simplex{1, T}, best_sqd=Inf)
     proj_sqdist(pt, translation(s), best_sqd)
 end
