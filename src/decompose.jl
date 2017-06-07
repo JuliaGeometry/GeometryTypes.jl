@@ -5,10 +5,8 @@ primitive.
 function decompose{SV <: StaticVector, N, T}(::Type{SV},
         r::AbstractGeometry{N, T}, args...
     )
-    println(SV)
     sz = size_or(SV, (N,))
     vectype = similar_type(SV, eltype_or(SV, T), Size{sz}())
-    println(vectype)
     # since we have not triangular dispatch, we can't define a function with the
     # signature for a fully specified Vector type. But we need to check for it
     # as it means that decompose is not implemented for that version
