@@ -52,29 +52,6 @@ convert{M <: AbstractMesh}(::Type{M}, mesh::Union{AbstractGeometry, AbstractMesh
 convert(::Type{T}, mesh::T) where T <: AbstractMesh = mesh
 # (::Type{HM1}){HM1 <: AbstractMesh}(mesh::HM1) = mesh
 
-"""
-Uses decompose to get all the converted attributes from the meshtype and
-creates a new mesh with the desired attributes from the converted attributs
-Getindex can be defined for any arbitrary geometric type or exotic mesh type.
-This way, we can make sure, that you can convert most of the meshes from one type to the other
-with minimal code.
-"""
-function (::Type{HM1}){HM1 <: AbstractMesh}(primitive::GeometryPrimitive)
-    result = Dict{Symbol, Any}()
-    for (field, target_type) in zip(fieldnames(HM1), HM1.parameters)
-        if target_type != Void
-            if field == :attribute_id
-                if !isa(primitive, HomogenousMesh)
-                    error("Primitive $primitive doesn't hold attribute indexes")
-                end
-                result[field] = primitive.attribute_id
-            else
-                result[field] = decompose(target_type, primitive)
-            end
-        end
-    end
-    HM1(result)
-end
 
 isvoid{T}(::Type{T}) = false
 isvoid(::Type{Void}) = true
