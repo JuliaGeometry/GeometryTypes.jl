@@ -5,7 +5,8 @@ primitive.
 function decompose{SV <: StaticVector, N, T}(::Type{SV},
         r::AbstractGeometry{N, T}, args...
     )
-    vectype = similar_type(SV, eltype_or(SV, T), size_or(SV, Size{(N,)}()))
+    sz = size_or(SV, (N,))
+    vectype = similar_type(SV, eltype_or(SV, T), Size{sz}())
     # since we have not triangular dispatch, we can't define a function with the
     # signature for a fully specified Vector type. But we need to check for it
     # as it means that decompose is not implemented for that version
@@ -38,8 +39,8 @@ isdecomposable{T<:Face, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
 isdecomposable{T<:TextureCoordinate, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
 isdecomposable{T<:Normal, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
 
-isdecomposable{T<:Point, HR<:HyperSphere}(::Type{T}, ::Type{HR}) = true
-isdecomposable{T<:Face, HR<:HyperSphere}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:Point, HR <: HyperSphere}(::Type{T}, ::Type{HR}) = true
+isdecomposable{T<:Face, HR <: HyperSphere}(::Type{T}, ::Type{HR}) = true
 
 """
 ```
@@ -368,7 +369,7 @@ function decompose{N,T}(PT::Type{Point{N,T}}, s::Sphere, facets=12)
     end
     vertices
 end
-function decompose{FT<:Face}(::Type{FT}, s::Sphere, facets=12)
+function decompose{FT <: Face}(::Type{FT}, s::Sphere, facets=12)
     indexes          = Vector{FT}(facets*facets*2)
     FTE              = eltype(FT)
     psydo_triangle_i = facets*facets+1

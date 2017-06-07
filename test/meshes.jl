@@ -52,10 +52,10 @@ end
 end
 
 @testset "Primitives" begin
-    # issue #16
-    #m = HomogenousMesh{Point{3,Float64},Face{3, Int}}(Sphere(Point(0,0,0), 1))
-    #@fact length(vertices(m)) --> 145
-    #@fact length(faces(m)) --> 288
+    m = GLNormalMesh(Sphere(Point3f0(0), 1f0))
+    @test length(vertices(m)) == 145
+    @test length(faces(m)) == 288
+
 end
 
 
@@ -173,23 +173,15 @@ end
     mesh = PlainMesh{eltype(VT), FT}(vertices=vs, faces=fs)
     @test convert(GLNormalMesh, mesh) == GLNormalMesh(vs, fs)
 end
+@testset "construction" begin
+    VT = vertextype(GLNormalMesh)
+    FT = facetype(GLNormalMesh)
+    vs = [VT(0., 0, 0), VT(1., 0, 0), VT(0., 1, 0)]
+    fs = [FT(1, 2, 3)]
 
+    # test for https://github.com/JuliaGeometry/GeometryTypes.jl/issues/92
+    m = HomogenousMesh(vs, fs)
+    @test HomogenousMesh(m) == m
 end
 
-
-using GeometryTypes
-attributes = Dict{Symbol, Any}()
-attributes[:faces] = GLTriangle[(1,2,3), (3, 2, 1)]
-attributes[:vertices] = rand(Point3f0, 3)
-attributes[:normals] = rand(Normal{3, Float32}, 3)
-@which HomogenousMesh(attributes)
-# M = HomogenousMesh
-# attribs = attributes
-# newfields = map(fieldnames(HomogenousMesh)) do field
-#     target_type = fieldtype(M, field)
-#     default = fieldtype(HomogenousMesh, field) <: Vector ? Void[] : nothing
-#     get(attribs, field, default)
-# end
-
-x = GeometryTypes.homogenousmesh(attributes)
-GLNormalMesh(x)
+end

@@ -1,6 +1,6 @@
 
 function (meshtype::Type{T}){T <: AbstractMesh}(c::Pyramid)
-    T(decompose(vertextype(T), c), decompose(facetype(T), c))
+    T(vertices = decompose(vertextype(T), c), faces = decompose(facetype(T), c))
 end
 
 
@@ -18,7 +18,7 @@ function (meshtype::Type{T}){T <: AbstractMesh}(c::GeometryPrimitive, args...)
             newattribs[fieldname] = decompose(eltype(typ), c, args...)
         end
     end
-    T(homogenousmesh(newattribs))
+    T(newattribs)
 end
 
 
