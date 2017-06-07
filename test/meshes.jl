@@ -184,20 +184,4 @@ end
     @test HomogenousMesh(m) == m
 end
 
-
-using GeometryTypes
-attributes = Dict{Symbol, Any}()
-attributes[:faces] = GLTriangle[(1,2,3), (3, 2, 1)]
-attributes[:vertices] = rand(Point3f0, 3)
-attributes[:normals] = rand(Normal{3, Float32}, 3)
-@which HomogenousMesh(attributes)
-# M = HomogenousMesh
-# attribs = attributes
-# newfields = map(fieldnames(HomogenousMesh)) do field
-#     target_type = fieldtype(M, field)
-#     default = fieldtype(HomogenousMesh, field) <: Vector ? Void[] : nothing
-#     get(attribs, field, default)
-# end
-
-x = GeometryTypes.homogenousmesh(attributes)
-GLNormalMesh(x)
+end
