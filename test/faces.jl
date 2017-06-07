@@ -21,4 +21,11 @@
         @test a == [7,6,5,4]
     end
 
+    @testset "views" begin
+        x = GLNormalMesh(AABB(Vec3f0(0), Vec3f0(1)))
+        v = view(vertices(x), faces(x))
+        vs = vertices(x)
+        vf = [vs[face] for face in faces(x)]
+        @test v == vf
+    end
 end
