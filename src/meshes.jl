@@ -48,7 +48,7 @@ function all_attributes{M <: HMesh}(m::M)
 end
 
 # Needed to not get into an stack overflow
-convert{M <: AbstractMesh}(::Type{M}, mesh::AbstractGeometry) = M(mesh)
+convert{M <: AbstractMesh}(::Type{M}, mesh::Union{AbstractGeometry, AbstractMesh}) = M(mesh)
 convert(::Type{T}, mesh::T) where T <: AbstractMesh = mesh
 # (::Type{HM1}){HM1 <: AbstractMesh}(mesh::HM1) = mesh
 
