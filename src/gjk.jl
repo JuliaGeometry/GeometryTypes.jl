@@ -3,19 +3,34 @@
 
 using Base.Cartesian
 
-type_immutable{T, n}(::Type{FlexibleSimplex{T}}, ::Type{Val{n}}) = Simplex{n,T}
+type_immutable(::Type{FlexibleSimplex{T}}, ::Type{Val{n}}) where {T,n}= Simplex{n,T}
 type_immutable(s, v=Val{length(s)}) = type_immutable(typeof(s), v)
 make_immutable(s, v=Val{length(s)}) = convert(type_immutable(s, v), s)
+
+#@generated function with_immutable{n}(f, s, max_depth::Type{Val{n}}=Val{10})
+#    quote
+#        l = length(s)
+#        @nif $n d->(d == l) d->(f(make_immutable(s, Val{d}))) d->error("length(s) = $s < max_depth = {n}")
+#    end
+#end
 
 """
 with_immutable{n}(f, s, max_depth::Type{Val{n}}=Val{10})
 
 Apply function f to immutable variant of s without introducing a type instability.
 """
-@generated function with_immutable{n}(f, s, max_depth::Type{Val{n}}=Val{10})
-    quote
-        l = length(s)
-        @nif $n d->(d == l) d->(f(make_immutable(s, Val{d}))) d->error("length(s) = $s < max_depth = {n}")
+function with_immutable(f, s)
+    l = length(s)
+    if l == 1
+        f(make_immutable(s, Val{1}))
+    elseif l == 2
+        f(make_immutable(s, Val{2}))
+    elseif l == 3
+        f(make_immutable(s, Val{3}))
+    elseif l == 4
+        f(make_immutable(s, Val{4}))
+    else
+        f(make_immutable(s, Val{l}))
     end
 end
 
@@ -80,7 +95,7 @@ end
 support_vector(ch, v) = support_vector_max(ch,v)[1]
 
 """
-s = shrink!(s::FlexibleSimplex, pt, atol=0.)
+    s = shrink!(s::FlexibleSimplex, pt, atol=0.)
 
 Drop as many vertices from s as possible, while keeping pt inside.
 """
@@ -96,7 +111,7 @@ end
 
 
 """
-pt_best, dist = gjk0(c)
+    pt_best, dist = gjk0(c)
 
 Compute the distance of a convex set to the origin using gjk algorithm. If c
 is not convex, the algorithm may or may not yield an optimal solution.
@@ -132,7 +147,6 @@ function gjk0(c,
             push!(sim, wk)
             pt_best::T, sqd = proj_sqdist(zero_point, sim)
             sqd == 0 && return pt_best, norm(pt_best)
-            #@show weights(pt_best, sim)
             shrink!(sim, pt_best, atol)
         end
     end
