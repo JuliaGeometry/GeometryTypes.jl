@@ -1,4 +1,4 @@
 julia 0.6.0-pre
 StaticArrays
 ColorTypes
-FixedPointNumbers
+FixedPointNumbers 0.3
