@@ -1,9 +1,9 @@
 using StaticArrays.FixedSizeArrays
 import StaticArrays.FixedSizeArrays: @fixed_vector
 
-@compat abstract type AbstractDistanceField end
-@compat abstract type AbstractUnsignedDistanceField <: AbstractDistanceField end
-@compat abstract type AbstractSignedDistanceField <: AbstractDistanceField end
+abstract type AbstractDistanceField end
+abstract type AbstractUnsignedDistanceField <: AbstractDistanceField end
+abstract type AbstractSignedDistanceField <: AbstractDistanceField end
 """
 Abstract to categorize geometry primitives of dimensionality `N` and
 the numeric element type `T`.
@@ -11,9 +11,9 @@ the numeric element type `T`.
 # abstract AbstractGeometry{N, T}
 # abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry{3, Float32}
 # abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
-@compat abstract type AbstractGeometry{N, T} end
-@compat abstract type AbstractMesh{VertT, FaceT}  end # <: AbstractGeometry
-@compat abstract type GeometryPrimitive{N, T} <: AbstractGeometry{N, T} end
+abstract type AbstractGeometry{N, T} end
+abstract type AbstractMesh{VertT, FaceT}  end # <: AbstractGeometry
+abstract type GeometryPrimitive{N, T} <: AbstractGeometry{N, T} end
 
 
 """
@@ -21,7 +21,7 @@ Abstract to classify Simplices. The convention for N starts at 1, which means
 a Simplex has 1 point. A 2-simplex has 2 points, and so forth. This convention
 is not the same as most mathematical texts.
 """
-@compat abstract type AbstractSimplex{S, T} <: StaticVector{S, T} end
+abstract type AbstractSimplex{S, T} <: StaticVector{S, T} end
 
 
 """
@@ -40,7 +40,7 @@ This is for a simpler implementation.
 It applies to infinite dimensions. The structure of this type is designed
 to allow embedding in higher-order spaces by parameterizing on `T`.
 """
-immutable Simplex{S, T} <: AbstractSimplex{S, T}
+struct Simplex{S, T} <: AbstractSimplex{S, T}
     data::NTuple{S, T}
     (::Type{Simplex{S, T}}){S, T}(x::NTuple{S, T}) = new{S, T}(x)
     (::Type{Simplex{S, T}}){S, T}(x::NTuple{S}) = new{S, T}(StaticArrays.convert_ntuple(T, x))
@@ -72,7 +72,7 @@ OffsetInteger type mainly for indexing.
 * `O` - The offset relative to Julia arrays. This helps reduce copying when
 communicating with 0-indexed systems such ad OpenGL.
 """
-immutable OffsetInteger{O, T <: Integer} <: Integer
+struct OffsetInteger{O, T <: Integer} <: Integer
     i::T
     
     OffsetInteger{O, T}(x::Integer) where {O, T <: Integer} = new{O, T}(T(x + O))
@@ -87,13 +87,13 @@ A `HyperRectangle` is a generalization of a rectangle into N-dimensions.
 Formally it is the cartesian product of intervals, which is represented by the
 `origin` and `width` fields, whose indices correspond to each of the `N` axes.
 """
-immutable HyperRectangle{N, T} <: GeometryPrimitive{N, T}
+struct HyperRectangle{N, T} <: GeometryPrimitive{N, T}
     origin::Vec{N, T}
     widths::Vec{N, T}
 end
 
 
-immutable HyperCube{N, T} <: GeometryPrimitive{N, T}
+struct HyperCube{N, T} <: GeometryPrimitive{N, T}
     origin::Vec{N, T}
     width::T
 end
@@ -103,12 +103,12 @@ end
 A `HyperSphere` is a generalization of a sphere into N-dimensions.
 A `center` and radius, `r`, must be specified.
 """
-immutable HyperSphere{N, T} <: GeometryPrimitive{N, T}
+struct HyperSphere{N, T} <: GeometryPrimitive{N, T}
     center::Point{N, T}
     r::T
 end
 
-immutable SimpleRectangle{T} <: GeometryPrimitive{2, T}
+struct SimpleRectangle{T} <: GeometryPrimitive{2, T}
     x::T
     y::T
     w::T
@@ -121,19 +121,19 @@ const Rectangle = SimpleRectangle
 """
 A rectangle in 3D space.
 """
-immutable Quad{T} <: GeometryPrimitive{3, T}
+struct Quad{T} <: GeometryPrimitive{3, T}
     downleft::Vec{3, T}
     width   ::Vec{3, T}
     height  ::Vec{3, T}
 end
 
-immutable Pyramid{T} <: GeometryPrimitive{3, T}
+struct Pyramid{T} <: GeometryPrimitive{3, T}
     middle::Point{3, T}
     length::T
     width ::T
 end
 
-immutable Particle{N, T} <: GeometryPrimitive{N, T}
+struct Particle{N, T} <: GeometryPrimitive{N, T}
     position::Point{N, T}
     velocity::Vec{N, T}
 end
@@ -152,7 +152,7 @@ The type is parameterized by:
 Note that decoupling the space and field types is useful since geometry can
 be formulated with integers and distances can be measured with floating points.
 """
-type SignedDistanceField{N,SpaceT,FieldT} <: AbstractSignedDistanceField
+mutable struct SignedDistanceField{N,SpaceT,FieldT} <: AbstractSignedDistanceField
     bounds::HyperRectangle{N,SpaceT}
     data::Array{FieldT,N}
 end
@@ -166,7 +166,7 @@ one mesh type.
 This is not perfect, but helps to reduce a type explosion (imagine defining
 every attribute combination as a new type).
 """
-immutable HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: AbstractMesh{VertT, FaceT}
+struct HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: AbstractMesh{VertT, FaceT}
     vertices            ::Vector{VertT}
     faces               ::Vector{FaceT}
     normals             ::Vector{NormalT}
@@ -181,7 +181,7 @@ AbstractFlexibleGeometry{T}
 
 AbstractFlexibleGeometry refers to shapes, which are somewhat mutable.
 """
-@compat abstract type AbstractFlexibleGeometry{T} end
+abstract type AbstractFlexibleGeometry{T} end
 const AFG = AbstractFlexibleGeometry
 
 """
@@ -189,7 +189,7 @@ FlexibleConvexHull{T}
 
 Represents the convex hull of finitely many points. The number of points is not fixed.
 """
-immutable FlexibleConvexHull{T} <: AFG{T}
+struct FlexibleConvexHull{T} <: AFG{T}
     _::Vector{T}
 end
 
@@ -198,7 +198,7 @@ FlexibleSimplex{T}
 
 Represents a Simplex whos number of vertices is not fixed.
 """
-immutable FlexibleSimplex{T} <: AFG{T}
+struct FlexibleSimplex{T} <: AFG{T}
     _::Vector{T}
 end
 
@@ -206,7 +206,7 @@ end
 A `Cylinder` is a 2D rectangle or a 3D cylinder defined by its origin point,
 its extremity and a radius. `origin`, `extremity` and `r`, must be specified.
 """
-immutable Cylinder{N,T<: AbstractFloat} <: GeometryPrimitive{N,T}
+struct Cylinder{N,T<: AbstractFloat} <: GeometryPrimitive{N,T}
     origin::Point{N,T}
     extremity::Point{N,T}
     r::T

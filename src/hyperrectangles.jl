@@ -161,7 +161,7 @@ end
 """
 Construct a HyperRectangle enclosing all points.
 """
-@compat function (t::Type{HyperRectangle{N1, T1}}){N1, T1, PT <: Point}(
+function (t::Type{HyperRectangle{N1, T1}}){N1, T1, PT <: Point}(
         geometry::AbstractArray{PT}
     )
     N2, T2 = length(PT), eltype(PT)

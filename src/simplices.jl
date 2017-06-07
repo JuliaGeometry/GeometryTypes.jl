@@ -43,10 +43,10 @@ function StaticArrays.similar_type{T}(::Union{Simplex, Type{Simplex}}, ::Type{T}
     Simplex{s[1], T}
 end
 
-# @compat (::Type{S}){S <: Simplex}(fs::FlexibleSimplex) = convert(S, fs)
+# (::Type{S}){S <: Simplex}(fs::FlexibleSimplex) = convert(S, fs)
 #
 # # FSA doesn't handle symbols for length 1 well.
-# @compat function (::Type{T}){T <: Simplex}(f::Symbol)
+# function (::Type{T}){T <: Simplex}(f::Symbol)
 #     Simplex{1 ,Symbol}((f,))
 # end
 
