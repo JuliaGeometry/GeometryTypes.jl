@@ -8,7 +8,7 @@ Base.eltype(::Type{OffsetInteger{O, T}}) where {O, T} = T
 Base.eltype(oi::OffsetInteger) = eltype(typeof(oi))
 
 # constructors and conversion
-convert(::Type{OffsetInteger{O1, T1}}, x::OffsetInteger{O2, T2}) where {O1, O2, T1 <: Integer, T2 <: Integer} = 
+convert(::Type{OffsetInteger{O1, T1}}, x::OffsetInteger{O2, T2}) where {O1, O2, T1 <: Integer, T2 <: Integer} =
     OffsetInteger{O1, T1}(T2(x))
 convert(::Type{OffsetInteger{O}}, x::Integer) where {O} = convert(OffsetInteger{O, eltype(x)}, x)
 convert(::Type{OffsetInteger{O}}, x::OffsetInteger) where {O} = convert(OffsetInteger{O, eltype(x)}, x)
@@ -20,6 +20,7 @@ Base.@pure pure_max(x1, x2) = x1 > x2 ? x1 : x2
 Base.promote_rule(::Type{T1}, ::Type{OffsetInteger{O, T2}}) where {T1 <: Integer, O, T2} = T1
 Base.promote_rule(::Type{OffsetInteger{O1, T1}}, ::Type{OffsetInteger{O2, T2}}) where {O1, O2, T1, T2} = OffsetInteger{pure_max(O1, O2), promote_type(T1, T2)}
 
+to_index(I::AbstractArray{<:Face}) = I
 to_index(I::OffsetInteger) = raw(OneIndex(I))
 to_index(I::OffsetInteger{0}) = raw(I)
 
@@ -51,4 +52,3 @@ end
     end
     :($(v))
 end
-
