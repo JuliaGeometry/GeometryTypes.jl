@@ -370,7 +370,7 @@ function decompose{N,T}(PT::Type{Point{N,T}}, s::Sphere, facets=12)
     vertices
 end
 function decompose{FT <: Face}(::Type{FT}, s::Sphere, facets=12)
-    indexes          = Vector{FT}(facets*facets*2)
+    indexes          = Vector{FT}(facets * facets * 2)
     FTE              = eltype(FT)
     psydo_triangle_i = facets*facets+1
     index            = 1
@@ -379,10 +379,10 @@ function decompose{FT <: Face}(::Type{FT}, s::Sphere, facets=12)
             next_index = mod1(i+1, facets)
             i1 = sub2ind((facets,), j, i)
             i2 = sub2ind((facets,), j, next_index)
-            i3 = (j != facets) ? sub2ind((facets,), j+1, i) : psydo_triangle_i
-            i6 = (j != facets) ? sub2ind((facets,), j+1, next_index) : psydo_triangle_i
-            indexes[index]   = FT(i1,i2,i3) # convert to required Face index offset
-            indexes[index+1] = FT(i3,i2,i6)
+            i3 = (j != facets) ? sub2ind((facets,), j + 1, i) : psydo_triangle_i
+            i6 = (j != facets) ? sub2ind((facets,), j + 1, next_index) : psydo_triangle_i
+            indexes[index] = FT(i1, i2, i3) # convert to required Face index offset
+            indexes[index + 1] = FT(i3, i2, i6)
             index += 2
         end
     end
