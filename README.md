@@ -63,7 +63,7 @@ end
 
 function decompose{T<:Face}(::Type{T}, r::SimpleRectangle, resolution=(2,2))
     w,h = resolution
-    faces = vec([Face{4, Int, 0}(
+    faces = vec([Face{4, Int}(
             sub2ind(resolution, i, j), sub2ind(resolution, i+1, j),
             sub2ind(resolution, i+1, j+1), sub2ind(resolution, i, j+1)
         ) for i=1:(w-1), j=1:(h-1)]
@@ -77,7 +77,7 @@ rect = SimpleRectangle(...)
 mesh = GLNormalMesh(rect)
 vertices(mesh) == decompose(Point3f0, rect)
 
-faces(mesh) == decompose(GLTriangle, rect) # Face{3, UInt32, 0} == GLTriangle
+faces(mesh) == decompose(GLTriangle, rect) # GLFace{3} == GLTriangle
 normals(mesh) # automatically calculated from mesh
 ```
 As you can see, the normals are automatically calculated only with the faces and points.

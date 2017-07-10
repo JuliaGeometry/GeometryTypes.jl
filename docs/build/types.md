@@ -53,7 +53,6 @@ A Face is typically used when constructing subtypes of `AbstractMesh` where the 
 
   * `N` - The number of vertices in the face.
   * `T` - The type of the indices in the face, a subtype of Integer.
-  * `O` - The offset relative to Julia arrays. This helps reduce copying when communicating with 0-indexed systems such ad OpenGL.
 
 ## DistanceFields
 

@@ -28,4 +28,12 @@
         vf = [vs[face] for face in faces(x)]
         @test v == vf
     end
+
+    @testset "negative offests and unsigned integers" begin
+        oi = OffsetInteger{-1, UInt64}(UInt64(1))
+        show(IOBuffer(), oi)
+
+        oi = OffsetInteger{1, UInt64}(UInt64(1))
+        show(IOBuffer(), oi)
+    end
 end

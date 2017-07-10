@@ -1,7 +1,7 @@
 import Base: +, -, abs, *, /, div, convert, ==, <=, >=, show, to_index
 
 function show{O, T}(io::IO, oi::OffsetInteger{O, T})
-    print(io, "|$(raw(oi)) (indexes as $(raw(oi) + -O))|")
+    print(io, "|$(raw(oi)) (indexes as $(O >= 0 ? raw(oi) - O : raw(oi) + -O))|")
 end
 
 Base.eltype(::Type{OffsetInteger{O, T}}) where {O, T} = T
