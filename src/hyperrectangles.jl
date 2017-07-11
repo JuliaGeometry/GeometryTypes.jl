@@ -198,10 +198,7 @@ function SimpleRectangle{T}(position::Vec{2,T}, width::Vec{2,T})
     SimpleRectangle{T}(position..., width...)
 end
 
-function getindex{T}(a::Array{T,2}, rect::SimpleRectangle)
-    a[rect.x+1:(rect.x+rect.w), rect.y+1:(rect.y+rect.h)]
-end
-
-function setindex!{T}(a::Array{T,2}, b::Array{T,2}, rect::SimpleRectangle)
-    a[rect.x+1:rect.w, rect.y+1:rect.h] = b
+function Base.to_indices{T}(A::AbstractArray{T, 2}, I::Tuple{<: SimpleRectangle})
+    i = I[1]
+    (i.x + 1 : (i.x + i.w), i.y + 1 : (i.y + i.h))
 end
