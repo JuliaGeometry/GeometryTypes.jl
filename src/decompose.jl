@@ -427,11 +427,11 @@ function decompose{FT <: Face, T}(::Type{FT}, c::Cylinder{3, T}, facets = 18)
     facets < 8 ? facets = 8 : nothing; nbv = Int(facets / 2)
     indexes = Vector{FT}(facets); index = 1
     for j = 1:(nbv-1)
-        indexes[index] = (index, index + 1, index + 2)
-        indexes[index + 1] = (index + 2, index + 1, index + 3)
+        indexes[index] = (index + 2, index + 1, index)
+        indexes[index + 1] = ( index + 3, index + 1, index + 2)
         index += 2
     end
-    indexes[index] = (index, index + 1, 1)
-    indexes[index + 1] = (1, index + 1, 2)
+    indexes[index] = (1, index + 1, index)
+    indexes[index + 1] = (2, index + 1, 1)
     return indexes
 end
