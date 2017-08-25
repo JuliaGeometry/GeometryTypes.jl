@@ -1,4 +1,4 @@
 origin(prim::HyperCube) = prim.origin
-widths{N,T}(prim::HyperCube{N,T}) = Vec{N,T}(prim.width)
-maximum{N,T}(prim::HyperCube{N,T}) = origin(prim)+widths(prim)
-minimum{N,T}(prim::HyperCube{N,T}) = origin(prim)
+widths(prim::HyperCube{N,T}) where {N,T} = Vec{N,T}(prim.width)
+maximum(prim::HyperCube{N,T}) where {N,T} = origin(prim)+widths(prim)
+minimum(prim::HyperCube{N,T}) where {N,T} = origin(prim)

@@ -24,7 +24,7 @@ using GeometryTypes
 Intersection of 2 line segmens `a` and `b`.
 Returns intersection_found::Bool, intersection_point
 """
-function intersects{N,T}(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}})
+function intersects(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}}) where {N,T}
     v1, v2 = a; v3, v4 = b; MT = Mat{2,2,T,4}; p0 = zero(Point{N,T})
 
     a = det(MT(
@@ -47,7 +47,7 @@ function intersects{N,T}(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}})
 end
 
 
-function simple_concat{P}(vec, range, endpoint::P)
+function simple_concat(vec, range, endpoint::P) where P
     result = Vector{P}(length(range)+1)
     for (i,j) in enumerate(range)
         result[i] = vec[mod1(j, length(vec))]
@@ -59,7 +59,7 @@ end
 """
 Finds all self intersections of polygon `points`
 """
-function self_intersections{N,T}(points::Vector{Point{N,T}})
+function self_intersections(points::Vector{Point{N,T}}) where {N,T}
     sections = Point{N,T}[]
     intersections = Int[]
     wraparound = i-> mod1(i, length(points) - 1)
@@ -82,7 +82,7 @@ end
 Splits polygon `points` into it's self intersecting parts. Only 1 intersection
 is handled right now.
 """
-function split_intersections{N,T}(points::Vector{Point{N,T}})
+function split_intersections(points::Vector{Point{N,T}}) where {N,T}
     intersections, sections = self_intersections(points)
     if isempty(intersections)
         return Vector{Point{N,T}}[points]

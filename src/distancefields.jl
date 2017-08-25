@@ -15,10 +15,10 @@ so a new HyperRectangle will be generated for the SignedDistanceField that
 may have larger maximum bounds than the input HyperRectangle. The default
 Field type is Float64, but this can be changed with the `fieldT` argument.
 """
-function SignedDistanceField{T}(f::Function,
-                                bounds::HyperRectangle{3, T},
-                                resolution=0.1,
-                                fieldT=Float64)
+function SignedDistanceField(f::Function,
+                             bounds::HyperRectangle{3, T},
+                             resolution=0.1,
+                             fieldT=Float64) where T
     x_min, y_min, z_min = minimum(bounds)
     x_max, y_max, z_max = maximum(bounds)
 
@@ -45,10 +45,10 @@ function SignedDistanceField{T}(f::Function,
     SignedDistanceField{3,T,fieldT}(HyperRectangle{3, T}(nb_min, nb_max-nb_min), vol)
 end
 
-function SignedDistanceField{T}(f::Function,
-                                bounds::HyperRectangle{2,T},
-                                resolution=0.1,
-                                fieldT=Float64)
+function SignedDistanceField(f::Function,
+                             bounds::HyperRectangle{2,T},
+                             resolution=0.1,
+                             fieldT=Float64) where T
     x_min, y_min = minimum(bounds)
     x_max, y_max = maximum(bounds)
 

@@ -1,20 +1,20 @@
 Base.eltype(fg::AFG) = eltype(typeof(fg))
 Base.length(fg::AFG) = length(vertices(fg))
 nvertices(fg::AFG) = length(fg)
-nvertices{n, T}(::Type{Simplex{n, T}}) = n
-nvertices{N,T}(::Type{HyperCube{N,T}}) = 2^N
-nvertices{N,T}(::Type{HyperRectangle{N,T}}) = 2^N
+nvertices(::Type{Simplex{n, T}}) where {n, T} = n
+nvertices(::Type{HyperCube{N,T}}) where {N,T} = 2^N
+nvertices(::Type{HyperRectangle{N,T}}) where {N,T} = 2^N
 nvertices(s::Union{AbstractGeometry, Simplex}) = nvertices(typeof(s))
 
 spacedim(s) = length(eltype(s))
-spacedim{N,T}(::HyperCube{N,T}) = N
+spacedim(::HyperCube{N,T}) where {N,T} = N
 numtype(s) = eltype(eltype(s))
-numtype{N,T}(::HyperCube{N,T}) = T
+numtype(::HyperCube{N,T}) where {N,T} = T
 
 Base.push!(fl::AFG, pt) = (push!(vertices(fl), pt); fl)
 Base.deleteat!(c::AbstractFlexibleGeometry, i) = (deleteat!(vertices(c), i); c)
 
-Base.copy{FG <: AFG}(fl::FG) = FG(copy(vertices(fl)))
+Base.copy(fl::FG) where {FG <: AFG} = FG(copy(vertices(fl)))
 push(fl::AFG, pt) = push!(copy(fl), pt)
 
 vertices(x::AbstractFlexibleGeometry) = x.vertices
@@ -31,7 +31,7 @@ function _combine_vcat(arr1, arr2)
     ret
 end
 
-@generated function standard_cube_vertices{N}(::Type{Val{N}})
+@generated function standard_cube_vertices(::Type{Val{N}}) where N
     @assert N::Int > 0
     quote
         vert_last = standard_cube_vertices($(Val{N-1}))

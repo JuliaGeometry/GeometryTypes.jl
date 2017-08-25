@@ -1,7 +1,7 @@
 origin(prim::HyperRectangle) = prim.origin
 maximum(prim::HyperRectangle) = origin(prim) + widths(prim)
 minimum(prim::HyperRectangle) = origin(prim)
-length{T, N}(prim::HyperRectangle{N, T}) = N
+length(prim::HyperRectangle{N, T}) where {T, N} = N
 widths(prim::HyperRectangle) = prim.widths
 
 """
@@ -9,7 +9,7 @@ Splits an HyperRectangle into two along an axis at a given location.
 """
 split(b::HyperRectangle, axis, value::Integer) = _split(b, axis, value)
 split(b::HyperRectangle, axis, value::Number) = _split(b, axis, value)
-function _split{H<:HyperRectangle}(b::H, axis, value)
+function _split(b::H, axis, value) where H<:HyperRectangle
     bmin = minimum(b)
     bmax = maximum(b)
     b1max = setindex(bmax, value, axis)
@@ -20,22 +20,22 @@ function _split{H<:HyperRectangle}(b::H, axis, value)
 end
 
 # empty constructor such that update will always include the first point
-function (HR::Type{HyperRectangle{N,T}}){T,N}()
+function (HR::Type{HyperRectangle{N,T}})() where {T,N}
     HR(Vec{N,T}(typemax(T)), Vec{N,T}(typemin(T)))
 end
 
 # conversion from other HyperRectangles
-function (HR::Type{HyperRectangle{N,T1}}){N,T1,T2}(a::HyperRectangle{N,T2})
+function (HR::Type{HyperRectangle{N,T1}})(a::HyperRectangle{N,T2}) where {N,T1,T2}
     HR(Vec{N, T1}(minimum(a)), Vec{N, T1}(widths(a)))
 end
 
-function HyperRectangle{N,T1,T2}(v1::Vec{N,T1}, v2::Vec{N,T2})
+function HyperRectangle(v1::Vec{N,T1}, v2::Vec{N,T2}) where {N,T1,T2}
     T = promote_type(T1,T2)
     HyperRectangle{N,T}(Vec{N,T}(v1), Vec{N,T}(v2))
 end
 
 
-function (HR::Type{HyperRectangle{N,T}}){N,T}(a::GeometryPrimitive)
+function (HR::Type{HyperRectangle{N,T}})(a::GeometryPrimitive) where {N,T}
     HR(Vec{N, T}(minimum(a)), Vec{N, T}(widths(a)))
 end
 """
@@ -59,11 +59,11 @@ width == Vec(1,2)
     Expr(:call, :HyperRectangle, v1, v2)
 end
 
-function HyperRectangle{T}(r::SimpleRectangle{T})
+function HyperRectangle(r::SimpleRectangle{T}) where T
     HyperRectangle{2,T}(r)
 end
 
-function (::Type{HyperRectangle{N,T}}){N,T}(r::SimpleRectangle)
+function HyperRectangle{N,T}(r::SimpleRectangle) where {N,T}
     if N > 2
         return HyperRectangle(Vec{N, T}(T(r.x), T(r.y), Vec{N-2,T}(zero(T))...),
                               Vec{N, T}(T(r.w), T(r.h), Vec{N-2,T}(zero(T))...))
@@ -77,7 +77,7 @@ end
 Transform a `HyperRectangle` using a matrix. Maintains axis-align properties
 so a significantly larger HyperRectangle may be generated.
 """
-function *{N1,N2,T1,T2}(m::Mat{N1,N1,T1}, h::HyperRectangle{N2, T2})
+function *(m::Mat{N1,N1,T1}, h::HyperRectangle{N2, T2}) where {N1,N2,T1,T2}
 
     # TypeVar constants
     T = promote_type(T1, T2)
@@ -99,7 +99,7 @@ function *{N1,N2,T1,T2}(m::Mat{N1,N1,T1}, h::HyperRectangle{N2, T2})
     HyperRectangle{N2, T}(vmin, vmax - vmin)
 end
 
-function *{N,T1,T2}(m::Mat{N,N,T1}, h::HyperRectangle{N,T2})
+function *(m::Mat{N,N,T1}, h::HyperRectangle{N,T2}) where {N,T1,T2}
     # equal dimension case
 
     # TypeVar constants
@@ -122,7 +122,7 @@ function *{N,T1,T2}(m::Mat{N,N,T1}, h::HyperRectangle{N,T2})
 end
 
 # fast path. TODO make other versions fast without code duplications like now
-function *{T}(m::Mat{4,4,T}, h::HyperRectangle{3,T})
+function *(m::Mat{4,4,T}, h::HyperRectangle{3,T}) where T
     # equal dimension case
 
     # get all points on the HyperRectangle
@@ -154,16 +154,16 @@ function *{T}(m::Mat{4,4,T}, h::HyperRectangle{3,T})
     HyperRectangle{3,T}(_vmin, _vmax - _vmin)
 end
 
-function HyperRectangle{N,T}(geometry::Array{Point{N, T}})
+function HyperRectangle(geometry::Array{Point{N, T}}) where {N,T}
     HyperRectangle{N,T}(geometry)
 end
 
 """
 Construct a HyperRectangle enclosing all points.
 """
-function (t::Type{HyperRectangle{N1, T1}}){N1, T1, PT <: Point}(
+function (t::Type{HyperRectangle{N1, T1}})(
         geometry::AbstractArray{PT}
-    )
+    ) where {N1, T1, PT <: Point}
     N2, T2 = length(PT), eltype(PT)
     @assert N1 >= N2
     vmin = Point{N2, T2}(typemax(T2))
@@ -188,17 +188,17 @@ width(a::SimpleRectangle)  = a.w
 yheight(a::SimpleRectangle) = a.h + a.y
 height(a::SimpleRectangle) = a.h
 area(a::SimpleRectangle) = a.w*a.h
-widths{T}(a::SimpleRectangle{T}) = Point{2,T}(a.w, a.h)
-maximum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x + widths(a)[1], a.y +widths(a)[2])
-minimum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
-origin{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
+widths(a::SimpleRectangle{T}) where {T} = Point{2,T}(a.w, a.h)
+maximum(a::SimpleRectangle{T}) where {T} = Point{2, T}(a.x + widths(a)[1], a.y +widths(a)[2])
+minimum(a::SimpleRectangle{T}) where {T} = Point{2, T}(a.x, a.y)
+origin(a::SimpleRectangle{T}) where {T} = Point{2, T}(a.x, a.y)
 
-(::Type{SimpleRectangle}){T}(val::Vec{2, T}) = SimpleRectangle{T}(0, 0, val...)
-function SimpleRectangle{T}(position::Vec{2,T}, width::Vec{2,T})
+SimpleRectangle(val::Vec{2, T}) where {T} = SimpleRectangle{T}(0, 0, val...)
+function SimpleRectangle(position::Vec{2,T}, width::Vec{2,T}) where T
     SimpleRectangle{T}(position..., width...)
 end
 
-function Base.to_indices{T}(A::AbstractArray{T, 2}, I::Tuple{<: SimpleRectangle})
+function Base.to_indices(A::AbstractArray{T, 2}, I::Tuple{<: SimpleRectangle}) where T
     i = I[1]
     (i.x + 1 : (i.x + i.w), i.y + 1 : (i.y + i.h))
 end
