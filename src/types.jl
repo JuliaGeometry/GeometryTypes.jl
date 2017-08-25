@@ -42,8 +42,8 @@ to allow embedding in higher-order spaces by parameterizing on `T`.
 """
 struct Simplex{S, T} <: AbstractSimplex{S, T}
     data::NTuple{S, T}
-    (::Type{Simplex{S, T}}){S, T}(x::NTuple{S, T}) = new{S, T}(x)
-    (::Type{Simplex{S, T}}){S, T}(x::NTuple{S}) = new{S, T}(StaticArrays.convert_ntuple(T, x))
+    Simplex{S, T}(x::NTuple{S, T}) where {S, T} = new{S, T}(x)
+    Simplex{S, T}(x::NTuple{S}) where {S, T} = new{S, T}(StaticArrays.convert_ntuple(T, x))
 end
 
 @fixed_vector Vec StaticVector

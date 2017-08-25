@@ -11,8 +11,8 @@ function Base.ndims(T::Type{<:AbstractGeometry})
     ndims_or(T, Any)
 end
 
-Base.eltype{N, T}(x::AbstractGeometry{N, T}) = T
-Base.ndims{N, T}(x::AbstractGeometry{N, T}) = N
+Base.eltype(x::AbstractGeometry{N, T}) where {N, T} = T
+Base.ndims(x::AbstractGeometry{N, T}) where {N, T} = N
 
-Base.eltype{T}(::Type{AFG{T}}) = T
-Base.eltype{FG <: AFG}(::Type{FG}) = eltype(supertype(FG))
+Base.eltype(::Type{AFG{T}}) where {T} = T
+Base.eltype(::Type{FG}) where {FG <: AFG} = eltype(supertype(FG))

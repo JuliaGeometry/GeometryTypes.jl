@@ -1,6 +1,6 @@
 import Base: +, -, abs, *, /, div, convert, ==, <=, >=, show, to_index
 
-function show{O, T}(io::IO, oi::OffsetInteger{O, T})
+function show(io::IO, oi::OffsetInteger{O, T}) where {O, T}
     print(io, "|$(raw(oi)) (indexes as $(O >= 0 ? raw(oi) - O : raw(oi) + -O))|")
 end
 
@@ -26,26 +26,26 @@ to_index(I::OffsetInteger{0}) = raw(I)
 
 # basic operators
 for op in (:(-), :abs)
-    @eval $(op){T <: OffsetInteger}(x::T) = T($(op)(x.i))
+    @eval $(op)(x::T) where {T <: OffsetInteger} = T($(op)(x.i))
 end
 for op in (:(+), :(-), :(*), :(/), :div)
     @eval begin
-        @inline function $(op){O}(x::OffsetInteger{O}, y::OffsetInteger{O})
+        @inline function $(op)(x::OffsetInteger{O}, y::OffsetInteger{O}) where O
             OffsetInteger{O}($op(x.i, y.i))
         end
     end
 end
 for op in (:(==), :(>=), :(<=))
     @eval begin
-        @inline function $(op){O}(x::OffsetInteger{O}, y::OffsetInteger{O})
+        @inline function $(op)(x::OffsetInteger{O}, y::OffsetInteger{O}) where O
             $op(x.i, y.i)
         end
     end
 end
 
-@generated function Base.getindex{N}(
+@generated function Base.getindex(
         A::AbstractArray, f::Face{N}
-    )
+    ) where N
     v = Expr(:tuple)
     for i = 1:N
         push!(v.args, :(A[f[$i]]))

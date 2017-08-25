@@ -55,7 +55,7 @@ const AbsoluteRectangle{T} = HyperRectangle{2, T}
 AABB, or Axis Aligned Bounding Box, is an alias for a 3D HyperRectangle.
 """
 const AABB{T} = HyperRectangle{3, T}
-(::Type{AABB})(m...) = HyperRectangle(m...)
+AABB(m...) = HyperRectangle(m...)
 
 const HMesh = HomogenousMesh
 

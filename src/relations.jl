@@ -2,18 +2,18 @@
 # http://en.wikipedia.org/wiki/Allen%27s_interval_algebra
 #
 
-function before{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
+function before(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) where {T1, T2, N}
     for i = 1:N
         maximum(b1)[i] < minimum(b2)[i] || return false
     end
     true
 end
 
-@inline function meets{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
+@inline function meets(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) where {T1, T2, N}
     maximum(b1) == minimum(b2)
 end
 
-function overlaps{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
+function overlaps(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) where {T1, T2, N}
     for i = 1:N
         maximum(b2)[i] > maximum(b1)[i] > minimum(b2)[i] &&
         minimum(b1)[i] < minimum(b2)[i] || return false
@@ -21,7 +21,7 @@ function overlaps{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2
     true
 end
 
-function starts{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
+function starts(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) where {T1, T2, N}
     if minimum(b1) == minimum(b2)
         for i = 1:N
             maximum(b1)[i] < maximum(b2)[i] || return false
@@ -32,7 +32,7 @@ function starts{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
     end
 end
 
-function during{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
+function during(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) where {T1, T2, N}
     for i = 1:N
         maximum(b1)[i] < maximum(b2)[i] && minimum(b1)[i] > minimum(b2)[i] ||
         return false
@@ -40,7 +40,7 @@ function during{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
     true
 end
 
-function finishes{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
+function finishes(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) where {T1, T2, N}
     if maximum(b1) == maximum(b2)
         for i = 1:N
             minimum(b1)[i] > minimum(b2)[i] || return false
@@ -87,7 +87,7 @@ Check if HyperRectangles are contained in each other. This does not use
 strict inequality, so HyperRectangles may share faces and this will still
 return true.
 """
-function contains{T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2})
+function contains(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) where {T1, T2, N}
     for i = 1:N
         maximum(b2)[i] <= maximum(b1)[i] && minimum(b2)[i] >= minimum(b1)[i] ||
         return false
@@ -99,7 +99,7 @@ end
 Check if a point is contained in a HyperRectangle. This will return true if
 the point is on a face of the HyperRectangle.
 """
-function contains{T, N}(b1::HyperRectangle{N, T}, pt::Union{FixedVector, AbstractVector})
+function contains(b1::HyperRectangle{N, T}, pt::Union{FixedVector, AbstractVector}) where {T, N}
     for i = 1:N
         pt[i] <= maximum(b1)[i] && pt[i] >= minimum(b1)[i] || return false
     end
@@ -126,14 +126,14 @@ in(pt::Union{FixedVector, AbstractVector}, b1::HyperRectangle) = contains(b1, pt
 #
 
 ==(a::AbstractMesh, b::AbstractMesh) = false
-function =={M <: AbstractMesh}(a::M, b::M)
+function ==(a::M, b::M) where M <: AbstractMesh
     for ((ka, va), (kb, vb)) in zip(all_attributes(a), all_attributes(b))
         va != vb && return false
     end
     true
 end
 
-(==){T1, T2, N}(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) =
+(==)(b1::HyperRectangle{N, T1}, b2::HyperRectangle{N, T2}) where {T1, T2, N} =
     minimum(b1) == minimum(b2) && widths(b1) == widths(b2)
 
 

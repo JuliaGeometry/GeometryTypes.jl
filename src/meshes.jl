@@ -1,10 +1,10 @@
 
-_eltype{T <: AbstractArray}(::Type{T}) = eltype(T)
-_eltype{T}(::Type{T}) = T
+_eltype(::Type{T}) where {T <: AbstractArray} = eltype(T)
+_eltype(::Type{T}) where {T} = T
 for (i, field) in enumerate((:vertextype, :facetype, :normaltype,
                        :texturecoordinatetype, :colortype))
     @eval begin
-        $field{T <: HomogenousMesh}(t::Type{T}) = _eltype(fieldtype(t, $i))
+        $field(t::Type{T}) where {T <: HomogenousMesh} = _eltype(fieldtype(t, $i))
         $field(mesh::HomogenousMesh) = $field(typeof(mesh))
     end
 end
@@ -23,7 +23,7 @@ colors(msh) = msh.color
 
 
 # Bad, bad name! But it's a little tricky to filter out faces and verts from the attributes, after get_attribute
-function attributes_noVF{T <: AbstractMesh}(m::T)
+function attributes_noVF(m::T) where T <: AbstractMesh
     fielddict = Dict{Symbol, Any}(map(fieldnames(T)[3:end]) do field
         field => getfield(m, field)
     end)
@@ -36,26 +36,26 @@ function attributes(m::AbstractMesh)
     filter((key,val) -> (val != nothing && val != Void[]), all_attributes(m))
 end
 #Gets all non Void attributes types from a mesh type fieldname => ValueType
-function attributes{M <: HMesh}(m::Type{M})
+function attributes(m::Type{M}) where M <: HMesh
     filter((key,val) -> (val != Void && val != Vector{Void}), all_attributes(M))
 end
 
-function all_attributes{M <: HMesh}(m::Type{M})
+function all_attributes(m::Type{M}) where M <: HMesh
     Dict{Symbol, Any}(map(field -> (field => fieldtype(M, field)), fieldnames(M)))
 end
-function all_attributes{M <: HMesh}(m::M)
+function all_attributes(m::M) where M <: HMesh
     Dict{Symbol, Any}(map(field -> (field => getfield(m, field)),  fieldnames(M)))
 end
 
 # Needed to not get into an stack overflow
-convert{M <: AbstractMesh}(::Type{M}, mesh::Union{AbstractGeometry, AbstractMesh}) = M(mesh)
+convert(::Type{M}, mesh::Union{AbstractGeometry, AbstractMesh}) where {M <: AbstractMesh} = M(mesh)
 convert(::Type{T}, mesh::T) where T <: AbstractMesh = mesh
 # (::Type{HM1}){HM1 <: AbstractMesh}(mesh::HM1) = mesh
 
 
-isvoid{T}(::Type{T}) = false
+isvoid(::Type{T}) where {T} = false
 isvoid(::Type{Void}) = true
-isvoid{T}(::Type{Vector{T}}) = isvoid(T)
+isvoid(::Type{Vector{T}}) where {T} = isvoid(T)
 
 @generated function (::Type{HM1})(primitive::HM2) where {HM1 <: HomogenousMesh, HM2 <: HomogenousMesh}
     fnames = fieldnames(HM1)
@@ -80,14 +80,14 @@ end
 #Should be:
 #function call{M <: HMesh, VT <: Point, FT <: Face}(::Type{M}, vertices::Vector{VT}, faces::Vector{FT})
 # Haven't gotten around to implement the types correctly with abstract types in FixedSizeArrays
-function (::Type{M}){M <: HMesh, VT, FT <: Face}(
+function (::Type{M})(
         vertices::Vector{Point{3, VT}}, faces::Vector{FT}
-    )
+    ) where {M <: HMesh, VT, FT <: Face}
     msh = PlainMesh{VT, FT}(vertices = vertices, faces = faces)
     convert(M, msh)
 end
 get_default(x::Union{Type, TypeVar}) = nothing
-get_default{X <: Array}(x::Type{X}) = Void[]
+get_default(x::Type{X}) where {X <: Array} = Void[]
 
 """
 generic constructor for abstract HomogenousMesh, infering the types from the keywords (which have to match the field names)
@@ -104,12 +104,12 @@ end
 """
 Creates a mesh from keyword arguments, which have to match the field types of the given concrete mesh
 """
-(::Type{M}){M <: HMesh}(; kw_args...) = M(Dict{Symbol, Any}(kw_args))
+(::Type{M})(; kw_args...) where {M <: HMesh} = M(Dict{Symbol, Any}(kw_args))
 
 """
 Creates a new mesh from a dict of `fieldname => value` and converts the types to the given meshtype
 """
-function (::Type{M}){M <: HMesh}(attribs::Dict{Symbol, Any})
+function (::Type{M})(attribs::Dict{Symbol, Any}) where M <: HMesh
     newfields = map(fieldnames(HomogenousMesh)) do field
         target_type = fieldtype(M, field)
         default = fieldtype(HomogenousMesh, field) <: Vector ? Void[] : nothing
@@ -121,7 +121,7 @@ end
 """
 Creates a new mesh from an old one, with changed attributes given by the keyword arguments
 """
-function (::Type{M}){M <: HMesh}(mesh::AbstractMesh, attributes::Dict{Symbol, Any})
+function (::Type{M})(mesh::AbstractMesh, attributes::Dict{Symbol, Any}) where M <: HMesh
     newfields = map(fieldnames(HomogenousMesh)) do field
         get(attributes, field, getfield(mesh, field))
     end
@@ -130,7 +130,7 @@ end
 """
 Creates a new mesh from an old one, with a new constant attribute (like a color)
 """
-function (::Type{HM}){HM <: HMesh, ConstAttrib}(mesh::AbstractMesh, constattrib::ConstAttrib)
+function (::Type{HM})(mesh::AbstractMesh, constattrib::ConstAttrib) where {HM <: HMesh, ConstAttrib}
     result = Dict{Symbol, Any}()
     for (field, target_type) in zip(fieldnames(HM), HM.parameters)
         if target_type <: ConstAttrib
@@ -150,13 +150,13 @@ end
 """
 Creates a new mesh from a tuple of a geometry type and a constant attribute
 """
-function (::Type{HM}){HM <: HMesh, ConstAttrib, P<:AbstractGeometry}(x::Tuple{P, ConstAttrib})
+function (::Type{HM})(x::Tuple{P, ConstAttrib}) where {HM <: HMesh, ConstAttrib, P<:AbstractGeometry}
     any, const_attribute = x
     add_attribute(HM(any), const_attribute)
 end
 
 
-merge{M <: AbstractMesh}(m::Vector{M}) = merge(m...)
+merge(m::Vector{M}) where {M <: AbstractMesh} = merge(m...)
 
 """
 Merges an arbitrary mesh. This function probably doesn't work for all types of meshes
@@ -164,7 +164,7 @@ parameters:
 `m1` first mesh
 `meshes...` other meshes
 """
-function merge{M <: AbstractMesh}(m1::M, meshes::M...)
+function merge(m1::M, meshes::M...) where M <: AbstractMesh
     v = copy(m1.vertices)
     f = copy(m1.faces)
     attribs = deepcopy(attributes_noVF(m1))
@@ -184,10 +184,10 @@ end
 A mesh with one constant attribute can be merged as an attribute mesh.
 Possible attributes are FSArrays
 """
-function merge{_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}(
+function merge(
         m1::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6},
         meshes::HMesh{_1, _2, _3, _4, ConstAttrib, _5, _6}...
-    )
+    ) where {_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}
     vertices     = copy(m1.vertices)
     faces        = copy(m1.faces)
     attribs      = Dict{Symbol, Any}(filter((k,v) -> k != :color, attributes_noVF(m1)))
@@ -217,8 +217,8 @@ end
 struct MeshMulFunctor{T}
     matrix::Mat{4,4,T}
 end
-(m::MeshMulFunctor{T}){T}(vert) = Vec{3, T}(m.matrix*Vec{4, T}(vert..., 1))
-function *{T}(m::Mat{4,4,T}, mesh::AbstractMesh)
+(m::MeshMulFunctor{T})(vert) where {T} = Vec{3, T}(m.matrix*Vec{4, T}(vert..., 1))
+function *(m::Mat{4,4,T}, mesh::AbstractMesh) where T
     msh = deepcopy(mesh)
     map!(MeshMulFunctor(m), msh.vertices)
     msh

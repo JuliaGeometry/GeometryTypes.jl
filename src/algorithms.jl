@@ -7,11 +7,11 @@ normals{VT,FD,FT,FO}(vertices::Vector{Point{3, VT}},
 
 Compute all vertex normals.
 """
-function normals{VT, F <: Face}(
+function normals(
         vertices::AbstractVector{Point{3, VT}},
         faces::AbstractVector{F},
         NT = Normal{3, VT}
-    )
+    ) where {VT, F <: Face}
     normals_result = zeros(Point{3, VT}, length(vertices)) # initilize with same type as verts but with 0
     for face in faces
         v = vertices[face]
@@ -34,7 +34,7 @@ Slice an AbstractMesh at the specified Z axis value.
 Returns a Vector of LineSegments generated from the faces at the specified
 heights. Note: This will not slice in-plane faces.
 """
-function slice{VT<:AbstractFloat,FT<:Integer}(mesh::AbstractMesh{Point{3,VT}, Face{3, FT}}, height::Number)
+function slice(mesh::AbstractMesh{Point{3,VT}, Face{3, FT}}, height::Number) where {VT<:AbstractFloat,FT<:Integer}
 
     height_ct = length(height)
     # intialize the LineSegment array
@@ -97,7 +97,7 @@ checkbounds{VT,FT,FD,FO}(m::AbstractMesh{VT,Face{FD,FT,FO}})
 Check the `Face` indices to ensure they are in the bounds of the vertex
 array of the `AbstractMesh`.
 """
-function Base.checkbounds{VT, FD, FT}(m::AbstractMesh{VT, Face{FD, FT}})
+function Base.checkbounds(m::AbstractMesh{VT, Face{FD, FT}}) where {VT, FD, FT}
     isempty(faces(m)) && return true # nothing to worry about I guess
     flat_inds = reinterpret(FT, faces(m))
     checkbounds(Bool, vertices(m), flat_inds)

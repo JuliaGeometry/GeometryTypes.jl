@@ -13,7 +13,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 =#
 
-function area{N, T}(contour::AbstractVector{Point{N, T}})
+function area(contour::AbstractVector{Point{N, T}}) where {N, T}
     n = length(contour)
     A = zero(T)
     p=n; q=1
@@ -28,7 +28,7 @@ end
  InsideTriangle decides if a point P is Inside of the triangle
  defined by A, B, C.
 """
-function InsideTriangle{T<:Point}(A::T, B::T, C::T, P::T)
+function InsideTriangle(A::T, B::T, C::T, P::T) where T<:Point
     a = C-B; b = A-C; c = B-A
     ap = P-A; bp = P-B; cp = P-C
     a_bp = a[1]*bp[2] - a[2]*bp[1];
@@ -38,9 +38,9 @@ function InsideTriangle{T<:Point}(A::T, B::T, C::T, P::T)
     return ((a_bp >= t0) && (b_cp >= t0) && (c_ap >= t0))
 end
 
-function snip{N, T}(
+function snip(
         contour::AbstractVector{Point{N, T}}, u, v, w, n, V
-    )
+    ) where {N, T}
     A = contour[V[u]]
     B = contour[V[v]]
     C = contour[V[w]]
@@ -68,9 +68,9 @@ end
 Triangulates a Polygon given as a `contour`::AbstractArray{Point} without holes.
 It will return a Vector{`facetype`}, defining indexes into `contour`
 """
-function polygon2faces{P<:Point}(
+function polygon2faces(
         contour::AbstractArray{P}, facetype = GLTriangle
-    )
+    ) where P<:Point
     #= allocate and initialize list of Vertices in polygon =#
     result = facetype[]
 
@@ -127,19 +127,19 @@ function polygon2faces{P<:Point}(
     return result
 end
 
-function topoint{T}(::Type{Point{3, T}}, p::Point{2, T})
+function topoint(::Type{Point{3, T}}, p::Point{2, T}) where T
     Point{3, T}(p[1], p[2], T(0))
 end
-function topoint{T}(::Type{Point{3, T}}, p::Point{3, T})
+function topoint(::Type{Point{3, T}}, p::Point{3, T}) where T
     p
 end
-function topoint{T}(::Type{Point{2, T}}, p::Point{3, T})
+function topoint(::Type{Point{2, T}}, p::Point{3, T}) where T
     Point{2, T}(p[1], p[2])
 end
 
-function (::Type{M}){M <: AbstractMesh, P <: Point}(
+function (::Type{M})(
         points::AbstractArray{P}
-    )
+    ) where {M <: AbstractMesh, P <: Point}
     faces = polygon2faces(points, facetype(M))
     VT = vertextype(M)
     M(faces = faces, vertices = VT[topoint(VT, p) for p in points])

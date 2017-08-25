@@ -83,7 +83,7 @@ No documentation found.
 **Summary:**
 
 ```julia
-abstract GeometryTypes.AbstractMesh{VertT,FaceT} <: GeometryTypes.GeometryPrimitive{N,T}
+abstract type GeometryTypes.AbstractMesh{VertT,FaceT} <: GeometryTypes.GeometryPrimitive{N,T} end
 ```
 
 **Subtypes:**
@@ -99,7 +99,7 @@ No documentation found.
 **Summary:**
 
 ```julia
-abstract GeometryTypes.AbstractDistanceField <: Any
+abstract type GeometryTypes.AbstractDistanceField <: Any end
 ```
 
 **Subtypes:**

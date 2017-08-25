@@ -2,34 +2,34 @@
 # We need this constructor to route around the FixedSizeArray `call` and
 # so Simplex(Pt, Pt...) etc works. Hopefully these ambiguities will be fixed in
 # forthcoming Julia versions.
-function (::Type{S}){S <: Simplex}(sv::StaticVector)
+function (::Type{S})(sv::StaticVector) where S <: Simplex
     Simplex{1, typeof(sv)}((sv,))
 end
 
-@inline function (::Type{Simplex{S, T}}){S, T}(x)
+@inline function Simplex{S, T}(x) where {S, T}
     Simplex{S, T}(ntuple(i-> T(x), Val{S}))
 end
-@inline function (::Type{Simplex{S}}){S, T}(x::T)
+@inline function Simplex{S}(x::T) where {S, T}
     Simplex{S, T}(ntuple(i-> x, Val{S}))
 end
-@inline function (::Type{Simplex{1, T}}){T}(x::T)
+@inline function Simplex{1, T}(x::T) where T
     Simplex{1, T}((x,))
 end
-@inline (::Type{Simplex}){S}(x::NTuple{S}) = Simplex{S}(x)
-@inline function (::Type{Simplex{S}}){S, T <: Tuple}(x::T)
+@inline Simplex(x::NTuple{S}) where {S} = Simplex{S}(x)
+@inline function Simplex{S}(x::T) where {S, T <: Tuple}
     Simplex{S, StaticArrays.promote_tuple_eltype(T)}(x)
 end
 
-Base.@pure Base.size{S}(::Union{Simplex{S}, Type{Simplex{S}}}) = (S, )
-Base.@pure Base.size{S,T}(::Type{Simplex{S, T}}) = (S,)
+Base.@pure Base.size(::Union{Simplex{S}, Type{Simplex{S}}}) where {S} = (S, )
+Base.@pure Base.size(::Type{Simplex{S, T}}) where {S,T} = (S,)
 
 Base.@propagate_inbounds function Base.getindex(v::Simplex, i::Int)
     v.data[i]
 end
 @inline Base.Tuple(v::Simplex) = v.data
-@inline Base.convert{S, T}(::Type{Simplex{S, T}}, x::NTuple{S, T}) = Simplex{S, T}(x)
+@inline Base.convert(::Type{Simplex{S, T}}, x::NTuple{S, T}) where {S, T} = Simplex{S, T}(x)
 # @inline Base.convert{SV <: Simplex}(::Type{SV}, x::StaticVector) = SV(x)
-@inline function Base.convert{S, T}(::Type{Simplex{S, T}}, x::Tuple)
+@inline function Base.convert(::Type{Simplex{S, T}}, x::Tuple) where {S, T}
     Simplex{S, T}(convert(NTuple{S, T}, x))
 end
 # StaticArrays.similar_type{SV <: Simplex}(::Union{SV, Type{SV}}) = Simplex
@@ -39,7 +39,7 @@ end
 # function StaticArrays.similar_type{SV <: Simplex}(::Union{SV, Type{SV}}, s::Tuple{Int})
 #     Simplex{s[1], eltype(SV)}
 # end
-function StaticArrays.similar_type{T, S}(::Union{Simplex, Type{Simplex}}, ::Type{T}, s::Size{S})
+function StaticArrays.similar_type(::Union{Simplex, Type{Simplex}}, ::Type{T}, s::Size{S}) where {T, S}
     Simplex{S[1], T}
 end
 
@@ -86,7 +86,7 @@ end
 
 translation(s::Simplex) = first(vertices(s))
 
-@generated function edgespan{m, T}(s::Simplex{m, T})
+@generated function edgespan(s::Simplex{m, T}) where {m, T}
     M = m - 1; N = length(T)
     ET = eltype(T)
     init = quote
@@ -115,7 +115,7 @@ simplex_face(s::Simplex, i::Int) = Simplex(deleteat(vertices(s), i))
 """
 proj_sqdist{T}(pt::T, s::LineSegment{T}, best_sqd=eltype(T)(Inf))
 """
-function proj_sqdist{T}(pt::T, s::LineSegment{T}, best_sqd=Inf)
+function proj_sqdist(pt::T, s::LineSegment{T}, best_sqd=Inf) where T
     v0, v1 = vertices(s)
     pt = pt - v0
     v = v1 - v0
@@ -143,7 +143,7 @@ distance is greater then best_sqd, the behaviour of pt_proj is not defined.
 distance is greater then best_sqd is returned instead.
 
 """
-function proj_sqdist{nv,T}(pt::T, s::Simplex{nv,T}, best_sqd=Inf)
+function proj_sqdist(pt::T, s::Simplex{nv,T}, best_sqd=Inf) where {nv,T}
     w = weights(pt, s)
     best_proj = Vec(vertexmat(s) * w)
     # at this point best_proj lies in the subspace spanned by s,
@@ -178,6 +178,6 @@ end
 """
 proj_sqdist{T}(pt::T, s::Simplex{1, T}, best_sqd=eltype(T)(Inf))
 """
-@inline function proj_sqdist{T}(pt::T, s::Simplex{1, T}, best_sqd=Inf)
+@inline function proj_sqdist(pt::T, s::Simplex{1, T}, best_sqd=Inf) where T
     proj_sqdist(pt, translation(s), best_sqd)
 end
