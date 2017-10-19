@@ -41,6 +41,7 @@ isdecomposable(::Type{T}, ::Type{HR}) where {T<:Normal, HR<:SimpleRectangle} = t
 
 isdecomposable(::Type{T}, ::Type{HR}) where {T<:Point, HR <: HyperSphere} = true
 isdecomposable(::Type{T}, ::Type{HR}) where {T<:Face, HR <: HyperSphere} = true
+isdecomposable(::Type{T}, ::Type{HR}) where {T<:TextureCoordinate, HR <: HyperSphere} = true
 
 """
 ```
@@ -369,6 +370,17 @@ function decompose(PT::Type{Point{N,T}}, s::Sphere, facets=12) where {N,T}
     end
     vertices
 end
+
+function decompose(PT::Type{UV{T}}, s::Sphere, facets = 12) where T
+    vertices = decompose(Point{3, T}, s, facets)
+    o5 = T(0.5)
+    map(vertices) do n
+        u = atan2(n[1], n[3]) / T(2*pi) + o5
+        v = n[2] * o5 + o5
+        UV{Float32}(u, v)
+    end
+end
+
 function decompose(::Type{FT}, s::Sphere, facets=12) where FT <: Face
     indexes          = Vector{FT}(facets * facets * 2)
     FTE              = eltype(FT)
