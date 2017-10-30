@@ -38,10 +38,10 @@ function intersects(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}}) wher
     x = det(MT(d1, v1[1] - v2[1], d2, v3[1] - v4[1])) / a;
     y = det(MT(d1, v1[2] - v2[2], d2, v3[2] - v4[2])) / a;
 
-    (x < prevfloat(min(v1[1], v2[1])) || prevfloat(x) > max(v1[1], v2[1]) + eps(T)) && return false, p0
-    (y < prevfloat(min(v1[2], v2[2])) || prevfloat(y) > max(v1[2], v2[2]) + eps(T)) && return false, p0
-    (x < prevfloat(min(v3[1], v4[1])) || prevfloat(x) > max(v3[1], v4[1]) + eps(T)) && return false, p0
-    (y < prevfloat(min(v3[2], v4[2])) || prevfloat(y) > max(v3[2], v4[2]) + eps(T)) && return false, p0
+    (x < prevfloat(min(v1[1], v2[1])) || x > nextfloat(max(v1[1], v2[1]))) && return false, p0
+    (y < prevfloat(min(v1[2], v2[2])) || y > nextfloat(max(v1[2], v2[2]))) && return false, p0
+    (x < prevfloat(min(v3[1], v4[1])) || x > nextfloat(max(v3[1], v4[1]))) && return false, p0
+    (y < prevfloat(min(v3[2], v4[2])) || y > nextfloat(max(v3[2], v4[2]))) && return false, p0
 
     return true, Point{N,T}(x, y)
 end
