@@ -169,6 +169,7 @@ function (t::Type{HyperRectangle{N1, T1}})(
     vmin = Point{N2, T2}(typemax(T2))
     vmax = Point{N2, T2}(typemin(T2))
     for p in geometry
+        isnan(p) && continue
         vmin = min.(p, vmin)
         vmax = max.(p, vmax)
     end
