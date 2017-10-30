@@ -18,7 +18,7 @@ function normals(
         # we can get away with two edges since faces are planar.
         a = v[2] - v[1]
         b = v[3] - v[1]
-        n = cross(a,b)
+        n = cross(a, b)
         for i =1:length(F)
             fi = face[i]
             normals_result[fi] = normals_result[fi] + n
