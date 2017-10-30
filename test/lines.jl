@@ -8,6 +8,18 @@
         a = LineSegment(Point2f0(0,0), Point2f0(0.499,0))
         b = LineSegment(Point2f0(0.5,0.5), Point2f0(0.5,-0.5))
         @test intersects(a,b) == (false, zero(Point2f0))
+
+
+        l = LineSegment(Point(6.0,11), Point(12.0,11))
+        r1 = LineSegment(Point(9.0,10.0), Point(9.0, 13.0))
+        r2 = LineSegment(Point(9.34365, 10.890), Point(9.34365, 13.402))
+        intersect, p = intersects(l, r2)
+        @test intersect
+        @test p ≈ Point(9.34365, 11.0)
+        intersect, p = intersects(l, r1)
+        @test intersect
+        @test p == Point(9.0, 11.0)
+
     end
     @testset "poly self intersections" begin
         p1 = Point2f0[(x, sin(x)) for x in 0:.5:6]
