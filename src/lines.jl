@@ -33,8 +33,8 @@ function intersects(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}}) wher
     ))
     (abs(a) < eps(T)) && return false, p0 # Lines are parallel
 
-    d1 = det(MT(v1..., v2...))
-    d2 = det(MT(v3..., v4...))
+    d1 = det(MT(v1[1], v1[2], v2[1], v2[2]))
+    d2 = det(MT(v3[1], v3[2], v4[1], v4[2]))
     x = det(MT(d1, v1[1] - v2[1], d2, v3[1] - v4[1])) / a;
     y = det(MT(d1, v1[2] - v2[2], d2, v3[2] - v4[2])) / a;
 
