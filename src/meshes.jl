@@ -1,20 +1,21 @@
-
 _eltype(::Type{T}) where {T <: AbstractArray} = eltype(T)
 _eltype(::Type{T}) where {T} = T
 for (i, field) in enumerate((:vertextype, :facetype, :normaltype,
-                       :texturecoordinatetype, :colortype))
+                       :texturecoordinatetype, :colortype, :attribute_idtype))
     @eval begin
         $field(t::Type{T}) where {T <: HomogenousMesh} = _eltype(fieldtype(t, $i))
         $field(mesh::HomogenousMesh) = $field(typeof(mesh))
     end
 end
 
+hasattribute_id(msh) = attribute_idtype(msh) != Void
 hasvertices(msh) = vertextype(msh) != Void
 hasfaces(msh) = facetype(msh) != Void
 hasnormals(msh) = normaltype(msh) != Void
 hastexturecoordinates(msh) = texturecoordinatetype(msh) != Void
 hascolors(msh) = colortype(msh) != Void
 
+attribute_id(msh) = msh.attribute_id
 vertices(msh) = msh.vertices
 faces(msh) = msh.faces
 normals(msh) = msh.normals
