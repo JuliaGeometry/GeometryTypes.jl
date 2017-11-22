@@ -99,6 +99,21 @@ function *(m::Mat{N1,N1,T1}, h::HyperRectangle{N2, T2}) where {N1,N2,T1,T2}
     HyperRectangle{N2, T}(vmin, vmax - vmin)
 end
 
+
+function -(h::HyperRectangle{N, T}, move::Vec{N}) where {N,T}
+    HyperRectangle{N, T}(minimum(h) .- move, widths(h))
+end
+function +(h::HyperRectangle{N, T}, move::Vec{N}) where {N,T}
+    HyperRectangle{N, T}(minimum(h) .+ move, widths(h))
+end
+
+function -(h::SimpleRectangle{T}, move::Vec{2}) where T
+    SimpleRectangle{T}((minimum(h) .- move)..., widths(h)...)
+end
+function +(h::SimpleRectangle{T}, move::Vec{2}) where T
+    SimpleRectangle{T}((minimum(h) .+ move)..., widths(h)...)
+end
+
 function *(m::Mat{N,N,T1}, h::HyperRectangle{N,T2}) where {N,T1,T2}
     # equal dimension case
 
