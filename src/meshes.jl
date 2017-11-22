@@ -220,6 +220,6 @@ end
 (m::MeshMulFunctor{T})(vert) where {T} = Vec{3, T}(m.matrix*Vec{4, T}(vert..., 1))
 function *(m::Mat{4,4,T}, mesh::AbstractMesh) where T
     msh = deepcopy(mesh)
-    map!(MeshMulFunctor(m), msh.vertices)
+    map!(MeshMulFunctor(m), msh.vertices, msh.vertices)
     msh
 end
