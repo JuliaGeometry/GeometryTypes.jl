@@ -155,27 +155,26 @@ end
     @test points == point_target
 
     faces = decompose(GLTriangle, sphere, 3)
-    face_target = NTuple{3, Cuint}[
-        (0,3,1)
-        (1,3,4)
-        (3,6,4)
-        (4,6,7)
-        (6,0,7)
-        (7,0,1)
-        (1,4,2)
-        (2,4,5)
-        (4,7,5)
-        (5,7,8)
-        (7,1,8)
-        (8,1,2)
-        (2,5,9)
-        (9,5,9)
-        (5,8,9)
-        (9,8,9)
-        (8,2,9)
-        (9,2,9)
+    face_target = GLTriangle[
+        (4, 1, 2),
+        (4, 2, 5),
+        (7, 4, 5),
+        (7, 5, 8),
+        (1, 7, 8),
+        (1, 8, 2),
+        (5, 2, 3),
+        (5, 3, 6),
+        (8, 5, 6),
+        (8, 6, 9),
+        (2, 8, 9),
+        (2, 9, 3),
+        (6, 3, 10),
+        (6, 10, 10),
+        (9, 6, 10),
+        (9, 10, 10),
+        (3, 9, 10),
+        (3, 10, 10),
     ]
-    face_target = reinterpret(GLTriangle, face_target)
     @test faces == face_target
 
     points = decompose(Point2f0, Circle(Point2f0(0), 0f0), 20)
