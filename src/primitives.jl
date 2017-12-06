@@ -21,6 +21,23 @@ function (meshtype::Type{T})(c::GeometryPrimitive, args...) where T <: AbstractM
     T(newattribs)
 end
 
+function to_pointn(::Type{Point{N, T}}, p::StaticVector{N2}, d = T(0)) where {T, N, N2}
+    Point(ntuple(i-> i <= N2 ? p[i] : d, Val{N}))
+end
+
+function (::Type{T})(c::Circle, n = 32) where T <: AbstractMesh
+    newattribs = Dict{Symbol, Any}()
+    VT = vertextype(T)
+    verts = decompose(VT, c)
+    N = length(verts)
+    push!(verts, to_pointn(VT, origin(c))) # middle point
+    middle_idx = length(verts)
+    FT = facetype(T)
+    faces = map(1:N) do i
+        FT(i, middle_idx, i + 1)
+    end
+    T(vertices = verts, faces = faces)
+end
 
 function (meshtype::Type{T})(
         c::Union{HyperCube{3,T}, HyperRectangle{3,HT}}
