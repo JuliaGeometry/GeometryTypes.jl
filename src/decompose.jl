@@ -393,8 +393,8 @@ function decompose(::Type{FT}, s::Sphere, facets=12) where FT <: Face
             i2 = sub2ind((facets,), j, next_index)
             i3 = (j != facets) ? sub2ind((facets,), j + 1, i) : psydo_triangle_i
             i6 = (j != facets) ? sub2ind((facets,), j + 1, next_index) : psydo_triangle_i
-            indexes[index] = FT(i1, i2, i3) # convert to required Face index offset
-            indexes[index + 1] = FT(i3, i2, i6)
+            indexes[index] = FT(i2, i1, i3) # convert to required Face index offset
+            indexes[index + 1] = FT(i2, i3, i6)
             index += 2
         end
     end
