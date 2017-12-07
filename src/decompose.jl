@@ -53,7 +53,6 @@ Triangulate an N-Face into a tuple of triangular faces.
 @generated function decompose(::Type{Face{3, FT1}},
                           f::Face{N, FT2}) where {N, FT1, FT2}
     3 <= N || error("decompose not implented for N <= 3 yet. N: $N")# other wise degenerate
-
     v = Expr(:tuple)
     for i = 3:N
         push!(v.args, :(Face{3, FT1}(f[1], f[$(i-1)], f[$i])))
@@ -341,13 +340,20 @@ end
 
 
 
-spherical(theta::T, phi::T) where {T} = Point{3, T}(
-    sin(theta)*cos(phi),
-    sin(theta)*sin(phi),
-    cos(theta)
-)
+function spherical(theta::T, phi::T) where {T}
+    Point{3, T}(
+        sin(theta)*cos(phi),
+        sin(theta)*sin(phi),
+        cos(theta)
+    )
+end
 
-function decompose(PT::Type{Point{2,T}}, s::Circle, n=32) where T
+function decompose(PT::Type{Point{3, T}}, s::Circle, n=64) where T
+    points2d = decompose(Point{2, T}, s, n)
+    map(x-> Point{3, T}(x[1], x[2], 0), points2d)
+end
+
+function decompose(PT::Type{Point{2,T}}, s::Circle, n=64) where T
     rad = radius(s)
     map(linspace(T(0), T(2pi), n)) do fi
         PT(
@@ -357,7 +363,7 @@ function decompose(PT::Type{Point{2,T}}, s::Circle, n=32) where T
     end
 end
 
-function decompose(PT::Type{Point{N,T}}, s::Sphere, facets=12) where {N,T}
+function decompose(PT::Type{Point{N,T}}, s::Sphere, facets=24) where {N,T}
     vertices = Vector{PT}(facets*facets+1)
     vertices[end] = PT(s.center) - PT(0,0,radius(s)) #Create a vertex for last triangle fan
     for j=1:facets
@@ -371,7 +377,7 @@ function decompose(PT::Type{Point{N,T}}, s::Sphere, facets=12) where {N,T}
     vertices
 end
 
-function decompose(PT::Type{UV{T}}, s::Sphere, facets = 12) where T
+function decompose(PT::Type{UV{T}}, s::Sphere, facets = 24) where T
     vertices = decompose(Point{3, T}, s, facets)
     o5 = T(0.5)
     map(vertices) do n
@@ -381,7 +387,7 @@ function decompose(PT::Type{UV{T}}, s::Sphere, facets = 12) where T
     end
 end
 
-function decompose(::Type{FT}, s::Sphere, facets=12) where FT <: Face
+function decompose(::Type{FT}, s::Sphere, facets=24) where FT <: Face
     indexes          = Vector{FT}(facets * facets * 2)
     FTE              = eltype(FT)
     psydo_triangle_i = facets*facets+1
