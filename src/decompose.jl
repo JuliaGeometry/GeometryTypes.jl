@@ -363,14 +363,14 @@ function decompose(PT::Type{Point{2,T}}, s::Circle, n=64) where T
     end
 end
 
-function decompose(PT::Type{Point{N,T}}, s::Sphere, facets=24) where {N,T}
+function decompose(PT::Type{Point{N,T}}, s::Sphere, facets = 24) where {N,T}
     vertices = Vector{PT}(facets*facets+1)
     vertices[end] = PT(s.center) - PT(0,0,radius(s)) #Create a vertex for last triangle fan
-    for j=1:facets
+    for j = 1:facets
         theta = T((pi*(j-1))/facets)
-        for i=1:facets
-            position           = sub2ind((facets,), j, i)
-            phi                = T((2*pi*(i-1))/facets)
+        for i = 1:facets
+            position = sub2ind((facets,), j, i)
+            phi = T((2*pi*(i-1))/facets)
             vertices[position] = (spherical(theta, phi)*T(s.r))+PT(s.center)
         end
     end
@@ -387,12 +387,12 @@ function decompose(PT::Type{UV{T}}, s::Sphere, facets = 24) where T
     end
 end
 
-function decompose(::Type{FT}, s::Sphere, facets=24) where FT <: Face
+function decompose(::Type{FT}, s::Sphere, facets = 24) where FT <: Face
     triangles = decompose(Face{3, eltype(FT)}, s, facets)
     decompose(FT, triangles)
 end
 
-function decompose(::Type{FT}, s::Sphere, facets=24) where FT <: Face{3}
+function decompose(::Type{FT}, s::Sphere, facets = 24) where FT <: Face{3}
     indexes          = Vector{FT}(facets * facets * 2)
     FTE              = eltype(FT)
     psydo_triangle_i = facets*facets+1

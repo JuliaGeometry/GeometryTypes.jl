@@ -169,7 +169,7 @@ function *(m::Mat{4,4,T}, h::HyperRectangle{3,T}) where T
     HyperRectangle{3,T}(_vmin, _vmax - _vmin)
 end
 
-function HyperRectangle(geometry::Array{Point{N, T}}) where {N,T}
+function HyperRectangle(geometry::AbstractArray{<: Point{N, T}}) where {N,T}
     HyperRectangle{N,T}(geometry)
 end
 
