@@ -388,6 +388,11 @@ function decompose(PT::Type{UV{T}}, s::Sphere, facets = 24) where T
 end
 
 function decompose(::Type{FT}, s::Sphere, facets=24) where FT <: Face
+    triangles = decompose(Face{3, eltype(FT)}, s, facets)
+    decompose(FT, triangles)
+end
+
+function decompose(::Type{FT}, s::Sphere, facets=24) where FT <: Face{3}
     indexes          = Vector{FT}(facets * facets * 2)
     FTE              = eltype(FT)
     psydo_triangle_i = facets*facets+1

@@ -199,6 +199,37 @@ function (t::Type{HyperRectangle{N1, T1}})(
    end
 end
 
+const FaceSubArray{ET} = SubArray{ET, 1, <: AbstractVector, <: Tuple{<: AbstractVector{<: Face}}}
+
+"""
+Construct a HyperRectangle enclosing all points.
+"""
+function (t::Type{HyperRectangle{N1, T1}})(
+        geometry::FaceSubArray{PT}
+    ) where {N1, T1, PT <: Point}
+    N2, T2 = length(PT), eltype(PT)
+    @assert N1 >= N2
+    vmin = Point{N2, T2}(typemax(T2))
+    vmax = Point{N2, T2}(typemin(T2))
+    for tup in geometry
+        for p in tup
+            isnan(p) && continue
+            vmin = min.(p, vmin)
+            vmax = max.(p, vmax)
+        end
+    end
+    o = vmin
+    w = vmax - vmin
+    if N1 > N2
+        z = zero(Vec{N1-N2, T1})
+        return HyperRectangle{N1, T1}(vcat(o, z),
+                                     vcat(w, z))
+    else
+        return HyperRectangle{N1, T1}(o, w)
+   end
+end
+
+
 xwidth(a::SimpleRectangle)  = a.w + a.x
 width(a::SimpleRectangle)  = a.w
 yheight(a::SimpleRectangle) = a.h + a.y
