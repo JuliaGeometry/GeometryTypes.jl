@@ -21,4 +21,8 @@
     @test radius(centered_rect) == 0.5f0
     @test maximum(centered_rect) == Vec3f0(0.5f0)
     @test minimum(centered_rect) == Vec3f0(-0.5f0)
+    s = Sphere(Point3f0(0), 1f0)
+    f = decompose(Face{2, Int}, s, 3)
+    # TODO 54 linesegments for 3 facets is too much.
+    @test length(f) == 54
 end
