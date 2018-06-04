@@ -169,8 +169,23 @@ function *(m::Mat{4,4,T}, h::HyperRectangle{3,T}) where T
     HyperRectangle{3,T}(_vmin, _vmax - _vmin)
 end
 
-function HyperRectangle(geometry::Array{Point{N, T}}) where {N,T}
+function HyperRectangle(geometry::AbstractArray{<: Point{N, T}}) where {N,T}
     HyperRectangle{N,T}(geometry)
+end
+
+@inline function minmax(p::StaticVector, vmin, vmax)
+    isnan(p) && return (vmin, vmax)
+    min.(p, vmin), max.(p, vmax)
+end
+
+# Annoying special case for view(Vector{Point}, Vector{Face})
+@inline function minmax(tup::Tuple, vmin, vmax)
+    for p in tup
+        isnan(p) && continue
+        vmin = min.(p, vmin)
+        vmax = max.(p, vmax)
+    end
+    vmin, vmax
 end
 
 """
@@ -184,9 +199,7 @@ function (t::Type{HyperRectangle{N1, T1}})(
     vmin = Point{N2, T2}(typemax(T2))
     vmax = Point{N2, T2}(typemin(T2))
     for p in geometry
-        isnan(p) && continue
-        vmin = min.(p, vmin)
-        vmax = max.(p, vmax)
+        vmin, vmax = minmax(p, vmin, vmax)
     end
     o = vmin
     w = vmax - vmin
@@ -198,6 +211,8 @@ function (t::Type{HyperRectangle{N1, T1}})(
         return HyperRectangle{N1, T1}(o, w)
    end
 end
+
+
 
 xwidth(a::SimpleRectangle)  = a.w + a.x
 width(a::SimpleRectangle)  = a.w

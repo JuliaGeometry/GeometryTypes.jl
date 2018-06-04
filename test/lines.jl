@@ -27,7 +27,7 @@
         points = vcat(p1, p2)
         inds, intersects = self_intersections(points)
         @test inds == [7,19]
-        @test intersects == Point2f0[(3.1434426,0.0)]
+        @test intersects ≈ Point2f0[(3.1434426,0.0)]
         polys = split_intersections(points)
         @test length(polys) == 2
         @test length(polys[1]) == 12

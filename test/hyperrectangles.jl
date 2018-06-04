@@ -198,7 +198,7 @@ end
         0, 1, 0,
         1, 2, 0
     )
-        
+
     h = t * HyperRectangle(0, 0, 1, 1)
     @test h == HyperRectangle(1, 2, 1, 1)
     t = Mat{2, 2}(0, 1, 1, 0)
@@ -209,6 +209,16 @@ end
     h = centered(HyperRectangle{3, Float32})
     @test h == h
 
+end
+
+@testset "boundingboxes" begin
+    s = Sphere(Point3f0(0), 1f0)
+    f = decompose(Face{2, Int}, s, 3)
+    v = decompose(Point3f0, s, 3)
+    x = view(v, f)
+    bb1 = HyperRectangle(x)
+    bb2 = HyperRectangle(v)
+    @test bb1 == bb2
 end
 
 end
