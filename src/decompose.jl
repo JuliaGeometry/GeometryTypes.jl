@@ -1,3 +1,13 @@
+# Handle https://github.com/JuliaLang/julia/pull/23750
+@static if VERSION >= v"0.7.0-DEV.2083"
+    _reshape_reinterpret(T, X, d...) = reshape(reinterpret(T, X), d...)
+else
+    _reshape_reinterpret(T, X, d...) = reinterpret(T, X, d...)
+end
+# TODO: when we drop support for Julia v0.6, change all instances of
+# _reshape_reinterpret(T, X, d...) to reshape(reinterpret(T, X), d...)
+
+
 """
 Allow to call decompose with unspecified vector type and infer types from
 primitive.
@@ -148,7 +158,7 @@ function decompose(
     w = widths(rect)
     o = origin(rect)
     points = T1[o[j]+((i>>(j-1))&1)*w[j] for j=1:N, i=0:(2^N-1)]
-    reshape(reinterpret(PT, points), (2^N,))
+    _reshape_reinterpret(PT, points, (2^N,))
 end
 """
 Get decompose a `HyperRectangle` into Texture Coordinates.
@@ -161,7 +171,7 @@ function decompose(
     w = Vec{3,T1}(1)
     o = Vec{3,T1}(0)
     points = T1[((i>>(j-1))&1) for j=1:N, i=0:(2^N-1)]
-    reshape(reinterpret(UVWT, points), (8,))
+    _reshape_reinterpret(UVWT, points, (8,))
 end
 decompose(::Type{FT}, faces::Vector{FT}) where {FT<:Face} = faces
 function decompose(::Type{FT1}, faces::Vector{FT2}) where {FT1<:Face, FT2<:Face}
