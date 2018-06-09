@@ -300,7 +300,7 @@ function decompose(T::Type{Normal{3, NT}}, mesh::AbstractMesh) where NT
     n = mesh.normals
     eltype(n) == T && return n
     eltype(n) <: Normal{3} && return map(T, n)
-    (n == Void[] || isempty(n)) && return normals(vertices(mesh), faces(mesh), T)
+    (n == Nothing[] || isempty(n)) && return normals(vertices(mesh), faces(mesh), T)
 end
 
 #Gets the uv attribute to a mesh, or creates it, or converts it
@@ -308,7 +308,7 @@ function decompose(::Type{UV{UVT}}, mesh::AbstractMesh) where UVT
     uv = mesh.texturecoordinates
     eltype(uv) == UV{UVT} && return uv
     (eltype(uv) <: UV || eltype(uv) <: UVW) && return map(UV{UVT}, uv)
-    eltype(uv) == Void && return zeros(UV{UVT}, length(vertices(mesh)))
+    eltype(uv) == Nothing && return zeros(UV{UVT}, length(vertices(mesh)))
 end
 
 

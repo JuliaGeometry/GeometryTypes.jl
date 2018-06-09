@@ -9,11 +9,11 @@ for (i, field) in enumerate((:vertextype, :facetype, :normaltype,
     end
 end
 
-hasvertices(msh) = vertextype(msh) != Void
-hasfaces(msh) = facetype(msh) != Void
-hasnormals(msh) = normaltype(msh) != Void
-hastexturecoordinates(msh) = texturecoordinatetype(msh) != Void
-hascolors(msh) = colortype(msh) != Void
+hasvertices(msh) = vertextype(msh) != Nothing
+hasfaces(msh) = facetype(msh) != Nothing
+hasnormals(msh) = normaltype(msh) != Nothing
+hastexturecoordinates(msh) = texturecoordinatetype(msh) != Nothing
+hascolors(msh) = colortype(msh) != Nothing
 
 vertices(msh) = msh.vertices
 faces(msh) = msh.faces
@@ -28,16 +28,16 @@ function attributes_noVF(m::T) where T <: AbstractMesh
         field => getfield(m, field)
     end)
     return filter(fielddict) do key,val
-        val != nothing && val != Void[]
+        val != nothing && val != Nothing[]
     end
 end
-#Gets all non Void attributes from a mesh in form of a Dict fieldname => value
+#Gets all non Nothing attributes from a mesh in form of a Dict fieldname => value
 function attributes(m::AbstractMesh)
-    filter((key,val) -> (val != nothing && val != Void[]), all_attributes(m))
+    filter((key,val) -> (val != nothing && val != Nothing[]), all_attributes(m))
 end
-#Gets all non Void attributes types from a mesh type fieldname => ValueType
+#Gets all non Nothing attributes types from a mesh type fieldname => ValueType
 function attributes(m::Type{M}) where M <: HMesh
-    filter((key,val) -> (val != Void && val != Vector{Void}), all_attributes(M))
+    filter((key,val) -> (val != Nothing && val != Vector{Nothing}), all_attributes(M))
 end
 
 function all_attributes(m::Type{M}) where M <: HMesh
@@ -54,7 +54,7 @@ convert(::Type{T}, mesh::T) where T <: AbstractMesh = mesh
 
 
 isvoid(::Type{T}) where {T} = false
-isvoid(::Type{Void}) = true
+isvoid(::Type{Nothing}) = true
 isvoid(::Type{Vector{T}}) where {T} = isvoid(T)
 
 @generated function (::Type{HM1})(primitive::HM2) where {HM1 <: HomogenousMesh, HM2 <: HomogenousMesh}
@@ -87,7 +87,7 @@ function (::Type{M})(
     convert(M, msh)
 end
 get_default(x::Union{Type, TypeVar}) = nothing
-get_default(x::Type{X}) where {X <: Array} = Void[]
+get_default(x::Type{X}) where {X <: Array} = Nothing[]
 
 """
 generic constructor for abstract HomogenousMesh, infering the types from the keywords (which have to match the field names)
@@ -112,7 +112,7 @@ Creates a new mesh from a dict of `fieldname => value` and converts the types to
 function (::Type{M})(attribs::Dict{Symbol, Any}) where M <: HMesh
     newfields = map(fieldnames(HomogenousMesh)) do field
         target_type = fieldtype(M, field)
-        default = fieldtype(HomogenousMesh, field) <: Vector ? Void[] : nothing
+        default = fieldtype(HomogenousMesh, field) <: Vector ? Nothing[] : nothing
         get(attribs, field, default)
     end
     M(HomogenousMesh(newfields...))
@@ -135,7 +135,7 @@ function (::Type{HM})(mesh::AbstractMesh, constattrib::ConstAttrib) where {HM <:
     for (field, target_type) in zip(fieldnames(HM), HM.parameters)
         if target_type <: ConstAttrib
             result[field] = constattrib
-        elseif target_type != Void
+        elseif target_type != Nothing
             result[field] = decompose(target_type, mesh)
         end
     end
@@ -209,7 +209,7 @@ function merge(
     attribs[:faces]         = faces
     attribs[:attributes]    = color_attrib
     attribs[:attribute_id]  = index
-    return HMesh{_1, _2, _3, _4, Void, typeof(color_attrib), eltype(index)}(attribs)
+    return HMesh{_1, _2, _3, _4, Nothing, typeof(color_attrib), eltype(index)}(attribs)
 end
 
 # Fast but slightly ugly way to implement mesh multiplication
