@@ -4,6 +4,8 @@ module GeometryTypes
 using StaticArrays
 using StaticArrays.FixedSizeArrays
 using ColorTypes
+using Compat: fieldcount, isconcretetype, LinearIndices
+using Compat.LinearAlgebra
 
 import FixedPointNumbers # U8
 

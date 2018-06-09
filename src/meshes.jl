@@ -1,3 +1,21 @@
+# Gracefully handle the change in `filter(::Function, ::Dict)` from
+# https://github.com/JuliaLang/julia/pull/23311
+@static if VERSION >= v"0.7.0-DEV.1393"
+    function filter_2_arg(f_2_arg, args...)
+        f_1_arg = x -> f_2_arg(x[1], x[2])
+        filter(f_1_arg, args...)
+    end
+else
+    const filter_2_arg = filter
+end
+# TODO: When we drop v0.6, we can change all the calls back to
+# Base.filter. We'll have to change the functions from 2-arg to 1-arg,
+# but that will be easy with the unpacking of function arguments,
+# so we can change:
+#     (k, v) -> foo(k, v)  # 2-argument
+# into:
+#     ((k, v),) -> foo(k, v) # 1-argument with unpacking
+
 
 _eltype(::Type{T}) where {T <: AbstractArray} = eltype(T)
 _eltype(::Type{T}) where {T} = T
@@ -27,17 +45,17 @@ function attributes_noVF(m::T) where T <: AbstractMesh
     fielddict = Dict{Symbol, Any}(map(fieldnames(T)[3:end]) do field
         field => getfield(m, field)
     end)
-    return filter(fielddict) do key,val
+    return filter_2_arg(fielddict) do key,val
         val != nothing && val != Nothing[]
     end
 end
 #Gets all non Nothing attributes from a mesh in form of a Dict fieldname => value
 function attributes(m::AbstractMesh)
-    filter((key,val) -> (val != nothing && val != Nothing[]), all_attributes(m))
+    filter_2_arg((key,val) -> (val != nothing && val != Nothing[]), all_attributes(m))
 end
 #Gets all non Nothing attributes types from a mesh type fieldname => ValueType
 function attributes(m::Type{M}) where M <: HMesh
-    filter((key,val) -> (val != Nothing && val != Vector{Nothing}), all_attributes(M))
+    filter_2_arg((key,val) -> (val != Nothing && val != Vector{Nothing}), all_attributes(M))
 end
 
 function all_attributes(m::Type{M}) where M <: HMesh
@@ -60,11 +78,11 @@ isvoid(::Type{Vector{T}}) where {T} = isvoid(T)
 @generated function (::Type{HM1})(primitive::HM2) where {HM1 <: HomogenousMesh, HM2 <: HomogenousMesh}
     fnames = fieldnames(HM1)
     expr = Expr(:call, HM1)
-    for i in 1:nfields(HM1)
+    for i in 1:fieldcount(HM1)
         field = fnames[i]
         target_type = fieldtype(HM1, i)
         source_type = fieldtype(HM2, i)
-        if !isleaftype(fieldtype(HM1, i))  # target is not defined
+        if !isconcretetype(fieldtype(HM1, i))  # target is not defined
             push!(expr.args, :(getfield(primitive, $(QuoteNode(field)))))
         elseif !isvoid(target_type) && isvoid(source_type) # target not there yet, maybe we can decompose though (e.g. normals)
             push!(expr.args, :(decompose($(HM1.parameters[i]), primitive)))
@@ -169,7 +187,7 @@ function merge(m1::M, meshes::M...) where M <: AbstractMesh
     f = copy(m1.faces)
     attribs = deepcopy(attributes_noVF(m1))
     for mesh in meshes
-        append!(f, mesh.faces + length(v))
+        append!(f, mesh.faces .+ length(v))
         append!(v, mesh.vertices)
         for (v1, v2) in zip(values(attribs), values(attributes_noVF(mesh)))
             append!(v1, v2)
@@ -190,12 +208,12 @@ function merge(
     ) where {_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}
     vertices     = copy(m1.vertices)
     faces        = copy(m1.faces)
-    attribs      = Dict{Symbol, Any}(filter((k,v) -> k != :color, attributes_noVF(m1)))
+    attribs      = Dict{Symbol, Any}(filter_2_arg((k,v) -> k != :color, attributes_noVF(m1)))
     attribs      = Dict{Symbol, Any}([(k, copy(v)) for (k,v) in attribs])
     color_attrib = RGBA{U8}[RGBA{U8}(m1.color)]
     index        = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
     for mesh in meshes
-        append!(faces, mesh.faces + length(vertices))
+        append!(faces, mesh.faces .+ length(vertices))
         append!(vertices, mesh.vertices)
         attribsb = attributes_noVF(mesh)
         for (k,v) in attribsb

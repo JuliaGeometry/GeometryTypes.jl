@@ -43,7 +43,7 @@ An alias for a HyperSphere of dimension 3. i.e. Sphere{T} -> HyperSphere{3, T}
 
 <a name="GeometryTypes.HomogenousMesh"></a>
 
-The `HomogenousMesh` type describes a polygonal mesh that is useful for computation on the CPU or on the GPU. All vectors must have the same length or must be empty, besides the face vector Type can be void or a value, this way we can create many combinations from this one mesh type. This is not perfect, but helps to reduce a type explosion (imagine defining every attribute combination as a new type).
+The `HomogenousMesh` type describes a polygonal mesh that is useful for computation on the CPU or on the GPU. All vectors must have the same length or must be empty, besides the face vector Type can be Void or a value, this way we can create many combinations from this one mesh type. This is not perfect, but helps to reduce a type explosion (imagine defining every attribute combination as a new type).
 
 ### Faces
 
