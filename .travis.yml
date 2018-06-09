@@ -15,3 +15,6 @@ matrix:
 notifications:
   email: false
 sudo: false
+
+after_success:
+  - julia -e 'cd(Pkg.dir("GeometryTypes")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
