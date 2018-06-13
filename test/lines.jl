@@ -34,7 +34,7 @@
         @test length(polys[2]) == 15
 
 
-        u = linspace(0, 2pi, 200)
+        u = range(0, stop=2pi, length=200)
         points = Point2f0[(sin(x), sin(2x)) for x in u]
 
         inds, intersects = self_intersections(points)

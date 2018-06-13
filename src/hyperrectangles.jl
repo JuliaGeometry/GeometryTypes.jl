@@ -86,7 +86,7 @@ function *(m::Mat{N1,N1,T1}, h::HyperRectangle{N2, T2}) where {N1,N2,T1,T2}
     # get all points on the HyperRectangle
     d = decompose(Point, h)
     # make sure our points are sized for the tranform
-    pts = (Vec{N1, T}[vcat(pt, ones(Vec{D, T})) for pt in d]...)::NTuple{2^N2,Vec{N1,T}}
+    pts = (Vec{N1, T}[vcat(pt, ones(Vec{D, T})) for pt in d]...,)::NTuple{2^N2,Vec{N1,T}}
 
     vmin = Vec{N1, T}(typemax(T))
     vmax = Vec{N1, T}(typemin(T))

@@ -1,3 +1,13 @@
+# Handle https://github.com/JuliaLang/julia/pull/23750
+@static if VERSION >= v"0.7.0-DEV.2083"
+    _reshape_reinterpret(T, X, d...) = reshape(reinterpret(T, X), d...)
+else
+    _reshape_reinterpret(T, X, d...) = reinterpret(T, X, d...)
+end
+# TODO: when we drop support for Julia v0.6, change all instances of
+# _reshape_reinterpret(T, X, d...) to reshape(reinterpret(T, X), d...)
+
+
 """
 Allow to call decompose with unspecified vector type and infer types from
 primitive.
@@ -148,7 +158,7 @@ function decompose(
     w = widths(rect)
     o = origin(rect)
     points = T1[o[j]+((i>>(j-1))&1)*w[j] for j=1:N, i=0:(2^N-1)]
-    reinterpret(PT, points, (2^N,))
+    _reshape_reinterpret(PT, points, (2^N,))
 end
 """
 Get decompose a `HyperRectangle` into Texture Coordinates.
@@ -161,7 +171,7 @@ function decompose(
     w = Vec{3,T1}(1)
     o = Vec{3,T1}(0)
     points = T1[((i>>(j-1))&1) for j=1:N, i=0:(2^N-1)]
-    reinterpret(UVWT, points, (8,))
+    _reshape_reinterpret(UVWT, points, (8,))
 end
 decompose(::Type{FT}, faces::Vector{FT}) where {FT<:Face} = faces
 function decompose(::Type{FT1}, faces::Vector{FT2}) where {FT1<:Face, FT2<:Face}
@@ -169,7 +179,7 @@ function decompose(::Type{FT1}, faces::Vector{FT2}) where {FT1<:Face, FT2<:Face}
     N1,N2 = length(FT1), length(FT2)
 
     n = length(decompose(FT1, first(faces)))
-    outfaces = Vector{FT1}(length(faces)*n)
+    outfaces = Vector{FT1}(undef, length(faces)*n)
     i = 1
     for face in faces
         for outface in decompose(FT1, face)
@@ -200,24 +210,25 @@ end
 
 function decompose(P::Type{Point{2, PT}}, r::SimpleRectangle, resolution=(2,2)) where PT
     w, h = resolution
-    vec(P[(x,y) for x=linspace(r.x, r.x+r.w, w), y=linspace(r.y, r.y+r.h, h)])
+    vec(P[(x,y) for x=range(r.x, stop=r.x+r.w, length=w), y=range(r.y, stop=r.y+r.h, length=h)])
 end
 function decompose(P::Type{Point{3, PT}}, r::SimpleRectangle, resolution=(2,2)) where PT
     w, h = resolution
-    vec(P[(x, y, 0) for x = linspace(r.x, r.x+r.w, w), y = linspace(r.y, r.y+r.h, h)])
+    vec(P[(x, y, 0) for x = range(r.x, stop=r.x+r.w, length=w), y = range(r.y, stop=r.y+r.h, length=h)])
 end
 function decompose(T::Type{UV{UVT}}, r::SimpleRectangle, resolution=(2,2)) where UVT
     w,h = resolution
-    vec(T[(x, y) for x = linspace(0, 1, w), y = linspace(1, 0, h)])
+    vec(T[(x, y) for x = range(0, stop=1, length=w), y = range(1, stop=0, length=h)])
 end
 function decompose(::Type{T}, r::SimpleRectangle, resolution=(2,2)) where T<:Normal
     fill(T(0,0,1), prod(resolution))
 end
 function decompose(::Type{T}, r::SimpleRectangle, resolution=(2,2)) where T<:Face
     w,h = resolution
+    Idx = LinearIndices(resolution)
     faces = vec([Face{4, Int}(
-            sub2ind(resolution, i, j), sub2ind(resolution, i+1, j),
-            sub2ind(resolution, i+1, j+1), sub2ind(resolution, i, j+1)
+            Idx[i, j], Idx[i+1, j],
+            Idx[i+1, j+1], Idx[i, j+1]
         ) for i=1:(w-1), j=1:(h-1)]
     )
     decompose(T, faces)
@@ -300,7 +311,7 @@ function decompose(T::Type{Normal{3, NT}}, mesh::AbstractMesh) where NT
     n = mesh.normals
     eltype(n) == T && return n
     eltype(n) <: Normal{3} && return map(T, n)
-    (n == Void[] || isempty(n)) && return normals(vertices(mesh), faces(mesh), T)
+    (n == Nothing[] || isempty(n)) && return normals(vertices(mesh), faces(mesh), T)
 end
 
 #Gets the uv attribute to a mesh, or creates it, or converts it
@@ -308,7 +319,7 @@ function decompose(::Type{UV{UVT}}, mesh::AbstractMesh) where UVT
     uv = mesh.texturecoordinates
     eltype(uv) == UV{UVT} && return uv
     (eltype(uv) <: UV || eltype(uv) <: UVW) && return map(UV{UVT}, uv)
-    eltype(uv) == Void && return zeros(UV{UVT}, length(vertices(mesh)))
+    eltype(uv) == Nothing && return zeros(UV{UVT}, length(vertices(mesh)))
 end
 
 
@@ -355,7 +366,7 @@ end
 
 function decompose(PT::Type{Point{2,T}}, s::Circle, n=64) where T
     rad = radius(s)
-    map(linspace(T(0), T(2pi), n)) do fi
+    map(range(T(0), stop=T(2pi), length=n)) do fi
         PT(
             rad*sin(fi + pi),
             rad*cos(fi + pi)
@@ -364,12 +375,12 @@ function decompose(PT::Type{Point{2,T}}, s::Circle, n=64) where T
 end
 
 function decompose(PT::Type{Point{N,T}}, s::Sphere, facets = 24) where {N,T}
-    vertices = Vector{PT}(facets*facets+1)
+    vertices = Vector{PT}(undef, facets*facets+1)
     vertices[end] = PT(s.center) - PT(0,0,radius(s)) #Create a vertex for last triangle fan
     for j = 1:facets
         theta = T((pi*(j-1))/facets)
         for i = 1:facets
-            position = sub2ind((facets,), j, i)
+            position = (i - 1) * facets + j
             phi = T((2*pi*(i-1))/facets)
             vertices[position] = (spherical(theta, phi)*T(s.r))+PT(s.center)
         end
@@ -393,17 +404,17 @@ function decompose(::Type{FT}, s::Sphere, facets = 24) where FT <: Face
 end
 
 function decompose(::Type{FT}, s::Sphere, facets = 24) where FT <: Face{3}
-    indexes          = Vector{FT}(facets * facets * 2)
+    indexes          = Vector{FT}(undef, facets * facets * 2)
     FTE              = eltype(FT)
     psydo_triangle_i = facets*facets+1
     index            = 1
     for j=1:facets
         for i=1:facets
             next_index = mod1(i+1, facets)
-            i1 = sub2ind((facets,), j, i)
-            i2 = sub2ind((facets,), j, next_index)
-            i3 = (j != facets) ? sub2ind((facets,), j + 1, i) : psydo_triangle_i
-            i6 = (j != facets) ? sub2ind((facets,), j + 1, next_index) : psydo_triangle_i
+            i1 = (i - 1) * facets + j
+            i2 = (next_index - 1) * facets + j
+            i3 = (j != facets) ? ((i - 1) * facets + (j + 1)) : psydo_triangle_i
+            i6 = (j != facets) ? ((next_index - 1) * facets + (j + 1)) : psydo_triangle_i
             indexes[index] = FT(i2, i1, i3) # convert to required Face index offset
             indexes[index + 1] = FT(i2, i3, i6)
             index += 2
@@ -431,7 +442,7 @@ function decompose(PT::Type{Point{3,T}}, c::Cylinder{3, T}, resolution = 5) wher
     isodd(resolution) && (resolution = 2 * div(resolution, 2))
     resolution = max(8, resolution); nbv = div(resolution, 2)
     M = rotation(c); h = height(c)
-    position = 1; vertices = Vector{PT}(2 * nbv)
+    position = 1; vertices = Vector{PT}(undef, 2 * nbv)
     for j = 1:nbv
         phi = T((2π * (j - 1)) / nbv)
         vertices[position] = PT(M * Point{3, T}(c.r * cos(phi), c.r * sin(phi),0)) + PT(c.origin)
@@ -448,7 +459,7 @@ end
 function decompose(::Type{FT}, c::Cylinder{3, T}, facets = 18) where {FT <: Face, T}
     isodd(facets) ? facets = 2 * div(facets, 2) : nothing
     facets < 8 ? facets = 8 : nothing; nbv = Int(facets / 2)
-    indexes = Vector{FT}(facets); index = 1
+    indexes = Vector{FT}(undef, facets); index = 1
     for j = 1:(nbv-1)
         indexes[index] = (index + 2, index + 1, index)
         indexes[index + 1] = ( index + 3, index + 1, index + 2)

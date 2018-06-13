@@ -75,36 +75,36 @@ const UVW{T} = TextureCoordinate{3, T}
 A `SimpleMesh` is an alias for a `HomogenousMesh` parameterized only by
 vertex and face types.
 """
-const SimpleMesh{VT, FT} = HMesh{VT, FT, Void, Void, Void, Void, Void}
-const PlainMesh{VT, FT} = HMesh{Point{3, VT}, FT, Void, Void, Void, Void, Void}
+const SimpleMesh{VT, FT} = HMesh{VT, FT, Nothing, Nothing, Nothing, Nothing, Nothing}
+const PlainMesh{VT, FT} = HMesh{Point{3, VT}, FT, Nothing, Nothing, Nothing, Nothing, Nothing}
 const GLPlainMesh = PlainMesh{Float32, GLTriangle}
 
-const Mesh2D{VT, FT} = HMesh{Point{2, VT}, FT, Void, Void, Void, Void, Void}
+const Mesh2D{VT, FT} = HMesh{Point{2, VT}, FT, Nothing, Nothing, Nothing, Nothing, Nothing}
 const GLMesh2D = Mesh2D{Float32, GLTriangle}
 
-const UVMesh{VT, FT, UVT} = HMesh{Point{3, VT}, FT, Void, UV{UVT}, Void, Void, Void}
+const UVMesh{VT, FT, UVT} = HMesh{Point{3, VT}, FT, Nothing, UV{UVT}, Nothing, Nothing, Nothing}
 const GLUVMesh = UVMesh{Float32, GLTriangle, Float32}
 
-const UVWMesh{VT, FT, UVT} = HMesh{Point{3, VT}, FT, Void, UVW{UVT}, Void, Void, Void}
+const UVWMesh{VT, FT, UVT} = HMesh{Point{3, VT}, FT, Nothing, UVW{UVT}, Nothing, Nothing, Nothing}
 const GLUVWMesh = UVWMesh{Float32, GLTriangle, Float32}
 
-const NormalMesh{VT, FT, NT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, Void, Void}
+const NormalMesh{VT, FT, NT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, Nothing, Nothing, Nothing, Nothing}
 const GLNormalMesh = NormalMesh{Float32, GLTriangle, Float32}
 
-const UVMesh2D{VT, FT, UVT} = HMesh{Point{2, VT}, FT, Void, UV{UVT}, Void, Void, Void}
+const UVMesh2D{VT, FT, UVT} = HMesh{Point{2, VT}, FT, Nothing, UV{UVT}, Nothing, Nothing, Nothing}
 const GLUVMesh2D = UVMesh2D{Float32, GLTriangle, Float32}
 
-const NormalColorMesh{VT, FT, NT, CT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, CT, Void, Void}
+const NormalColorMesh{VT, FT, NT, CT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, Nothing, CT, Nothing, Nothing}
 const GLNormalColorMesh = NormalColorMesh{Float32, GLTriangle, Float32, RGBA{Float32}}
 
-const NormalVertexcolorMesh{VT, FT, NT, CT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Vector{CT}, Void, Void}
+const NormalVertexcolorMesh{VT, FT, NT, CT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, Nothing, Vector{CT}, Nothing, Nothing}
 const GLNormalVertexcolorMesh = NormalVertexcolorMesh{Float32, GLTriangle, Float32, RGBA{Float32}}
 
-const NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} = HMesh{Point{3, VT}, FT, Normal{3, NT}, Void, Void, AT, A_ID_T}
+const NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} = HMesh{Point{3, VT}, FT, Normal{3, NT}, Nothing, Nothing, AT, A_ID_T}
 const GLNormalAttributeMesh = NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBA{U8}}, Float32}
 
-const NormalUVWMesh{VT, FT, NT, UVT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, UVW{UVT}, Void, Void, Void}
+const NormalUVWMesh{VT, FT, NT, UVT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, UVW{UVT}, Nothing, Nothing, Nothing}
 const GLNormalUVWMesh = NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
 
-const NormalUVMesh{VT, FT, NT, UVT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, UV{UVT}, Void, Void, Void}
+const NormalUVMesh{VT, FT, NT, UVT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, UV{UVT}, Nothing, Nothing, Nothing}
 const GLNormalUVMesh = NormalUVMesh{Float32, GLTriangle, Float32, Float32}

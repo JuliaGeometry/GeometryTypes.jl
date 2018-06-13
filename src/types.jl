@@ -4,13 +4,11 @@ import StaticArrays.FixedSizeArrays: @fixed_vector
 abstract type AbstractDistanceField end
 abstract type AbstractUnsignedDistanceField <: AbstractDistanceField end
 abstract type AbstractSignedDistanceField <: AbstractDistanceField end
+
 """
 Abstract to categorize geometry primitives of dimensionality `N` and
 the numeric element type `T`.
 """
-# abstract AbstractGeometry{N, T}
-# abstract AbstractMesh{VertT, FaceT} <: AbstractGeometry{3, Float32}
-# abstract GeometryPrimitive{N, T} <: AbstractGeometry{N, T}
 abstract type AbstractGeometry{N, T} end
 abstract type AbstractMesh{VertT, FaceT}  end # <: AbstractGeometry
 abstract type GeometryPrimitive{N, T} <: AbstractGeometry{N, T} end
@@ -161,7 +159,7 @@ end
 The `HomogenousMesh` type describes a polygonal mesh that is useful for
 computation on the CPU or on the GPU.
 All vectors must have the same length or must be empty, besides the face vector
-Type can be void or a value, this way we can create many combinations from this
+Type can be Void or a value, this way we can create many combinations from this
 one mesh type.
 This is not perfect, but helps to reduce a type explosion (imagine defining
 every attribute combination as a new type).

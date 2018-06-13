@@ -28,7 +28,7 @@ function SignedDistanceField(f::Function,
     ny = ceil(Int, y_rng/resolution)
     nz = ceil(Int, z_rng/resolution)
 
-    vol = Array{fieldT}(nx+1, ny+1, nz+1)
+    vol = Array{fieldT}(undef, nx+1, ny+1, nz+1)
 
     nb_max = Vec(x_min + resolution*nx,
                  y_min + resolution*ny,
@@ -57,7 +57,7 @@ function SignedDistanceField(f::Function,
     nx = ceil(Int, x_rng/resolution)
     ny = ceil(Int, y_rng/resolution)
 
-    vol = Array{fieldT}(nx+1, ny+1)
+    vol = Array{fieldT}(undef, nx+1, ny+1)
 
     nb_max = Vec(x_min + resolution*nx,
                  y_min + resolution*ny)

@@ -31,9 +31,9 @@ end
 
 @testset "indexing" begin
     r = SimpleRectangle(0,0,2,2)
-    a = eye(4)
-    @test a[r] == eye(2)
-    a[r] = eye(2)*2
+    a = Matrix(1.0I, 4, 4)
+    @test a[r] == Matrix(1.0I, 2, 2)
+    a[r] = Matrix(I, 2, 2)*2
     @test a == [2 0 0 0; 0 2 0 0; 0 0 1 0; 0 0 0 1]
 end
 
