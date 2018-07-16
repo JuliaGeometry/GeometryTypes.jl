@@ -99,22 +99,21 @@ end
 #function call{M <: HMesh, VT <: Point, FT <: Face}(::Type{M}, vertices::Vector{VT}, faces::Vector{FT})
 # Haven't gotten around to implement the types correctly with abstract types in FixedSizeArrays
 function (::Type{M})(
-        vertices::Vector{Point{3, VT}}, faces::Vector{FT}
+        vertices::AbstractVector{Point{3, VT}}, faces::AbstractVector{FT}
     ) where {M <: HMesh, VT, FT <: Face}
     msh = PlainMesh{VT, FT}(vertices = vertices, faces = faces)
     convert(M, msh)
 end
 get_default(x::Union{Type, TypeVar}) = nothing
-get_default(x::Type{X}) where {X <: Array} = Nothing[]
+get_default(x::Type{X}) where {X <: AbstractArray} = Nothing[]
 
 """
 generic constructor for abstract HomogenousMesh, infering the types from the keywords (which have to match the field names)
 some problems with the dispatch forced me to use this method name... need to further investigate this
 """
 function homogenousmesh(attribs::Dict{Symbol, Any})
-    newfields = []
-    for name in fieldnames(HMesh)
-        push!(newfields, get(attribs, name, get_default(fieldtype(HMesh, name))))
+    newfields = map(fieldnames(HMesh)) do name
+        get(attribs, name, get_default(fieldtype(HMesh, name)))
     end
     HomogenousMesh(newfields...)
 end
@@ -130,10 +129,10 @@ Creates a new mesh from a dict of `fieldname => value` and converts the types to
 function (::Type{M})(attribs::Dict{Symbol, Any}) where M <: HMesh
     newfields = map(fieldnames(HomogenousMesh)) do field
         target_type = fieldtype(M, field)
-        default = fieldtype(HomogenousMesh, field) <: Vector ? Nothing[] : nothing
+        default = fieldtype(HomogenousMesh, field) <: AbstractVector ? Nothing[] : nothing
         get(attribs, field, default)
     end
-    M(HomogenousMesh(newfields...))
+    M(newfields...)
 end
 
 """
@@ -174,7 +173,7 @@ function (::Type{HM})(x::Tuple{P, ConstAttrib}) where {HM <: HMesh, ConstAttrib,
 end
 
 
-merge(m::Vector{M}) where {M <: AbstractMesh} = merge(m...)
+merge(m::AbstractVector{M}) where {M <: AbstractMesh} = merge(m...)
 
 """
 Merges an arbitrary mesh. This function probably doesn't work for all types of meshes
