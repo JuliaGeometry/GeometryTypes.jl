@@ -60,16 +60,13 @@ vertices(c::HyperCube) = vertices(convert(HyperRectangle, c))
 vertexmat(s) = hcat(vertices(s)...)
 vertexmatrix(s::AbstractConvexHull) = Matrix(vertexmat(s))::Matrix{numtype(s)}
 
-convert(S::Type{<: Simplex}, fs::FlexibleSimplex) = S(tuple(vertices(fs)...))
-convert(F::Type{<: AFG}, s::Simplex) = F(collect(vertices(s)))
-convert(FG::Type{<: AFG}, f::FlexibleSimplex) = FG(vertices(f))
-convert(R::Type{<: HyperRectangle}, c::HyperCube) = R(origin(c), widths(c))
-convert(F::Type{<:FlexibleConvexHull}, s::Simplex) = F(collect(vertices(s)))
-convert(F::Type{<:FlexibleConvexHull}, s::FlexibleSimplex) = F(vertices(s))
-convert(F::Type{FlexibleConvexHull}, c::FlexibleConvexHull) = c
-convert(F::Type{<:FlexibleConvexHull}, c::FlexibleConvexHull) = F(vertices(c))
-convert(::Type{F}, x::F) where {F <: FlexibleConvexHull} = x
-convert(F::Type{<:FlexibleConvexHull}, c) = F(collect(vertices(c)))
+(::Type{F})(g::Union{AbstractSimplex, AFG, GeometryPrimitive}) where {F <: AFG} = F(vertices(g))
+(::Type{F})(v::NTuple) where {F <: AFG} = F(collect(v))
+Base.convert(::Type{F}, s::Simplex) where {F <: AFG} = F(s)
+
+(::Type{R})(c::HyperCube) where {R <: HyperRectangle} = R(origin(c), widths(c))
+Base.convert(::Type{R}, c::HyperCube) where {R <: HyperRectangle} = R(c)
+Base.convert(::Type{F}, c::HyperCube) where {F <: AFG} = F(c)
 
 function Base.isapprox(s1::AbstractConvexHull, s2::AbstractConvexHull;kw...)
     isapprox(vertexmat(s1), vertexmat(s2); kw...)

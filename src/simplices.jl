@@ -7,10 +7,10 @@ function (::Type{S})(sv::StaticVector) where S <: Simplex
 end
 
 @inline function Simplex{S, T}(x) where {S, T}
-    Simplex{S, T}(ntuple(i-> T(x), Val{S}))
+    Simplex{S, T}(ntuple(i-> T(x), Val(S)))
 end
 @inline function Simplex{S}(x::T) where {S, T}
-    Simplex{S, T}(ntuple(i-> x, Val{S}))
+    Simplex{S, T}(ntuple(i-> x, Val(S)))
 end
 @inline function Simplex{1, T}(x::T) where T
     Simplex{1, T}((x,))
@@ -19,6 +19,10 @@ end
 @inline function Simplex{S}(x::T) where {S, T <: Tuple}
     Simplex{S, StaticArrays.promote_tuple_eltype(T)}(x)
 end
+Simplex{S, T}(f::FlexibleSimplex) where {S, T} = Simplex{S, T}(tuple(vertices(f)...))
+Simplex{S}(f::FlexibleSimplex) where {S} = Simplex{S, eltype(f)}(f)
+Simplex(f::FlexibleSimplex) = Simplex(tuple(vertices(f)...))
+
 
 Base.@pure Base.size(::Union{Simplex{S}, Type{Simplex{S}}}) where {S} = (S, )
 Base.@pure Base.size(::Type{Simplex{S, T}}) where {S,T} = (S,)
@@ -32,6 +36,7 @@ end
 @inline function Base.convert(::Type{Simplex{S, T}}, x::Tuple) where {S, T}
     Simplex{S, T}(convert(NTuple{S, T}, x))
 end
+Base.convert(::Type{S}, f::AFG) where {S <: Simplex} = S(f)
 # StaticArrays.similar_type{SV <: Simplex}(::Union{SV, Type{SV}}) = Simplex
 # function StaticArrays.similar_type{SV <: Simplex, T}(::Union{SV, Type{SV}}, ::Type{T})
 #     Simplex{length(SV), T}
@@ -81,7 +86,7 @@ sum(w .* vertices(s)) = projection of pt onto affine subspace spanned by s.
 """
 function weights(pt, s::Simplex)
     wp = pinvli(edgespan(s)) * (pt - translation(s))
-    unshift(wp, 1-sum(wp))
+    pushfirst(wp, 1-sum(wp))
 end
 
 translation(s::Simplex) = first(vertices(s))
