@@ -57,7 +57,7 @@ struct MinkowskiDifference{S,T}
 end
 
 ⊖(c1,c2) = MinkowskiDifference(c1,c2)
-convert(::FlexibleConvexHull, md::MinkowskiDifference) = FlexibleConvexHull(vertices(md))
+FlexibleConvexHull(md::MinkowskiDifference) = FlexibleConvexHull(vertices(md))
 
 function vertices(m::MinkowskiDifference)
     # There might be redundant vertices, should we try
