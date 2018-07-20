@@ -8,13 +8,11 @@ Base.eltype(::Type{OffsetInteger{O, T}}) where {O, T} = T
 Base.eltype(oi::OffsetInteger) = eltype(typeof(oi))
 
 # constructors and conversion
-convert(::Type{OffsetInteger{O1, T1}}, x::OffsetInteger{O2, T2}) where {O1, O2, T1 <: Integer, T2 <: Integer} =
-    OffsetInteger{O1, T1}(T2(x))
-convert(::Type{OffsetInteger{O}}, x::Integer) where {O} = convert(OffsetInteger{O, eltype(x)}, x)
-convert(::Type{OffsetInteger{O}}, x::OffsetInteger) where {O} = convert(OffsetInteger{O, eltype(x)}, x)
-convert(::Type{OffsetInteger{O, T}}, x::Integer) where {O, T <: Integer} = convert(OffsetInteger{O, T}, OneIndex{eltype(x)}(x))
+OffsetInteger{O1, T1}(x::OffsetInteger{O2, T2}) where {O1, O2, T1 <: Integer, T2 <: Integer} = OffsetInteger{O1, T1}(T2(x))
 
-convert(::Type{IT}, x::OffsetInteger{O, T}) where {IT <: Integer, O, T <: Integer} = IT(raw(x) + -O)
+OffsetInteger{O}(x::Integer) where {O} = OffsetInteger{O, eltype(x)}(x)
+OffsetInteger{O}(x::OffsetInteger) where {O} = OffsetInteger{O, eltype(x)}(x)
+(::Type{IT})(x::OffsetInteger{O, T}) where {IT <: Integer, O, T <: Integer} = IT(raw(x) + -O)
 
 Base.@pure pure_max(x1, x2) = x1 > x2 ? x1 : x2
 Base.promote_rule(::Type{T1}, ::Type{OffsetInteger{O, T2}}) where {T1 <: Integer, O, T2} = T1
