@@ -1,9 +1,5 @@
 # Handle https://github.com/JuliaLang/julia/pull/23750
-@static if VERSION >= v"0.7.0-DEV.2083"
-    _reshape_reinterpret(T, X, d...) = reshape(reinterpret(T, X), d...)
-else
-    _reshape_reinterpret(T, X, d...) = reinterpret(T, X, d...)
-end
+_reshape_reinterpret(T, X, d...) = reshape(reinterpret(T, X), d...)
 # TODO: when we drop support for Julia v0.6, change all instances of
 # _reshape_reinterpret(T, X, d...) to reshape(reinterpret(T, X), d...)
 
@@ -392,7 +388,7 @@ function decompose(PT::Type{UV{T}}, s::Sphere, facets = 24) where T
     vertices = decompose(Point{3, T}, s, facets)
     o5 = T(0.5)
     map(vertices) do n
-        u = atan2(n[1], n[3]) / T(2*pi) + o5
+        u = atan(n[1], n[3]) / T(2*pi) + o5
         v = n[2] * o5 + o5
         UV{Float32}(u, v)
     end
