@@ -8,4 +8,6 @@
     @test val ≈ 1.0
 
     @test @allocated(GeometryTypes.argmax(sin, range(0, stop=π, length=101))) == 0
+
+    @test_throws ArgumentError GeometryTypes.argmax(identity, [])
 end
