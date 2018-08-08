@@ -1,8 +1,8 @@
 using GeometryTypes, ColorTypes
 using Compat
 using Compat: range
-using Compat.Test
-using Compat.Test: @inferred
+using Test
+using Test: @inferred
 using Compat.LinearAlgebra
 
 
