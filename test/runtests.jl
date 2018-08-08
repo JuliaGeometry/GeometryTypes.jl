@@ -7,6 +7,7 @@ using Compat.LinearAlgebra
 
 
 @testset "GeometryTypes" begin
+    include("baseutils.jl")
     include("convexhulls.jl")
     include("polygons.jl")
     include("hyperrectangles.jl")
