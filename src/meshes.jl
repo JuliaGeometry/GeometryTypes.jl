@@ -1,18 +1,3 @@
-# Gracefully handle the change in `filter(::Function, ::Dict)` from
-# https://github.com/JuliaLang/julia/pull/23311
-function filter_2_arg(f_2_arg, args...)
-    f_1_arg = x -> f_2_arg(x[1], x[2])
-    filter(f_1_arg, args...)
-end
-# TODO: When we drop v0.6, we can change all the calls back to
-# Base.filter. We'll have to change the functions from 2-arg to 1-arg,
-# but that will be easy with the unpacking of function arguments,
-# so we can change:
-#     (k, v) -> foo(k, v)  # 2-argument
-# into:
-#     ((k, v),) -> foo(k, v) # 1-argument with unpacking
-
-
 _eltype(::Type{T}) where {T <: AbstractArray} = eltype(T)
 _eltype(::Type{T}) where {T} = T
 for (i, field) in enumerate((:vertextype, :facetype, :normaltype,
@@ -41,17 +26,17 @@ function attributes_noVF(m::T) where T <: AbstractMesh
     fielddict = Dict{Symbol, Any}(map(fieldnames(T)[3:end]) do field
         field => getfield(m, field)
     end)
-    return filter_2_arg(fielddict) do key,val
+    return filter(fielddict) do (key, val)
         val != nothing && val != Nothing[]
     end
 end
 #Gets all non Nothing attributes from a mesh in form of a Dict fieldname => value
 function attributes(m::AbstractMesh)
-    filter_2_arg((key,val) -> (val != nothing && val != Nothing[]), all_attributes(m))
+    filter(((key,val),) -> (val != nothing && val != Nothing[]), all_attributes(m))
 end
 #Gets all non Nothing attributes types from a mesh type fieldname => ValueType
 function attributes(m::Type{M}) where M <: HMesh
-    filter_2_arg((key,val) -> (val != Nothing && val != Vector{Nothing}), all_attributes(M))
+    filter(((key,val),) -> (val != Nothing && val != Vector{Nothing}), all_attributes(M))
 end
 
 function all_attributes(m::Type{M}) where M <: HMesh
@@ -204,7 +189,7 @@ function merge(
     ) where {_1, _2, _3, _4, ConstAttrib <: Colorant, _5, _6}
     vertices     = copy(m1.vertices)
     faces        = copy(m1.faces)
-    attribs      = Dict{Symbol, Any}(filter_2_arg((k,v) -> k != :color, attributes_noVF(m1)))
+    attribs      = Dict{Symbol, Any}(filter(((k,v),) -> k != :color, attributes_noVF(m1)))
     attribs      = Dict{Symbol, Any}([(k, copy(v)) for (k,v) in attribs])
     color_attrib = RGBA{U8}[RGBA{U8}(m1.color)]
     index        = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
