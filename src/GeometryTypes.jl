@@ -31,6 +31,7 @@ import Base: ==,
              union,
              unique
 
+@static if VERSION < v"1.0.0-" import Base: contains end
 
 
 include("types.jl")
@@ -140,7 +141,6 @@ export AABB,
        before,
        colors,
        colortype,
-       contains,
        during,
        faces,
        facetype,
@@ -194,5 +194,7 @@ export AABB,
        ZeroIndex,
        OneIndex,
        GLIndex
+
+@static if !(VERSION < v"1.0.0-") export contains end
 
 end # module
