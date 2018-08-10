@@ -1,9 +1,7 @@
 using GeometryTypes, ColorTypes
-using Compat
-using Compat: range
 using Test
 using Test: @inferred
-using Compat.LinearAlgebra
+using LinearAlgebra
 
 
 @testset "GeometryTypes" begin

@@ -3,8 +3,7 @@ module GeometryTypes
 using StaticArrays
 using StaticArrays.FixedSizeArrays
 using ColorTypes
-using Compat: fieldcount, isconcretetype, LinearIndices, Nothing, undef, range
-using Compat.LinearAlgebra
+using LinearAlgebra
 
 import FixedPointNumbers # U8
 
@@ -13,7 +12,6 @@ using IterTools: partition
 
 import Base: ==,
              *,
-             contains,
              convert,
              diff,
              getindex,
@@ -33,6 +31,7 @@ import Base: ==,
              union,
              unique
 
+@static if VERSION < v"1.0.0-" import Base: contains end
 
 
 include("types.jl")
@@ -195,5 +194,7 @@ export AABB,
        ZeroIndex,
        OneIndex,
        GLIndex
+
+@static if !(VERSION < v"1.0.0-") export contains end
 
 end # module
