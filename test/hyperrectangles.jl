@@ -1,3 +1,5 @@
+using LinearAlgebra
+
 @testset "Hyper Cubes" begin
     @testset "Core" begin
         x = centered(HyperCube)

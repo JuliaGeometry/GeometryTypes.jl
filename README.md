@@ -63,7 +63,7 @@ end
 
 function decompose{T<:Face}(::Type{T}, r::SimpleRectangle, resolution=(2,2))
     w,h = resolution
-    Idx = LinearIndices(resolution) # Compat.LinearIndices in Julia v0.6 and below
+    Idx = LinearIndices(resolution)
     faces = vec([Face{4, Int}(
             Idx[i, j], Idx[i+1, j],
             Idx[i+1, j+1], Idx[i, j+1]

@@ -1,10 +1,11 @@
 using GeometryTypes, ColorTypes
-using Compat
-using Compat: range
 using Test
 using Test: @inferred
-using Compat.LinearAlgebra
 
+# 0.7 Base still contains a (deprecated) contains
+if VERSION == v"0.7"
+    const contains = GeometryTypes.contains
+end
 
 @testset "GeometryTypes" begin
     include("baseutils.jl")
