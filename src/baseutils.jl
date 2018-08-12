@@ -26,11 +26,14 @@ best_arg, best_val = argmax(f, iter)
 Computes the first element of iterator, on which f takes its maximum.
 """
 function argmax(f, iter)
-    state = start(iter)
-    best_arg, state = next(iter, state)
+    iter_result = iterate(iter, state)
+    iter_result === nothing && return nothing
+    best_arg, state = iter_result
     best_val = f(best_arg)
-    while !done(iter,state)
-        arg, state = next(iter,state)
+    while true
+        iter_result = iterate(iter, state)
+        iter_result === nothing && break
+        arg, state = iter_result
         val = f(arg)
         if val > best_val
             best_val = val
