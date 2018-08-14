@@ -2,9 +2,9 @@ using GeometryTypes, ColorTypes
 using Test
 using Test: @inferred
 
-# 0.7 Base still contains a (deprecated) contains
+# 0.7 Base still contains a (deprecated) contains; resolve ambiguity
 if VERSION == v"0.7"
-    const contains = GeometryTypes.contains
+    using GeometryTypes: contains
 end
 
 @testset "GeometryTypes" begin
