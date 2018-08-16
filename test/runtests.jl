@@ -3,7 +3,7 @@ using Test
 using Test: @inferred
 
 # 0.7 Base still contains a (deprecated) contains; resolve ambiguity
-if VERSION == v"0.7"
+if VERSION < v"1.0-"
     using GeometryTypes: contains
 end
 
