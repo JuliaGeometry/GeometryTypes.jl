@@ -63,6 +63,7 @@ include("gjk.jl")
 include("polygons.jl")
 include("lines.jl")
 include("cylinder.jl")
+include("parse.jl")
 
 export AABB,
        AbstractFlexibleGeometry,
