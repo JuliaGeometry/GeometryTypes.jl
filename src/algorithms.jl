@@ -52,17 +52,23 @@ end
 """
 Calculate the signed volume of one tetrahedron. Be sure the orientation of your surface is right.
 """
-function volume( nodes, face )
-    v1, v2, v3 = nodes[face]
+function volume(
+        vertices::AbstractVector{Point{3, VT}},
+        face::Point{3,Int}
+    ) where VT
+    v1, v2, v3 = vertices[face]
     sig = sign( normal( v1, v2, v3 ) ⋅ v1 )
-    return sig * abs( v1 ⋅ ( v2 × v3 ) ) / eltype(nodes[1])(6)
+    return sig * abs( v1 ⋅ ( v2 × v3 ) ) / eltype(vertices[1])(6)
 end
 
 """
 Calculate the signed volume of all tetrahedra using mapreduce. Be sure the orientation of your surface is right.
 """
-function volume( vm::VesicleMesh )
-    return mapreduce( x->volume( vm.nodes, x), +, vm.faces )
+function volume(
+        vertices::AbstractVector{Point{3, VT}},
+        faces::AbstractVector{Point{3,Int}}
+    ) where VT
+    return mapreduce( x->volume( vertices, x), +, faces )
 end
 
 """
