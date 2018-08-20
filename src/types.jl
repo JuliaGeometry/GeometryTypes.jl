@@ -165,16 +165,24 @@ This is not perfect, but helps to reduce a type explosion (imagine defining
 every attribute combination as a new type).
 """
 struct HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT} <: AbstractMesh{VertT, FaceT}
-    vertices            ::AbstractVector{VertT}
-    faces               ::AbstractVector{FaceT}
-    normals             ::AbstractVector{NormalT}
-    texturecoordinates  ::AbstractVector{TexCoordT}
+    vertices            ::Vector{VertT}
+    faces               ::Vector{FaceT}
+    normals             ::Vector{NormalT}
+    texturecoordinates  ::Vector{TexCoordT}
     color               ::ColorT
     attributes          ::AttribT
-    attribute_id        ::AbstractVector{AttribIDT}
-
-
-
+    attribute_id        ::Vector{AttribIDT}
+    function HomogenousMesh(vertices, faces, normals, texturecoordinates, color, attributes, attribute_id)
+        new{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT}(
+            convert(Vector{VertT}, vertices),
+            convert(Vector{FaceT}, faces),
+            convert(Vector{NormalT}, normals),
+            convert(Vector{TexCoordT}, texturecoordinates),
+            color,
+            attributes,
+            convert(Vector{AttribIDT}, attribute_id),
+        )
+    end
 end
 
 

@@ -1,12 +1,8 @@
 # Gracefully handle the change in `filter(::Function, ::Dict)` from
 # https://github.com/JuliaLang/julia/pull/23311
-@static if VERSION >= v"0.7.0-DEV.1393"
-    function filter_2_arg(f_2_arg, args...)
-        f_1_arg = x -> f_2_arg(x[1], x[2])
-        filter(f_1_arg, args...)
-    end
-else
-    const filter_2_arg = filter
+function filter_2_arg(f_2_arg, args...)
+    f_1_arg = x -> f_2_arg(x[1], x[2])
+    filter(f_1_arg, args...)
 end
 # TODO: When we drop v0.6, we can change all the calls back to
 # Base.filter. We'll have to change the functions from 2-arg to 1-arg,
