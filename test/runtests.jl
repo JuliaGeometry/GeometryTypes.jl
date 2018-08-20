@@ -1,12 +1,14 @@
 using GeometryTypes, ColorTypes
-using Compat
-using Compat: range
-using Compat.Test
-using Compat.Test: @inferred
-using Compat.LinearAlgebra
+using Test
+using Test: @inferred
 
+# 0.7 Base still contains a (deprecated) contains; resolve ambiguity
+if VERSION < v"1.0-"
+    using GeometryTypes: contains
+end
 
 @testset "GeometryTypes" begin
+    include("baseutils.jl")
     include("convexhulls.jl")
     include("polygons.jl")
     include("hyperrectangles.jl")

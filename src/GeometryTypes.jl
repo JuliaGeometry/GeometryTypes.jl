@@ -1,4 +1,3 @@
-__precompile__()
 module GeometryTypes
 
 using StaticArrays
@@ -13,7 +12,6 @@ using IterTools: partition
 
 import Base: ==,
              *,
-             contains,
              convert,
              diff,
              getindex,
@@ -72,6 +70,7 @@ export AABB,
        AbstractDistanceField,
        Circle,
        centered,
+       contains,
        Cube,
        Cylinder,
        Cylinder2,

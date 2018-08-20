@@ -4,6 +4,7 @@ os:
   - osx
 julia:
   - 0.7
+  - 1.0
   - nightly
 
 notifications:
@@ -11,4 +12,4 @@ notifications:
 sudo: false
 
 after_success:
-  - julia -e 'cd(Pkg.dir("GeometryTypes")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
+  - julia -e 'using Pkg; cd(Pkg.dir("GeometryTypes")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
