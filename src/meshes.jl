@@ -113,7 +113,7 @@ function (::Type{M})(attribs::Dict{Symbol, Any}) where M <: HMesh
         default = fieldtype(HomogenousMesh, field) <: AbstractVector ? Nothing[] : nothing
         get(attribs, field, default)
     end
-    M(newfields...)
+    convert(M, HomogenousMesh(newfields...))
 end
 
 """
