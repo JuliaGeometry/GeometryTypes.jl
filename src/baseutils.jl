@@ -1,3 +1,4 @@
+
 using Base.Cartesian
 
 """
@@ -34,9 +35,7 @@ function argmax(f, iter)
     best_val = f(best_arg)
     while true
         iter_result = iterate(iter, state)
-        if iter_result === nothing
-            break
-        end
+        iter_result === nothing && break
         arg, state = iter_result
         val = f(arg)
         if val > best_val
