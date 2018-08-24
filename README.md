@@ -9,7 +9,7 @@ Geometry primitives and operations building up on FixedSizeArrays.
 Documentation is available [here](./docs/build/).
 
 
-Some of the types offered by GeometryTypes visualized with [GLVisualize](http://www.glvisualize.com/):
+Some of the types offered by GeometryTypes visualized with [GLVisualize](https://github.com/JuliaGL/GLVisualize.jl):
 
 ```Julia
 HyperRectangle(Vec2f0(0), Vec2f0(100))
