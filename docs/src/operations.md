@@ -2,15 +2,20 @@
 
 ## Slicing
 
-@{slice}
+```@docs
+slice
+```
 
 ## Set Operations
 
-@{union
-  diff
-  intersect
-}
+```@docs
+union
+diff
+intersect
+```
 
 ## Decompositions
 
-@{decompose}
+```@docs
+decompose
+```
