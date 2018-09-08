@@ -13,3 +13,8 @@ sudo: false
 
 after_success:
   - julia -e 'using Pkg; cd(Pkg.dir("GeometryTypes")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
+  # Documenter auto-deploy
+  # following `using` instruction is for triggering precompilation
+  - julia -e 'Pkg.add("Documenter")'
+  - julia -e 'cd(Pkg.dir("GeometryTypes", "docs")); include("make.jl")'
+  
