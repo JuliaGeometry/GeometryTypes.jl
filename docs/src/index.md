@@ -6,41 +6,49 @@
 
 Geometry primitives and operations building up on FixedSizeArrays.
 
-Some of the types offered by GeometryTypes visualized with [GLVisualize](https://github.com/JuliaGL/GLVisualize.jl):
+Some of the types offered by GeometryTypes visualized with [Makie](https://github.com/JuliaPlots/Makie.jl):
 
 ```julia
-HyperRectangle(Vec2f0(0), Vec2f0(100))
+using Makie, GeometryTypes, AbstractPlotting
+AbstractPlotting.set_theme!(
+    plot = NT(show_axis = false, scale_plot = false),
+    color = :turquoise1
+)
+poly(HyperRectangle(Vec2f0(0), Vec2f0(100)))
 ```
-
 ![HyperRectangle1](screenshots/a0dc3014-fc0a-11e5-860b-ee7e15bc2f9b.png)
 
 ```julia
-HyperRectangle(Vec3f0(0), Vec3f0(1))
 HyperCube(Vec3f0(0), 1f0)
+scene = mesh(HyperRectangle(Vec3f0(-0.5), Vec3f0(1)))
+update_cam!(scene, Vec3f0(-2, 2, 2), Vec3f0(0))
+scene
 ```
 
 ![HyperRectangle2](screenshots/80f4bd52-fc0a-11e5-986a-cac828585a21.png)
 
 ```julia
-HyperSphere(Point2f0(100), 100f0)
+poly(HyperSphere(Point2f0(100), 100f0))
 ```
 
 ![HyperSphere1](screenshots/4d8633f6-fc0a-11e5-920e-caa7e5c7c3e7.png)
 
 ```julia
-HyperSphere(Point3f0(0), 1f0)
+mesh(HyperSphere(Point3f0(0), 1f0))
 ```
 
 ![HyperSphere2](screenshots/666c1e44-fc0a-11e5-8430-c214e6640690.png)
 
 ```julia
-Pyramid(Point3f0(0), 1f0, 1f0)
+x, y, z = 1:20, 1:20, (x,y)-> sin(x) + cos(y)
+meshscatter(x, y, z.(x, y'), marker = Pyramid(Point3f0(0), 1f0, 1f0), markersize = 0.8)
 ```
 
 ![Pyramid](screenshots/3742e350-fc0a-11e5-9c10-b46fde8d9b1b.png)
 
 ```julia
-load("cat.obj") # --> GLNormalMesh, via FileIO
+using FileIO
+mesh(load(Makie.assetpath("cat.obj"))) # --> GLNormalMesh, via FileIO
 ```
 
 ![GLNormalMesh](screenshots/1c4087f6-fc0a-11e5-95c5-97d4cd840c1a.png)
@@ -53,16 +61,16 @@ This can be done for any arbitrary primitive, by overloading the following inter
 ```julia
 # Lets take SimpleRectangle as an example:
 # Minimal set of decomposable attributes to build up a triangle mesh
-isdecomposable{T<:Point, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
-isdecomposable{T<:Face, HR<:SimpleRectangle}(::Type{T}, ::Type{HR}) = true
+isdecomposable(::Type{T}, ::Type{HR}) where {T<:Point, HR<:SimpleRectangle} = true
+isdecomposable(::Type{T}, ::Type{HR}) where {T<:Face, HR<:SimpleRectangle} = true
 
 # Example implementation of decompose for points
-function decompose{PT}(P::Type{Point{3, PT}}, r::SimpleRectangle, resolution=(2,2))
+function GeometryTypes.decompose(P::Type{Point{3, PT}}, r::SimpleRectangle, resolution=(2,2)) where PT
     w,h = resolution
-    vec(P[(x,y,0) for x=linspace(r.x, r.x+r.w, w), y=linspace(r.y, r.y+r.h, h)])
+    vec(P[(x,y,0) for x=range(r.x, stop = r.x+r.w, length = w), y=range(r.y, stop = r.y+r.h, length = h)])
 end
 
-function decompose{T<:Face}(::Type{T}, r::SimpleRectangle, resolution=(2,2))
+function GeometryTypes.decompose(::Type{T}, r::SimpleRectangle, resolution=(2,2)) where T <: Face
     w,h = resolution
     Idx = LinearIndices(resolution)
     faces = vec([Face{4, Int}(
@@ -77,12 +85,12 @@ end
 With these methods defined, this constructor will magically work:
 
 ```julia
-rect = SimpleRectangle(...)
-mesh = GLNormalMesh(rect)
-vertices(mesh) == decompose(Point3f0, rect)
+rect = SimpleRectangle(0, 0, 1, 1)
+m = GLNormalMesh(rect)
+vertices(m) == decompose(Point3f0, rect)
 
-faces(mesh) == decompose(GLTriangle, rect) # GLFace{3} == GLTriangle
-normals(mesh) # automatically calculated from mesh
+faces(m) == decompose(GLTriangle, rect) # GLFace{3} == GLTriangle
+normals(m) # automatically calculated from mesh
 ```
 
 As you can see, the normals are automatically calculated only with the faces and points.
