@@ -84,7 +84,7 @@ Extract all line segments in a Face.
 end
 
 """
-Decompose an N-Simplex into a tuple of Simplex{3}
+Decompose an N-Simplex into a tuple of `Simplex{3}`
 """
 @generated function decompose(::Type{Simplex{3, T1}},
                             f::Simplex{N, T2}) where {N, T1, T2}
@@ -105,7 +105,7 @@ end
 decompose(::Type{Simplex{3}}, f::Simplex{N, T}) where {N, T} = decompose(Simplex{3,T}, f)
 
 """
-Decompose an N-Simplex into tuple of Simplex{2}
+Decompose an N-Simplex into tuple of `Simplex{2}`
 """
 @generated function decompose(::Type{Simplex{2, T1}},
                             f::Simplex{N, T2}) where {N, T1, T2}
@@ -126,7 +126,7 @@ decompose(::Type{Simplex{2}}, f::Simplex{N, T}) where {N, T} =
     decompose(Simplex{2,T}, f)
 
 """
-Decompose an N-Simplex into a tuple of Simplex{1}
+Decompose an N-Simplex into a tuple of `Simplex{1}`
 """
 @generated function decompose(::Type{Simplex{1, T1}},
                             f::Simplex{N, T2}) where {N, T1, T2}
