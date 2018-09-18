@@ -17,7 +17,7 @@ makedocs(
 
 deploydocs(
     repo = "github.com/JuliaGeometry/GeometryTypes.jl.git",
-    julia  = "0.7",
+    julia  = "1.0",
     latest = "master",
     target = "build",
     deps = nothing,  # we use the `format = :html`, without `mkdocs`
