@@ -24,7 +24,7 @@ end
 const U8 = FixedPointNumbers.Normed{UInt8, 8}
 
 """
-An alias for a one-simplex, corresponding to LineSegment{T} -> Simplex{2,T}.
+An alias for a one-simplex, corresponding to `LineSegment{T}` -> `Simplex{2,T}`.
 """
 const LineSegment{T} = Simplex{2,T}
 
@@ -40,19 +40,19 @@ const GLQuad = Face{4, GLIndex}
 const Cube{T} = HyperCube{3, T}
 
 """
-An alias for a HyperSphere of dimension 2. i.e. Circle{T} -> HyperSphere{2, T}
+An alias for a HyperSphere of dimension 2. i.e. `Circle{T}` -> `HyperSphere{2, T}`
 """
 const Circle{T} = HyperSphere{2, T}
 
 """
-An alias for a HyperSphere of dimension 3. i.e. Sphere{T} -> HyperSphere{3, T}
+An alias for a HyperSphere of dimension 3. i.e. `Sphere{T}` -> `HyperSphere{3, T}`
 """
 const Sphere{T} = HyperSphere{3, T}
 
 const AbsoluteRectangle{T} = HyperRectangle{2, T}
 
 """
-AABB, or Axis Aligned Bounding Box, is an alias for a 3D HyperRectangle.
+AABB, or Axis Aligned Bounding Box, is an alias for a 3D `HyperRectangle`.
 """
 const AABB{T} = HyperRectangle{3, T}
 AABB(m...) = HyperRectangle(m...)
