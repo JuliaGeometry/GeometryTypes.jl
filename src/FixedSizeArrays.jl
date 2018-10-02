@@ -78,16 +78,6 @@ macro fsa(ex)
     esc(expr)
 end
 
-
-function Base.isnan(x::StaticArray)
-    for elem in x
-        isnan(elem) && return true
-    end
-    false
-end
-
-
-
 function unit(::Type{T}, i::Integer) where T <: StaticVector
     T(ntuple(Val(length(T))) do j
         ifelse(i == j, 1, 0)
@@ -95,19 +85,6 @@ function unit(::Type{T}, i::Integer) where T <: StaticVector
 end
 
 export unit
-
-function Base.extrema(a::AbstractVector{T}) where T <: StaticVector
-    ET = eltype(T)
-    reduce((x, v)-> (min.(x[1], v), max.(x[2], v)), a; init = (T(typemax(ET)), T(typemin(ET))))
-end
-function Base.minimum(a::AbstractVector{T}) where T <: StaticVector
-    reduce((x, v)-> min.(x[1], v), a; init=T(typemax(eltype(T))))
-end
-function Base.maximum(a::AbstractVector{T}) where T <: StaticVector
-    reduce((x, v)-> max.(x[1], v), a; init=T(typemin(eltype(T))))
-end
-
-
 
 macro fixed_vector(name, parent)
     esc(quote
