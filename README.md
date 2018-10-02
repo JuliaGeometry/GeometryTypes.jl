@@ -8,3 +8,11 @@
 Geometry primitives and operations building up on FixedSizeArrays.
 
 Documentation is available at http://juliageometry.github.io/GeometryTypes.jl/latest/.
+
+## Installation
+
+Enter package mode in the Julia REPL and run the following command:
+
+```julia
+pkg> add GeometryTypes
+```
