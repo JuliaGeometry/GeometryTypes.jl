@@ -1,5 +1,4 @@
-using StaticArrays.FixedSizeArrays
-import StaticArrays.FixedSizeArrays: @fixed_vector
+import .FixedSizeArrays: @fixed_vector
 
 abstract type AbstractDistanceField end
 abstract type AbstractUnsignedDistanceField <: AbstractDistanceField end
