@@ -52,8 +52,6 @@ function intersects(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}}) wher
         v4 = rotation * v4
     end
 
-    @assert !(v1[1] == v2[1] || v3[1] == v4[1])
-
     a = det(MT(
         v1[1] - v2[1], v1[2] - v2[2],
         v3[1] - v4[1], v3[2] - v4[2]
