@@ -25,11 +25,15 @@
     end
 
     @testset "linesegment intersect: #133" begin
-      s1 = LineSegment(Point{2,Float64}[[0.88033, 1.28211], [3.525, 1.28211]]...)
-      s2 = LineSegment(Point{2,Float64}[[2.0375, 1.1625], [2.0375, 1.2875]]...)
-      result = GeometryTypes.intersects(s1, s2)
-      @test result[1] == true
-      @test result[2] ≈ Point(2.0375, 1.28211)
+        s1 = LineSegment(Point{2,Float64}[[0.88033, 1.28211], [3.525, 1.28211]]...)
+        s2 = LineSegment(Point{2,Float64}[[2.0375, 1.1625], [2.0375, 1.2875]]...)
+        s1_old = deepcopy(s1)
+        s2_old = deepcopy(s2)
+        result = GeometryTypes.intersects(s1, s2)
+        @test s1 == s1_old # make sure it doesn't mutate inputs
+        @test s2 == s2_old # make sure it doesn't mutate inputs
+        @test result[1] == true
+        @test result[2] ≈ Point(2.0375, 1.28211)
     end
 
     @testset "poly self intersections" begin
