@@ -27,6 +27,32 @@ Returns intersection_found::Bool, intersection_point
 function intersects(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}}) where {N,T}
     v1, v2 = a; v3, v4 = b; MT = Mat{2,2,T,4}; p0 = zero(Point{N,T})
 
+    verticalA = v1[1] == v2[1]
+    verticalB = v3[1] == v4[1]
+   
+    # if a segment is vertical the linear algebra might have trouble
+    # so we will rotate the segments such that neither is vertical
+    dorotation = verticalA || verticalB 
+    if dorotation
+      θ = T(0.0)  
+      if verticalA && verticalB
+        θ = T(π/4)
+      elseif verticalA || verticalB # obviously true, but make it clear
+        θ34 = -atan(v4[2] - v3[2], v4[1] - v3[1])
+        θ12 = -atan(v2[2] - v1[2], v2[1] - v1[1])
+        θ = verticalA ? θ34 : θ12
+        θ = abs(θ) == T(0) ? (θ12 + θ34)/2 : θ
+        θ = abs(θ) == T(pi) ? (θ12 + θ34)/2 : θ
+      end
+      rotation = MT(cos(θ), sin(θ), -sin(θ), cos(θ))
+      v1 = rotation * v1
+      v2 = rotation * v2
+      v3 = rotation * v3
+      v4 = rotation * v4
+    end
+
+    @assert !(v1[1] == v2[1] || v3[1] == v4[1])
+
     a = det(MT(
         v1[1] - v2[1], v1[2] - v2[2],
         v3[1] - v4[1], v3[2] - v4[2]
@@ -42,7 +68,11 @@ function intersects(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}}) wher
     (y < prevfloat(min(v1[2], v2[2])) || y > nextfloat(max(v1[2], v2[2]))) && return false, p0
     (x < prevfloat(min(v3[1], v4[1])) || x > nextfloat(max(v3[1], v4[1]))) && return false, p0
     (y < prevfloat(min(v3[2], v4[2])) || y > nextfloat(max(v3[2], v4[2]))) && return false, p0
-
+   
+    # don't forget to rotate the answer back
+    if dorotation
+      (x, y) = transpose(rotation)*[x, y]
+    end
     return true, Point{N,T}(x, y)
 end
 
