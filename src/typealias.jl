@@ -108,3 +108,31 @@ const GLNormalUVWMesh = NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
 
 const NormalUVMesh{VT, FT, NT, UVT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, UV{UVT}, Nothing, Nothing, Nothing}
 const GLNormalUVMesh = NormalUVMesh{Float32, GLTriangle, Float32, Float32}
+
+for T in (
+        :SimpleMesh,
+        :PlainMesh,
+        :GLPlainMesh,
+        :Mesh2D,
+        :GLMesh2D,
+        :UVMesh,
+        :GLUVMesh,
+        :UVWMesh,
+        :GLUVWMesh,
+        :NormalMesh,
+        :GLNormalMesh,
+        :UVMesh2D,
+        :GLUVMesh2D,
+        :NormalColorMesh,
+        :GLNormalColorMesh,
+        :NormalVertexcolorMesh,
+        :GLNormalVertexcolorMesh,
+        :NormalAttributeMesh,
+        :GLNormalAttributeMesh,
+        :NormalUVWMesh,
+        :GLNormalUVWMesh,
+        :NormalUVMesh,
+        :GLNormalUVMesh,
+    )
+    @eval Base.show(io::IO, ::Type{<: $T}) = print(io, $(string(T)))
+end
