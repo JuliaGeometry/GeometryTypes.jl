@@ -364,53 +364,20 @@ function decompose(PT::Type{Point{2,T}}, s::Circle, n=64) where T
     end
 end
 
-function decompose(PT::Type{Point{N,T}}, s::Sphere, facets = 24) where {N,T}
-    vertices = Vector{PT}(undef, facets*facets+1)
-    vertices[end] = PT(s.center) - PT(0,0,radius(s)) #Create a vertex for last triangle fan
-    for j = 1:facets
-        theta = T((pi*(j-1))/facets)
-        for i = 1:facets
-            position = (i - 1) * facets + j
-            phi = T((2*pi*(i-1))/facets)
-            vertices[position] = (spherical(theta, phi)*T(s.r))+PT(s.center)
-        end
-    end
-    vertices
+function decompose(PT::Type{Point{N,T}}, s::Sphere, n = 24) where {N,T}
+    θ = LinRange(0, pi, n); φ = 2 .* θ
+    vec(map((θ, φ) for θ in θ, φ in φ) do (θ, φ,)
+        Point3f0(cos(φ)*sin(θ), sin(φ)*sin(θ), cos(θ))
+    end)
 end
 
-function decompose(PT::Type{UV{T}}, s::Sphere, facets = 24) where T
-    vertices = decompose(Point{3, T}, s, facets)
-    o5 = T(0.5)
-    map(vertices) do n
-        u = atan(n[1], n[3]) / T(2*pi) + o5
-        v = n[2] * o5 + o5
-        UV{Float32}(u, v)
-    end
+function decompose(PT::Type{UV{T}}, s::Sphere, n = 24) where T
+    ux = LinRange(0, 1, n)
+    vec([UV{Float32}(φ, θ) for θ in reverse(ux), φ in ux])
 end
 
-function decompose(::Type{FT}, s::Sphere, facets = 24) where FT <: Face
-    triangles = decompose(Face{3, eltype(FT)}, s, facets)
-    decompose(FT, triangles)
-end
-
-function decompose(::Type{FT}, s::Sphere, facets = 24) where FT <: Face{3}
-    indexes          = Vector{FT}(undef, facets * facets * 2)
-    FTE              = eltype(FT)
-    psydo_triangle_i = facets*facets+1
-    index            = 1
-    for j=1:facets
-        for i=1:facets
-            next_index = mod1(i+1, facets)
-            i1 = (i - 1) * facets + j
-            i2 = (next_index - 1) * facets + j
-            i3 = (j != facets) ? ((i - 1) * facets + (j + 1)) : psydo_triangle_i
-            i6 = (j != facets) ? ((next_index - 1) * facets + (j + 1)) : psydo_triangle_i
-            indexes[index] = FT(i2, i1, i3) # convert to required Face index offset
-            indexes[index + 1] = FT(i2, i3, i6)
-            index += 2
-        end
-    end
-    indexes
+function decompose(::Type{FT}, s::Sphere, n = 24) where FT <: Face
+    decompose(FT, SimpleRectangle(0, 0, 1, 1), (n, n))
 end
 
 isdecomposable(::Type{T}, ::Type{C}) where {T <:Point, C <:Cylinder3} = true

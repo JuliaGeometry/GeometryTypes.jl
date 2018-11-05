@@ -53,9 +53,9 @@ end
 
 @testset "Primitives" begin
     m = GLNormalMesh(Sphere(Point3f0(0), 1f0))
-    @test length(vertices(m)) == 577
-    @test length(faces(m)) == 1152
-    @test length(normals(m)) == 577
+    @test length(vertices(m)) == 576
+    @test length(faces(m)) == 1058
+    @test length(normals(m)) == 576
 end
 
 
