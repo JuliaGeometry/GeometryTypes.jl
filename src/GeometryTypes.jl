@@ -1,7 +1,6 @@
 module GeometryTypes
 
 using StaticArrays
-using StaticArrays.FixedSizeArrays
 using ColorTypes
 using LinearAlgebra
 
@@ -31,7 +30,8 @@ import Base: ==,
              union,
              unique
 
-
+include("FixedSizeArrays.jl")
+using .FixedSizeArrays
 
 include("types.jl")
 include("typeutils.jl")
