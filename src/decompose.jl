@@ -367,7 +367,7 @@ end
 function decompose(PT::Type{Point{N,T}}, s::Sphere, n = 24) where {N,T}
     θ = LinRange(0, pi, n); φ = 2 .* θ
     vec(map((θ, φ) for θ in θ, φ in φ) do (θ, φ,)
-        Point3f0(cos(φ)*sin(θ), sin(φ)*sin(θ), cos(θ))
+        Point3f0(cos(φ)*sin(θ), sin(φ)*sin(θ), cos(θ)) * T(s.r) + PT(s.center)
     end)
 end
 
