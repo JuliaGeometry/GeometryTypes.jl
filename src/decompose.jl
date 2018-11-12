@@ -356,7 +356,7 @@ function decompose(PT::Type{Point{2,T}}, s::Circle, n=64) where T
 end
 
 function decompose(PT::Type{Point{N,T}}, s::Sphere, n = 24) where {N,T}
-    θ = LinRange(0, pi, n); φ = LinRange(0, (2pi) - (2pi/n), n)
+    θ = LinRange(0, pi, n); φ = LinRange(0, 2pi, n)
     vec(map((θ, φ) for θ in θ, φ in φ) do (θ, φ,)
         Point3f0(cos(φ)*sin(θ), sin(φ)*sin(θ), cos(θ)) * T(s.r) + PT(s.center)
     end)
@@ -369,6 +369,13 @@ end
 
 function decompose(::Type{FT}, s::Sphere, n = 24) where FT <: Face
     decompose(FT, SimpleRectangle(0, 0, 1, 1), (n, n))
+end
+
+function decompose(::Type{T}, s::Sphere, n = 24) where T <: Normal
+    θ = LinRange(0, pi, n); φ = LinRange(0, 2pi, n)
+    vec(map((θ, φ) for θ in θ, φ in φ) do (θ, φ,)
+        T(cos(φ)*sin(θ), sin(φ)*sin(θ), cos(θ))
+    end)
 end
 
 isdecomposable(::Type{T}, ::Type{C}) where {T <:Point, C <:Cylinder3} = true
