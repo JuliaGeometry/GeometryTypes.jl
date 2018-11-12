@@ -184,4 +184,14 @@ end
     @test HomogenousMesh(m) == m
 end
 
+@testset "unique vertices" begin
+    # geom <> with overlapping verts for middle points
+    v = Point3f0[(0, 0, 0), (1, 1, 0), (1, -1, 0), (1, 1, 0), (2, 0, 0), (1, -1, 0)]
+    f = GLTriangle[(1, 2, 3), (4, 5, 6)]
+    m = GLPlainMesh(v, f)
+    GeometryTypes.remove_overlap!(m)
+    @test vertices(m) == Point3f0[(0, 0, 0), (1, 1, 0), (1, -1, 0), (2, 0, 0)]
+    @test faces(m) == GLTriangle[(1, 2, 3), (2, 4, 3)]
+end
+
 end
