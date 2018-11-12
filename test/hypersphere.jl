@@ -34,6 +34,3 @@
     middle = (minimum(bb) .+ (widths(bb) ./ 2))
     @test all(((x,y),)-> isapprox(x, y, atol = 0.05), zip((-1, 10, 5), middle))
 end
-
-s = Sphere(Point3f0(-1, 10, 5), 3f0)
-mesh(s, color = :blue)
