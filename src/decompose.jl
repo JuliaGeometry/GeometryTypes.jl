@@ -340,15 +340,6 @@ end
 
 
 
-
-function spherical(theta::T, phi::T) where {T}
-    Point{3, T}(
-        sin(theta)*cos(phi),
-        sin(theta)*sin(phi),
-        cos(theta)
-    )
-end
-
 function decompose(PT::Type{Point{3, T}}, s::Circle, n=64) where T
     points2d = decompose(Point{2, T}, s, n)
     map(x-> Point{3, T}(x[1], x[2], 0), points2d)
