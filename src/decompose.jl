@@ -299,8 +299,10 @@ end
 #Gets the normal attribute to a mesh
 function decompose(T::Type{Normal{3, NT}}, mesh::AbstractMesh) where NT
     n = mesh.normals
-    eltype(n) == T && return n
-    eltype(n) <: Normal{3} && return map(T, n)
+    if !isempty(n)
+        eltype(n) == T && return n
+        eltype(n) <: Normal{3} && return map(T, n)
+    end
     (n == Nothing[] || isempty(n)) && return normals(vertices(mesh), faces(mesh), T)
 end
 
