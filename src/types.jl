@@ -170,7 +170,7 @@ struct HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribI
     texturecoordinates  ::Vector{TexCoordT}
     color               ::ColorT
     attributes          ::AttribT
-    attribute_id        ::Vector{AttribIDT}
+    attribute_id        ::AbstractVector{AttribIDT}
 end
 
 function HomogenousMesh(
