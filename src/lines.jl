@@ -29,10 +29,10 @@ function intersects(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}}) wher
 
     verticalA = v1[1] == v2[1]
     verticalB = v3[1] == v4[1]
-   
+
     # if a segment is vertical the linear algebra might have trouble
     # so we will rotate the segments such that neither is vertical
-    dorotation = verticalA || verticalB 
+    dorotation = verticalA || verticalB
 
     if dorotation
         θ = T(0.0)
@@ -67,7 +67,7 @@ function intersects(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}}) wher
     (y < prevfloat(min(v1[2], v2[2])) || y > nextfloat(max(v1[2], v2[2]))) && return false, p0
     (x < prevfloat(min(v3[1], v4[1])) || x > nextfloat(max(v3[1], v4[1]))) && return false, p0
     (y < prevfloat(min(v3[2], v4[2])) || y > nextfloat(max(v3[2], v4[2]))) && return false, p0
-   
+
     # don't forget to rotate the answer back
     if dorotation
         (x, y) = transpose(rotation)*[x, y]
@@ -85,6 +85,18 @@ function simple_concat(vec, range, endpoint::P) where P
     result
 end
 
+struct PairIterator{T}
+    data::T
+end
+Base.length(x::PairIterator) = length(x.data) - 1
+function Base.iterate(iter::PairIterator)
+    length(iter.data) < 2 && return nothing
+    (iter.data[1], iter.data[2]), 2
+end
+function Base.iterate(iter::PairIterator, state)
+    (state + 1) > length(iter.data) && return nothing
+    (iter.data[state], iter.data[state + 1]), state + 1
+end
 """
 Finds all self intersections of polygon `points`
 """
@@ -92,8 +104,8 @@ function self_intersections(points::Vector{Point{N,T}}) where {N,T}
     sections = Point{N,T}[]
     intersections = Int[]
     wraparound = i-> mod1(i, length(points) - 1)
-    for (i, (a,b)) in enumerate(partition(points, 2, 1))
-        for (j, (a2, b2)) in enumerate(partition(points, 2, 1))
+    for (i, (a, b)) in enumerate(PairIterator(points))
+        for (j, (a2, b2)) in enumerate(PairIterator(points))
             is1, is2 = wraparound(i+1), wraparound(i-1)
             if i!=j && is1!=j && is2!=j && !(i in intersections) && !(j in intersections)
                 intersected, p = GeometryTypes.intersects(LineSegment(a,b), LineSegment(a2, b2))
@@ -126,4 +138,3 @@ function split_intersections(points::Vector{Point{N,T}}) where {N,T}
         error("More than 1 intersections can't be handled currently. Found: $intersections, $sections")
     end
 end
-
