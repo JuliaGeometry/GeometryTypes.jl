@@ -1,25 +1,4 @@
-using GeometryTypes
-# function intersects{N,T}(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}})
-#     x12 = a[1][1] - a[2][1]
-#     x34 = b[1][1] - b[2][1]
-#     y12 = a[1][2] - a[2][2]
-#     y34 = b[1][2] - b[2][2]
-#
-#     c = x12 * y34 - y12 * x34;
-#     if abs(c) < 0.01
-#         # No intersection
-#         return false, Point{2,T}(0,0);
-#     else
-#         # Intersection
-#         ai = a[1][1] * a[2][2] - a[1][2] * a[2][1];
-#         bi = b[1][1] * b[2][2] - b[1][2] * b[2][1];
-#
-#         x = (ai * x34 - bi * x12) / c;
-#         y = (ai * y34 - bi * y12) / c;
-#
-#         return true, Point{2,T}(x,y)
-#     end
-# end
+
 """
 Intersection of 2 line segmens `a` and `b`.
 Returns intersection_found::Bool, intersection_point
@@ -29,10 +8,10 @@ function intersects(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}}) wher
 
     verticalA = v1[1] == v2[1]
     verticalB = v3[1] == v4[1]
-   
+
     # if a segment is vertical the linear algebra might have trouble
     # so we will rotate the segments such that neither is vertical
-    dorotation = verticalA || verticalB 
+    dorotation = verticalA || verticalB
 
     if dorotation
         θ = T(0.0)
@@ -67,7 +46,7 @@ function intersects(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}}) wher
     (y < prevfloat(min(v1[2], v2[2])) || y > nextfloat(max(v1[2], v2[2]))) && return false, p0
     (x < prevfloat(min(v3[1], v4[1])) || x > nextfloat(max(v3[1], v4[1]))) && return false, p0
     (y < prevfloat(min(v3[2], v4[2])) || y > nextfloat(max(v3[2], v4[2]))) && return false, p0
-   
+
     # don't forget to rotate the answer back
     if dorotation
         (x, y) = transpose(rotation)*[x, y]
@@ -76,9 +55,9 @@ function intersects(a::LineSegment{Point{N,T}}, b::LineSegment{Point{N,T}}) wher
 end
 
 
-function simple_concat(vec, range, endpoint::P) where P
-    result = Vector{P}(undef, length(range)+1)
-    for (i,j) in enumerate(range)
+function simple_concat(vec::AbstractVector, range, endpoint::P) where P
+    result = Vector{P}(undef, length(range) + 1)
+    for (i, j) in enumerate(range)
         result[i] = vec[mod1(j, length(vec))]
     end
     result[end] = endpoint
@@ -126,4 +105,3 @@ function split_intersections(points::Vector{Point{N,T}}) where {N,T}
         error("More than 1 intersections can't be handled currently. Found: $intersections, $sections")
     end
 end
-

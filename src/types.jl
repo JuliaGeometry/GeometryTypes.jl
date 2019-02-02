@@ -43,9 +43,12 @@ struct Simplex{S, T} <: AbstractSimplex{S, T}
     Simplex{S, T}(x::NTuple{S}) where {S, T} = new{S, T}(StaticArrays.convert_ntuple(T, x))
 end
 
+abstract type AbstractPoint{N, T} <: StaticVector{N, T} end
+
+
 @fixed_vector Vec StaticVector
 
-@fixed_vector Point StaticVector
+@fixed_vector Point AbstractPoint
 
 @fixed_vector Normal StaticVector
 
@@ -238,3 +241,12 @@ const AbstractConvexHull = Union{
     Simplex, FlexibleConvexHull, FlexibleSimplex,
     HyperCube, HyperRectangle
 } # should we parametrize ACH by the type of points T?
+
+
+
+struct Polygon{T, A <: AbstractVector{<: AbstractPoint{2, T}}}
+    points::A
+    ishole::Bool
+    isconvex::Bool
+    boundingbox::HyperRectangle{2, T}
+end

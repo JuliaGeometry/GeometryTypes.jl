@@ -20,24 +20,25 @@ function _split(b::H, axis, value) where H<:HyperRectangle
 end
 
 # empty constructor such that update will always include the first point
-function (HR::Type{HyperRectangle{N,T}})() where {T,N}
+function (HR::Type{Rect{N, T}})() where {T,N}
     HR(Vec{N,T}(typemax(T)), Vec{N,T}(typemin(T)))
 end
 
 # conversion from other HyperRectangles
-function (HR::Type{HyperRectangle{N,T1}})(a::HyperRectangle{N,T2}) where {N,T1,T2}
+function (HR::Type{Rect{N,T1}})(a::Rect{N, T2}) where {N,T1,T2}
     HR(Vec{N, T1}(minimum(a)), Vec{N, T1}(widths(a)))
 end
 
-function HyperRectangle(v1::Vec{N,T1}, v2::Vec{N,T2}) where {N,T1,T2}
-    T = promote_type(T1,T2)
-    HyperRectangle{N,T}(Vec{N,T}(v1), Vec{N,T}(v2))
+function Rect(v1::Vec{N, T1}, v2::Vec{N, T2}) where {N,T1,T2}
+    T = promote_type(T1, T2)
+    Rect{N,T}(Vec{N, T}(v1), Vec{N, T}(v2))
 end
 
 
-function (HR::Type{HyperRectangle{N,T}})(a::GeometryPrimitive) where {N,T}
-    HR(Vec{N, T}(minimum(a)), Vec{N, T}(widths(a)))
+function Rect{N, T}(a::GeometryPrimitive) where {N, T}
+    Rect{N, T}(Vec{N, T}(minimum(a)), Vec{N, T}(widths(a)))
 end
+
 """
 ```
 HyperRectangle(vals::Number...)
@@ -59,19 +60,62 @@ width == Vec(1,2)
     Expr(:call, :HyperRectangle, v1, v2)
 end
 
-function HyperRectangle(r::SimpleRectangle{T}) where T
-    HyperRectangle{2,T}(r)
-end
+Rect(r::SimpleRectangle{T}) where T = HyperRectangle{2, T}(r)
+Rect{N}(r::SimpleRectangle{T}) where {N, T} = Rect{N, T}(r)
 
-function HyperRectangle{N,T}(r::SimpleRectangle) where {N,T}
-    if N > 2
-        return HyperRectangle(Vec{N, T}(T(r.x), T(r.y), Vec{N-2,T}(zero(T))...),
-                              Vec{N, T}(T(r.w), T(r.h), Vec{N-2,T}(zero(T))...))
+function Rect{N, T}(r::SimpleRectangle) where {N, T}
+    if N === 2
+        return Rect(Vec{N, T}(T(r.x), T(r.y)), Vec{N, T}(T(r.w), T(r.h)))
     else
-        return HyperRectangle(Vec{N, T}(T(r.x), T(r.y)),
-                              Vec{N, T}(T(r.w), T(r.h)))
+        return Rect(
+            Vec{N, T}(r.x, r.y, Vec{N - 2}(zero(T))...),
+            Vec{N, T}(r.w, r.h, Vec{N - 2}(zero(T))...)
+        )
     end
 end
+
+#=
+From other types
+=#
+function Rect2D(xy::NamedTuple{(:x, :y)}, wh::NamedTuple{(:width, :height)})
+    Rect2D(xy.x, xy.y, wh.width, wh.height)
+end
+
+
+function FRect3D(x::Rect2D{T}) where T
+    FRect3D{T}(Vec{3, T}(minimum(x)..., 0), Vec{3, T}(widths(x)..., 0.0))
+end
+
+#=
+From different args
+=#
+function Rect2D(x::Number, y::Number, w::Number, h::Number)
+    args = promote(x, y, w, h)
+    FRect2D{2, eltype(args)}(args...)
+end
+function Rect2D{T}(args::Vararg{Number, 4}) where T
+    x, y, w, h = T <: Integer ? round.(T, args) : args
+    FRect2D{T}(Vec{2, T}(x, y), Vec{2, T}(w, h))
+end
+
+function Rect2D(xy::VecTypes{2}, w::Number, h::Number)
+    Rect2D(xy..., w, h)
+end
+
+function Rect2D(x::Number, y::Number, wh::VecTypes{2})
+    Rect2D(x, y, wh...)
+end
+
+#=
+From limits
+=#
+function FRect3D(x::Tuple{Tuple{<: Number, <: Number}, Tuple{<: Number, <: Number}})
+    FRect3D(Vec3f0(x[1]..., 0), Vec3f0(x[2]..., 0))
+end
+function FRect3D(x::Tuple{Tuple{<: Number, <: Number, <: Number}, Tuple{<: Number, <: Number, <: Number}})
+    FRect3D(Vec3f0(x[1]...), Vec3f0(x[2]...))
+end
+
 
 """
 Transform a `HyperRectangle` using a matrix. Maintains axis-align properties
@@ -238,12 +282,19 @@ AbsoluteRectangle(mini::Vec{N,T}, maxi::Vec{N,T}) where {N,T} = HyperRectangle{N
 
 AABB(a) = AABB{Float32}(a)
 
-function (B::Type{AABB{T}})(a::Pyramid) where T
+function Rect{T}(a::Pyramid) where T
     w,h = a.width/T(2), a.length
     m = Vec{3,T}(a.middle)
-    B(m-Vec{3,T}(w,w,0), m+Vec{3,T}(w, w, h))
+    Rect{T}(m-Vec{3,T}(w,w,0), m+Vec{3,T}(w, w, h))
 end
 
-(B::Type{AABB{T}})(a::Cube) where {T} = B(origin(a), widths(a))
+Rect{T}(a::Cube) where T = Rect{T}(origin(a), widths(a))
 
-(B::Type{AABB{T}})(a::AbstractMesh) where {T} = B(vertices(a))
+Rect{T}(a::AbstractMesh) where T = Rect{T}(vertices(a))
+
+function positive_widths(rect::Rect{N, T}) where {N, T}
+    mini, maxi = minimum(rect), maximum(rect)
+    realmin = min.(mini, maxi)
+    realmax = max.(mini, maxi)
+    Rect{N, T}(realmin, realmax .- realmin)
+end

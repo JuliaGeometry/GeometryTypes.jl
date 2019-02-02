@@ -13,22 +13,23 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 =#
 
-function area(contour::AbstractVector{Point{N, T}}) where {N, T}
+function area(contour::AbstractVector{<: AbstractPoint{N, T}}) where {N, T}
     n = length(contour)
+    n < 3 && return zero(T)
     A = zero(T)
-    p=n; q=1
+    p = n; q = 1
     while q <= n
         A += cross(contour[p], contour[q])
         p = q; q +=1
     end
-    return A*T(0.5)
+    return A * T(0.5)
 end
 
 """
  InsideTriangle decides if a point P is Inside of the triangle
  defined by A, B, C.
 """
-function InsideTriangle(A::T, B::T, C::T, P::T) where T<:Point
+function InsideTriangle(A::T, B::T, C::T, P::T) where T <: AbstractPoint
     a = C-B; b = A-C; c = B-A
     ap = P-A; bp = P-B; cp = P-C
     a_bp = a[1]*bp[2] - a[2]*bp[1];
@@ -39,7 +40,7 @@ function InsideTriangle(A::T, B::T, C::T, P::T) where T<:Point
 end
 
 function snip(
-        contour::AbstractVector{Point{N, T}}, u, v, w, n, V
+        contour::AbstractVector{<: AbstractPoint{N, T}}, u, v, w, n, V
     ) where {N, T}
     A = contour[V[u]]
     B = contour[V[v]]
@@ -70,7 +71,7 @@ It will return a Vector{`facetype`}, defining indexes into `contour`
 """
 function polygon2faces(
         contour::AbstractArray{P}, facetype = GLTriangle
-    ) where P<:Point
+    ) where P <: AbstractPoint
     #= allocate and initialize list of Vertices in polygon =#
     result = facetype[]
 

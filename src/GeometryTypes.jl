@@ -4,7 +4,9 @@ using StaticArrays
 using ColorTypes
 using LinearAlgebra
 
-import FixedPointNumbers # U8
+import FixedPointNumbers
+using FixedPointNumbers: N0f8
+
 
 import IterTools
 using IterTools: partition
@@ -53,7 +55,6 @@ include("setops.jl")
 include("display.jl")
 include("slice.jl")
 include("decompose.jl")
-include("deprecated.jl")
 include("center.jl")
 include("convexhulls.jl")
 include("gjk.jl")

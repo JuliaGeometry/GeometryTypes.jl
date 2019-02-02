@@ -190,7 +190,7 @@ function merge(
     faces        = copy(m1.faces)
     attribs      = Dict{Symbol, Any}(filter(((k,v),) -> k != :color, attributes_noVF(m1)))
     attribs      = Dict{Symbol, Any}([(k, copy(v)) for (k,v) in attribs])
-    color_attrib = RGBA{U8}[RGBA{U8}(m1.color)]
+    color_attrib = RGBA{N0f8}[RGBA{N0f8}(m1.color)]
     index        = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
     for mesh in meshes
         append!(faces, mesh.faces .+ length(vertices))
