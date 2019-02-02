@@ -58,7 +58,8 @@ include("decompose.jl")
 include("center.jl")
 include("convexhulls.jl")
 include("gjk.jl")
-include("polygons.jl")
+include("polygon.jl")
+include("polygon_triangulations.jl")
 include("lines.jl")
 include("cylinder.jl")
 
@@ -104,6 +105,7 @@ export AABB,
        HyperCube,
        HyperSphere,
        intersects,
+       isinside,
        LineSegment,
        Mat,
        Mesh2D,
