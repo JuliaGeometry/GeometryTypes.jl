@@ -64,6 +64,18 @@ function simple_concat(vec::AbstractVector, range, endpoint::P) where P
     result
 end
 
+struct PairIterator{T}
+    data::T
+end
+Base.length(x::PairIterator) = length(x.data) - 1
+function Base.iterate(iter::PairIterator)
+    length(iter.data) < 2 && return nothing
+    (iter.data[1], iter.data[2]), 2
+end
+function Base.iterate(iter::PairIterator, state)
+    (state + 1) > length(iter.data) && return nothing
+    (iter.data[state], iter.data[state + 1]), state + 1
+end
 """
 Finds all self intersections of polygon `points`
 """
@@ -71,8 +83,8 @@ function self_intersections(points::Vector{Point{N,T}}) where {N,T}
     sections = Point{N,T}[]
     intersections = Int[]
     wraparound = i-> mod1(i, length(points) - 1)
-    for (i, (a,b)) in enumerate(partition(points, 2, 1))
-        for (j, (a2, b2)) in enumerate(partition(points, 2, 1))
+    for (i, (a, b)) in enumerate(PairIterator(points))
+        for (j, (a2, b2)) in enumerate(PairIterator(points))
             is1, is2 = wraparound(i+1), wraparound(i-1)
             if i!=j && is1!=j && is2!=j && !(i in intersections) && !(j in intersections)
                 intersected, p = GeometryTypes.intersects(LineSegment(a,b), LineSegment(a2, b2))

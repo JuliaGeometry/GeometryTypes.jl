@@ -8,9 +8,6 @@ import FixedPointNumbers
 using FixedPointNumbers: N0f8
 
 
-import IterTools
-using IterTools: partition
-
 import Base: ==,
              *,
              convert,
