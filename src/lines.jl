@@ -64,18 +64,26 @@ function simple_concat(vec::AbstractVector, range, endpoint::P) where P
     result
 end
 
-struct PairIterator{T}
+struct Partition{N, T}
     data::T
+    connect::Bool # build a pair connecting to first elements
 end
-Base.length(x::PairIterator) = length(x.data) - 1
-function Base.iterate(iter::PairIterator)
-    length(iter.data) < 2 && return nothing
-    (iter.data[1], iter.data[2]), 2
+Partition{N}(data, connect = false) where N = Partition{N, typeof(data)}(data, connect)
+
+# one less if not connect to first elements
+length(x::Partition{N}) where N = (length(x.data) ÷ (N - 1)) - (!x.connect)
+eltype(itr::Partition{N}) where N = NTuple{N, eltype(itr.data)}
+
+function iterate(iter::Partition{N}, state = 1) where N
+    state > length(iter) && return nothing
+    let data = iter.data, s = state
+        tup = ntuple(Val(N)) do i
+            data[mod1(((s - 1) * (N - 1)) + i, length(data))]
+        end
+        return tup, state + 1
+    end
 end
-function Base.iterate(iter::PairIterator, state)
-    (state + 1) > length(iter.data) && return nothing
-    (iter.data[state], iter.data[state + 1]), state + 1
-end
+
 """
 Finds all self intersections of polygon `points`
 """
@@ -83,8 +91,8 @@ function self_intersections(points::Vector{Point{N,T}}) where {N,T}
     sections = Point{N,T}[]
     intersections = Int[]
     wraparound = i-> mod1(i, length(points) - 1)
-    for (i, (a, b)) in enumerate(PairIterator(points))
-        for (j, (a2, b2)) in enumerate(PairIterator(points))
+    for (i, (a, b)) in enumerate(Partition{2}(points))
+        for (j, (a2, b2)) in enumerate(Partition{2}(points))
             is1, is2 = wraparound(i+1), wraparound(i-1)
             if i!=j && is1!=j && is2!=j && !(i in intersections) && !(j in intersections)
                 intersected, p = GeometryTypes.intersects(LineSegment(a,b), LineSegment(a2, b2))

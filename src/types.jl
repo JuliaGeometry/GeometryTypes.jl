@@ -243,10 +243,14 @@ const AbstractConvexHull = Union{
 } # should we parametrize ACH by the type of points T?
 
 
-
 struct Polygon{T, A <: AbstractVector{<: AbstractPoint{2, T}}}
     points::A
-    ishole::Bool
-    isconvex::Bool
     boundingbox::HyperRectangle{2, T}
+    isconvex::Bool
+    ishole::Bool
+end
+
+struct MultiPolygon{T, A <: AbstractVector{<: Polygon{T}}}
+   polygons::A
+   boundingbox::HyperRectangle{2, T}
 end

@@ -27,7 +27,9 @@ import Base: ==,
              size,
              split,
              union,
-             unique
+             unique,
+             iterate,
+             eltype
 
 include("FixedSizeArrays.jl")
 using .FixedSizeArrays

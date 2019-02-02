@@ -54,18 +54,18 @@ end
 #
 # Containment
 #
-
-
 function isinside(rect::SimpleRectangle, x::Real, y::Real)
     rect.x <= x && rect.y <= y && rect.x + rect.w >= x && rect.y + rect.h >= y
 end
-
 function isinside(c::Circle, x::Real, y::Real)
-    @inbounds ox,oy = origin(c)
+    @inbounds ox, oy = origin(c)
     xD = abs(ox - x)
     yD = abs(oy - y)
     xD <= c.r && yD <= c.r
 end
+# TODO only have point in c and deprecate above methods
+in(x::AbstractPoint{2}, c::Circle) = isinside(c, x...)
+in(x::AbstractPoint{2}, c::SimpleRectangle) = isinside(c, x...)
 
 
 """

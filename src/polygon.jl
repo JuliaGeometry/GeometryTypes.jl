@@ -1,58 +1,57 @@
-struct MultiPolygon{T, P<:AbstractPoint}
-   polys::Vector{Polygon{T, P}}
-   bbox::HyperRectangle{T}
-   ishole::Vector{Bool}
+function Polygon(
+        points::AbstractVector;
+        boundingbox = Rect2D(points),
+        isconvex = isconvex(points),
+        ishole = false
+    )
+    ps = convert(AbstractVector{Point}, points)
+    NumType = eltype(eltype(ps))
+    Polygon{NumType, typeof(ps)}(ps, boundingbox, isconvex, ishole)
 end
 
-struct Polygon{T, P<:AbstractPoint}
-   points::Vector{P{T}}
-   bbox::HyperRectangle{T}
-   isconvex::Bool
-end
+iterate(polygons::MultiPolygon) = iterate(polygons.polygons)
+iterate(polygons::MultiPolygon, state) = iterate(polygons.polygons, state)
 
-Polygon(points::Vector{P{T}}, bbox::HyperRectangle{T}, isconvex::Bool) where T where P <: AbstractPoint =
-    Polygon{T, P}(points, bbox, isconvex)
+vertices(poly::Polygon) = poly.points
+boundingbox(poly::Polygon) = poly.boundingbox
+ishole(poly::Polygon) = poly.ishole
+isconvex(poly::Polygon) = poly.isconvex
 
-Polygon(points::AbstractVector{P{T}}) where T where P <: AbstractPoint = Polygon(points, boundingbox(points), isconvex(points))
-Polygon(points::AbstractVector) = Polygon(Point.(points))
 
-boundingbox(points::AbstractVector{P{T}}) where T where P <: AbstractPoint = error("implement")
-isconvex(points::AbstractVector{P{T}}) where T where P <: AbstractPoint = error("implement")
+"""
+    in(point::AbstractPoint, poly::Polygon)
 
-vertices(poly::P) where P <: Polygon = poly.points
-
-function isinside(r::AbstractPoint, poly::Polygon)
-    # An implementation of Hormann-Agathos (2001) Point in Polygon algorithm
-    # See: http://www.sciencedirect.com/science/article/pii/S0925772101000128
-    # Code segment adapted from PolygonClipping.jl
-    isinside(r, poly.bbox) || return false
+# An implementation of Hormann-Agathos (2001) Point in Polygon algorithm
+# See: http://www.sciencedirect.com/science/article/pii/S0925772101000128
+# Code segment adapted from PolygonClipping.jl
+"""
+function in(point::AbstractPoint, poly::Polygon)
+    (point in boundingbox(poly)) || return false
     c = false
-    detq(q1,q2,r) = (q1[1]-r[1])*(q2[2]-r[2])-(q2[1]-r[1])*(q1[2]-r[2])
-    for i in eachindex(vertices(poly))[2:end]
-        q2 = poly[i]
-        q1 = poly[i-1]
-        if q1 == r
+    detq(q1, q2, point) = (q1[1]-point[1])*(q2[2]-point[2])-(q2[1]-point[1])*(q1[2]-point[2])
+    for (q1, q2) in Partition{2}(poly)
+        if q1 == point
             @warn("point on polygon vertex - returning false")
             return false
         end
-        if q2[2] == r[2]
-            if q2[1] == r[1]
+        if q2[2] == point[2]
+            if q2[1] == point[1]
                 @warn("point on polygon vertex - returning false")
                 return false
-            elseif (q1[2] == r[2]) && ((q2[1] > x) == (q1[1] < r[1]))
+            elseif (q1[2] == point[2]) && ((q2[1] > x) == (q1[1] < point[1]))
                 @warn("point on edge - returning false")
                 return false
             end
         end
-        if (q1[2] < r[2]) != (q2[2] < r[2]) # crossing
-            if q1[1] >= r[1]
-                if q2[1] > r[1]
+        if (q1[2] < point[2]) != (q2[2] < point[2]) # crossing
+            if q1[1] >= point[1]
+                if q2[1] > point[1]
                     c = !c
-                elseif ((detq(q1,q2,r) > 0) == (q2[2] > q1[2])) # right crossing
+                elseif ((detq(q1,q2,point) > 0) == (q2[2] > q1[2])) # right crossing
                     c = !c
                 end
-            elseif q2[1] > r[1]
-                if ((detq(q1,q2,r) > 0) == (q2[2] > q1[2])) # right crossing
+            elseif q2[1] > point[1]
+                if ((detq(q1,q2,point) > 0) == (q2[2] > q1[2])) # right crossing
                     c = !c
                 end
             end
@@ -61,16 +60,30 @@ function isinside(r::AbstractPoint, poly::Polygon)
     return c
 end
 
-function isinside(r::AbstractPoint, poly::M) where M <: MultiPolygon)
-    isinside(r, poly.bbox) || return false
-    for p in findall(poly.ishole)
-        isinside(r, poly.polys[p]) && return false
-    end
-    for p in findall(.!(poly.ishole))
-        isinside(r, poly.polys[p]) && return true
+function in(point::AbstractPoint, polygons::MultiPolygon)
+    point in boundingbox(polygons) || return false
+    for polygon in polygons
+        if ishole(polygon)
+            point in polygon && return false
+        else
+            point in polygon && return true
+        end
     end
     return false
 end
 
-isinside(r::AbstractPoint, bbox::HyperRectangle) =
-    origin(bbox)[1] < r[1] < widths(bbox)[1] && origin(bbox)[1] < r[2] < widths(bbox)[2]
+function isconvex(points::AbstractVector{<: AbstractPoint})
+    length(points) < 4 && return true
+    sign = false
+    for (i, (a, b, c)) in enumerate(Partition{3}(points, true))
+        Δ1 = c .- b
+        Δ2 = a .- b
+        det = cross(Δ1, Δ2)
+        if i == 1
+            sign = det > 0
+        elseif (sign != (det > 0))
+            return false
+        end
+    end
+    return true
+end
