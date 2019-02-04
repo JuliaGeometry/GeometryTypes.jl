@@ -87,15 +87,15 @@ end
 """
 Finds all self intersections of polygon `points`
 """
-function self_intersections(points::Vector{Point{N,T}}) where {N,T}
-    sections = Point{N,T}[]
+function self_intersections(points::AbstractVector{<: AbstractPoint})
+    sections = similar(points, 0)
     intersections = Int[]
     wraparound = i-> mod1(i, length(points) - 1)
     for (i, (a, b)) in enumerate(Partition{2}(points))
         for (j, (a2, b2)) in enumerate(Partition{2}(points))
             is1, is2 = wraparound(i+1), wraparound(i-1)
-            if i!=j && is1!=j && is2!=j && !(i in intersections) && !(j in intersections)
-                intersected, p = GeometryTypes.intersects(LineSegment(a,b), LineSegment(a2, b2))
+            if i != j && is1 != j && is2 != j && !(i in intersections) && !(j in intersections)
+                intersected, p = intersects(LineSegment(a,b), LineSegment(a2, b2))
                 if intersected
                     push!(intersections, i, j)
                     push!(sections, p)
@@ -110,17 +110,17 @@ end
 Splits polygon `points` into it's self intersecting parts. Only 1 intersection
 is handled right now.
 """
-function split_intersections(points::Vector{Point{N,T}}) where {N,T}
+function split_intersections(points::AbstractVector{<: AbstractPoint})
     intersections, sections = self_intersections(points)
     if isempty(intersections)
-        return Vector{Point{N,T}}[points]
+        return [points]
     elseif length(intersections) == 2 && length(sections) == 1
-        a,b = intersections
+        a, b = intersections
         p = sections[1]
         a,b = min(a,b), max(a,b)
         poly1 = simple_concat(points, (a+1):(b-1), p)
         poly2 = simple_concat(points, (b+1):(length(points)+a), p)
-        return Vector{Point{N,T}}[poly1, poly2]
+        return [poly1, poly2]
     else
         error("More than 1 intersections can't be handled currently. Found: $intersections, $sections")
     end

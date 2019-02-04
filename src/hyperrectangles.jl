@@ -20,19 +20,24 @@ function _split(b::H, axis, value) where H<:HyperRectangle
 end
 
 # empty constructor such that update will always include the first point
-function (HR::Type{Rect{N, T}})() where {T,N}
-    HR(Vec{N,T}(typemax(T)), Vec{N,T}(typemin(T)))
+function Rect{N, T}() where {T,N}
+    Rect(Vec{N,T}(typemax(T)), Vec{N,T}(typemin(T)))
 end
 
 # conversion from other HyperRectangles
-function (HR::Type{Rect{N,T1}})(a::Rect{N, T2}) where {N,T1,T2}
-    HR(Vec{N, T1}(minimum(a)), Vec{N, T1}(widths(a)))
+function Rect{N,T1}(a::Rect{N, T2}) where {N,T1,T2}
+    Rect(Vec{N, T1}(minimum(a)), Vec{N, T1}(widths(a)))
 end
 
 function Rect(v1::Vec{N, T1}, v2::Vec{N, T2}) where {N,T1,T2}
     T = promote_type(T1, T2)
     Rect{N,T}(Vec{N, T}(v1), Vec{N, T}(v2))
 end
+function Rect{N}(v1::Vec{N, T1}, v2::Vec{N, T2}) where {N,T1,T2}
+    T = promote_type(T1, T2)
+    Rect{N,T}(Vec{N, T}(v1), Vec{N, T}(v2))
+end
+
 
 
 function Rect{N, T}(a::GeometryPrimitive) where {N, T}
@@ -60,6 +65,9 @@ width == Vec(1,2)
     Expr(:call, :HyperRectangle, v1, v2)
 end
 
+Rect{3}(a::Vararg{Number, 6}) = Rect{3}(Vec{3}(a[1], a[2], a[3]), Vec{3}(a[4], a[5], a[6]))
+Rect{3}(args::Vararg{Number, 4}) = Rect{3}(Rect{2}(args...))
+
 Rect(r::SimpleRectangle{T}) where T = HyperRectangle{2, T}(r)
 Rect{N}(r::SimpleRectangle{T}) where {N, T} = Rect{N, T}(r)
 
@@ -83,7 +91,7 @@ end
 
 
 function FRect3D(x::Rect2D{T}) where T
-    FRect3D{T}(Vec{3, T}(minimum(x)..., 0), Vec{3, T}(widths(x)..., 0.0))
+    Rect{3, T}(Vec{3, T}(minimum(x)..., 0), Vec{3, T}(widths(x)..., 0.0))
 end
 
 #=
@@ -91,11 +99,11 @@ From different args
 =#
 function Rect2D(x::Number, y::Number, w::Number, h::Number)
     args = promote(x, y, w, h)
-    FRect2D{2, eltype(args)}(args...)
+    Rect2D{eltype(args)}(args...)
 end
 function Rect2D{T}(args::Vararg{Number, 4}) where T
     x, y, w, h = T <: Integer ? round.(T, args) : args
-    FRect2D{T}(Vec{2, T}(x, y), Vec{2, T}(w, h))
+    Rect{2, T}(Vec{2, T}(x, y), Vec{2, T}(w, h))
 end
 
 function Rect2D(xy::VecTypes{2}, w::Number, h::Number)
@@ -278,8 +286,6 @@ function Base.to_indices(A::AbstractArray{T, 2}, I::Tuple{<: SimpleRectangle}) w
     (i.x + 1 : (i.x + i.w), i.y + 1 : (i.y + i.h))
 end
 
-AbsoluteRectangle(mini::Vec{N,T}, maxi::Vec{N,T}) where {N,T} = HyperRectangle{N,T}(mini, maxi-mini)
-
 AABB(a) = AABB{Float32}(a)
 
 function Rect{T}(a::Pyramid) where T
@@ -298,3 +304,245 @@ function positive_widths(rect::Rect{N, T}) where {N, T}
     realmax = max.(mini, maxi)
     Rect{N, T}(realmin, realmax .- realmin)
 end
+
+
+# set operations
+
+"""
+Perform a union between two HyperRectangles.
+"""
+function union(h1::Rect{N}, h2::Rect{N}) where N
+    m = min.(minimum(h1), minimum(h2))
+    mm = max.(maximum(h1), maximum(h2))
+    Rect{N}(m, mm - m)
+end
+
+
+"""
+Perform a difference between two HyperRectangles.
+"""
+diff(h1::Rect, h2::Rect) = h1
+
+
+"""
+Perform a intersection between two HyperRectangles.
+"""
+function intersect(h1::Rect{N}, h2::Rect{N}) where N
+    m = max.(minimum(h1), minimum(h2))
+    mm = min.(maximum(h1), maximum(h2))
+    Rect{N}(m, mm - m)
+end
+
+function intersect(a::SimpleRectangle, b::SimpleRectangle)
+    min_n = max.(minimum(a), minimum(b))
+    max_n = min.(maximum(a), maximum(b))
+    w = max_n - min_n
+    SimpleRectangle(min_n[1], min_n[2], w[1], w[2])
+end
+
+
+
+function update(b::HyperRectangle{N, T}, v::Vec{N, T2}) where {N, T, T2}
+    update(b, Vec{N, T}(v))
+end
+function update(b::HyperRectangle{N, T}, v::Vec{N, T}) where {N, T}
+    m = min.(minimum(b), v)
+    maxi = maximum(b)
+    mm = if isnan(maxi)
+        v-m
+    else
+        max.(v, maxi) - m
+    end
+    HyperRectangle{N, T}(m, mm)
+end
+
+# Min maximum distance functions between hrectangle and point for a given dimension
+@inline function min_dist_dim(rect::HyperRectangle{N, T}, p::Vec{N, T}, dim::Int) where {N, T}
+    max(zero(T), max(minimum(rect)[dim] - p[dim], p[dim] - maximum(rect)[dim]))
+end
+
+@inline function max_dist_dim(rect::HyperRectangle{N, T}, p::Vec{N, T}, dim::Int) where {N, T}
+    max(maximum(rect)[dim] - p[dim], p[dim] - minimum(rect)[dim])
+end
+
+@inline function min_dist_dim(rect1::HyperRectangle{N, T},
+                              rect2::HyperRectangle{N, T},
+                              dim::Int) where {N, T}
+    max(zero(T), max(
+        minimum(rect1)[dim] - maximum(rect2)[dim],
+        minimum(rect2)[dim] - maximum(rect1)[dim]
+    ))
+end
+
+@inline function max_dist_dim(rect1::HyperRectangle{N, T},
+                              rect2::HyperRectangle{N, T},
+                              dim::Int) where {N, T}
+    max(
+        maximum(rect1)[dim] - minimum(rect2)[dim],
+        maximum(rect2)[dim] - minimum(rect1)[dim]
+    )
+end
+
+# Total minimum maximum distance functions
+@inline function min_euclideansq(rect::HyperRectangle{N, T},
+                                 p::Union{Vec{N, T},
+                                 HyperRectangle{N, T}}) where {N, T}
+    minimum_dist = T(0.0)
+    for dim in 1:length(p)
+        d = min_dist_dim(rect, p, dim)
+        minimum_dist += d*d
+    end
+    return minimum_dist
+end
+
+
+@inline function max_euclideansq(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}}) where {N, T}
+    maximum_dist = T(0.0)
+    for dim in 1:length(p)
+        d = max_dist_dim(rect, p, dim)
+        maximum_dist += d*d
+    end
+    return maximum_dist
+end
+function max_euclidean(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}}) where {N, T}
+    sqrt(max_euclideansq(rect, p))
+end
+
+
+# Functions that return both minimum and maximum for convenience
+@inline function minmax_dist_dim(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}}, dim::Int) where {N, T}
+    minimum_d = min_dist_dim(rect, p, dim)
+    maximum_d = max_dist_dim(rect, p, dim)
+    return minimum_d, maximum_d
+end
+
+
+@inline function minmax_euclideansq(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}}) where {N, T}
+    minimum_dist = min_euclideansq(rect, p)
+    maximum_dist = max_euclideansq(rect, p)
+    return minimum_dist, maximum_dist
+end
+
+function minmax_euclidean(rect::HyperRectangle{N, T}, p::Union{Vec{N, T}, HyperRectangle{N, T}}) where {N, T}
+    minimumsq, maximumsq = minmax_euclideansq(rect, p)
+    return sqrt(minimumsq), sqrt(maximumsq)
+end
+
+#
+# http://en.wikipedia.org/wiki/Allen%27s_interval_algebra
+#
+
+function before(b1::Rect{N}, b2::Rect{N}) where N
+    for i = 1:N
+        maximum(b1)[i] < minimum(b2)[i] || return false
+    end
+    true
+end
+
+meets(b1::Rect{N}, b2::Rect{N}) where N = maximum(b1) == minimum(b2)
+
+function overlaps(b1::Rect{N}, b2::Rect{N}) where N
+    for i = 1:N
+        maximum(b2)[i] > maximum(b1)[i] > minimum(b2)[i] &&
+        minimum(b1)[i] < minimum(b2)[i] || return false
+    end
+    true
+end
+
+function starts(b1::Rect{N}, b2::Rect{N}) where N
+    if minimum(b1) == minimum(b2)
+        for i = 1:N
+            maximum(b1)[i] < maximum(b2)[i] || return false
+        end
+        return true
+    else
+        return false
+    end
+end
+
+function during(b1::Rect{N}, b2::Rect{N}) where N
+    for i = 1:N
+        maximum(b1)[i] < maximum(b2)[i] && minimum(b1)[i] > minimum(b2)[i] ||
+        return false
+    end
+    true
+end
+
+function finishes(b1::Rect{N}, b2::Rect{N}) where N
+    if maximum(b1) == maximum(b2)
+        for i = 1:N
+            minimum(b1)[i] > minimum(b2)[i] || return false
+        end
+        return true
+    else
+        return false
+    end
+end
+
+#
+# Containment
+#
+function isinside(rect::SimpleRectangle, x::Real, y::Real)
+    rect.x <= x && rect.y <= y && rect.x + rect.w >= x && rect.y + rect.h >= y
+end
+
+# TODO only have point in c and deprecate above methods
+in(x::AbstractPoint{2}, c::Circle) = isinside(c, x...)
+in(x::AbstractPoint{2}, c::SimpleRectangle) = isinside(c, x...)
+
+
+
+
+"""
+Check if HyperRectangles are contained in each other. This does not use
+strict inequality, so HyperRectangles may share faces and this will still
+return true.
+"""
+function contains(b1::Rect{N}, b2::Rect{N}) where N
+    for i = 1:N
+        maximum(b2)[i] <= maximum(b1)[i] &&
+            minimum(b2)[i] >= minimum(b1)[i] ||
+            return false
+    end
+    return true
+end
+
+"""
+Check if a point is contained in a Rect. This will return true if
+the point is on a face of the Rect.
+"""
+function contains(b1::Rect{N, T}, pt::Union{FixedVector, AbstractVector}) where {T, N}
+    for i = 1:N
+        pt[i] <= maximum(b1)[i] && pt[i] >= minimum(b1)[i] || return false
+    end
+    return true
+end
+
+"""
+Check if HyperRectangles are contained in each other. This does not use
+strict inequality, so HyperRectangles may share faces and this will still
+return true.
+"""
+in(b1::Rect, b2::Rect) = contains(b2, b1)
+
+"""
+Check if a point is contained in a Rect. This will return true if
+the point is on a face of the Rect.
+"""
+in(pt::Union{FixedVector, AbstractVector}, b1::Rect) = contains(b1, pt)
+
+
+
+#
+# Equality
+#
+(==)(b1::Rect, b2::Rect) = minimum(b1) == minimum(b2) && widths(b1) == widths(b2)
+
+
+isequal(b1::Rect, b2::Rect) = b1 == b2
+
+isless(a::SimpleRectangle, b::SimpleRectangle) = isless(area(a), area(b))
+
+
+centered(R::Type{HyperRectangle{N,T}}) where {N, T} = R(Vec{N,T}(-0.5), Vec{N,T}(1))
+centered(::Type{T}) where {T <: HyperRectangle} = centered(HyperRectangle{ndims_or(T, 3), eltype_or(T, Float32)})

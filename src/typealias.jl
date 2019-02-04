@@ -51,7 +51,6 @@ An alias for a HyperSphere of dimension 3. i.e. `Sphere{T}` -> `HyperSphere{3, T
 """
 const Sphere{T} = HyperSphere{3, T}
 
-const AbsoluteRectangle{T} = HyperRectangle{2, T}
 const Rect{N, T} = HyperRectangle{N, T}
 const Rect2D{T} = HyperRectangle{2, T}
 const FRect2D = Rect2D{Float32}
@@ -66,7 +65,6 @@ const VecTypes{N, T} = Union{StaticVector{N, T}, NTuple{N, T}}
 AABB, or Axis Aligned Bounding Box, is an alias for a 3D `HyperRectangle`.
 """
 const AABB{T} = HyperRectangle{3, T}
-AABB(m...) = HyperRectangle(m...)
 
 const HMesh = HomogenousMesh
 

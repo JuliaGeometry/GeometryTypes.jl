@@ -35,26 +35,16 @@ include("FixedSizeArrays.jl")
 using .FixedSizeArrays
 
 include("types.jl")
-include("typeutils.jl")
+include("utils.jl")
 include("typealias.jl")
-include("baseutils.jl")
-include("linalgutils.jl")
 include("simplices.jl")
-include("algorithms.jl")
 include("faces.jl")
 include("hyperrectangles.jl")
 include("hypersphere.jl")
 include("hypercube.jl")
-include("relations.jl")
-include("operations.jl")
 include("meshes.jl")
-include("primitives.jl")
 include("distancefields.jl")
-include("setops.jl")
-include("display.jl")
-include("slice.jl")
 include("decompose.jl")
-include("center.jl")
 include("convexhulls.jl")
 include("gjk.jl")
 include("polygon.jl")
@@ -65,7 +55,6 @@ include("cylinder.jl")
 export AABB,
        AbstractFlexibleGeometry,
        AbstractGeometry,
-       AbsoluteRectangle,
        AbstractMesh,
        AbstractSimplex,
        AbstractDistanceField,
