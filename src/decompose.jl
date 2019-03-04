@@ -386,7 +386,7 @@ isdecomposable(::Type{T}, ::Type{C}) where {T <:Point, C <:Cylinder2} = true
 isdecomposable(::Type{T}, ::Type{C}) where {T <:Face, C <:Cylinder2} = true
 
 # def of resolution + rotation
-function decompose(PT::Type{Point{3, T}}, c::Cylinder{2, T}, resolution = (2, 2)) where T
+function decompose(PT::Type{Point{3, T}}, c::Cylinder{2}, resolution = (2, 2)) where T
     r = SimpleRectangle{T}(c.origin[1] - c.r/2, c.origin[2], c.r, height(c))
     M = rotation(c); vertices = decompose(PT, r, resolution)
     vo = length(c.origin) == 2 ? Point{3, T}(c.origin[1], c.origin[2], 0) : c.origin
@@ -395,7 +395,7 @@ function decompose(PT::Type{Point{3, T}}, c::Cylinder{2, T}, resolution = (2, 2)
     end
     return vertices
 end
-function decompose(PT::Type{Point{3,T}}, c::Cylinder{3, T}, resolution = 5) where T
+function decompose(PT::Type{Point{3, T}}, c::Cylinder{3}, resolution = 30) where T
     isodd(resolution) && (resolution = 2 * div(resolution, 2))
     resolution = max(8, resolution); nbv = div(resolution, 2)
     M = rotation(c); h = height(c)
@@ -409,11 +409,11 @@ function decompose(PT::Type{Point{3,T}}, c::Cylinder{3, T}, resolution = 5) wher
     return vertices
 end
 
-function decompose(::Type{FT}, c::Cylinder{2, T}, resolution = (2, 2)) where {FT <: Face, T}
-    r = SimpleRectangle{T}(c.origin[1] - c.r/2, c.origin[2], c.r, height(c))
+function decompose(::Type{FT}, c::Cylinder{2}, resolution = (2, 2)) where FT <: Face
+    r = SimpleRectangle(c.origin[1] - c.r/2, c.origin[2], c.r, height(c))
     return decompose(FT, r, resolution)
 end
-function decompose(::Type{FT}, c::Cylinder{3, T}, facets = 18) where {FT <: Face, T}
+function decompose(::Type{FT}, c::Cylinder{3}, facets = 30) where FT <: Face
     isodd(facets) ? facets = 2 * div(facets, 2) : nothing
     facets < 8 ? facets = 8 : nothing; nbv = Int(facets / 2)
     indexes = Vector{FT}(undef, facets); index = 1
