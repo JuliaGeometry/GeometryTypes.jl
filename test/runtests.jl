@@ -2,10 +2,12 @@ using GeometryTypes, ColorTypes
 using Test
 using Test: @inferred
 
-# 0.7 Base still contains a (deprecated) contains; resolve ambiguity
-if VERSION < v"1.0-"
-    using GeometryTypes: contains
-end
+
+@test !isnan(Point3f0(1))
+@test isnan(Point3f0(NaN))
+@test unit(Point3f0, 1) == Point3f0(1, 0, 0)
+@test unit(Point3f0, 2) == Point3f0(0, 1, 0)
+@test unit(Point3f0, 3) == Point3f0(0, 0, 1)
 
 @testset "GeometryTypes" begin
     include("baseutils.jl")
