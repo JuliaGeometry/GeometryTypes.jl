@@ -170,10 +170,10 @@ function Base.extrema(a::AbstractVector{T}) where T <: FixedVector
     reduce((x, v)-> (min.(x[1], v), max.(x[2], v)), a; init = (T(typemax(ET)), T(typemin(ET))))
 end
 function Base.minimum(a::AbstractVector{T}) where T <: FixedVector
-    reduce((x, v)-> min.(x[1], v), a; init=T(typemax(eltype(T))))
+    reduce((x, v)-> min.(x, v), a; init=T(typemax(eltype(T))))
 end
 function Base.maximum(a::AbstractVector{T}) where T <: FixedVector
-    reduce((x, v)-> max.(x[1], v), a; init=T(typemin(eltype(T))))
+    reduce((x, v)-> max.(x, v), a; init=T(typemin(eltype(T))))
 end
 
 
