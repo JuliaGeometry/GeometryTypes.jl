@@ -11,3 +11,21 @@
 
     @test_throws ArgumentError GeometryTypes.argmax(identity, [])
 end
+
+@testset "extrema" begin
+    xs = [GeometryTypes.Vec2f0(1f0, 1f0), GeometryTypes.Vec2f0(0.5f0, 1.5f0)]
+    extr = extrema(xs)
+
+    @test extr[1] ≈ GeometryTypes.Vec2f0(0.5f0, 1f0)
+    @test extr[2] ≈ GeometryTypes.Vec2f0(1f0, 1.5f0)
+
+    @testset "minimum" begin
+        val = minimum(xs)
+        @test val ≈ extr[1]
+    end
+
+    @testset "maximum" begin
+        val = maximum(xs)
+        @test val ≈ extr[2]
+    end
+end
