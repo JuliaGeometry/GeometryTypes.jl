@@ -1,2 +1,6 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+GeometryTypes = "4d00f742-c7ba-57c2-abde-4428a4b178cb"
+
+[compat]
+Documenter = "~0.23"
