@@ -72,7 +72,7 @@ communicating with 0-indexed systems such ad OpenGL.
 struct OffsetInteger{O, T <: Integer} <: Integer
     i::T
 
-    OffsetInteger{O, T}(x::Integer) where {O, T <: Integer} = new{O, T}(T(O >= 0 ? x + O : x - (-O)))
+    OffsetInteger{O, T}(x::Integer) where {O, T <: Integer} = new{O, T}(T(x + O))
 end
 
 
