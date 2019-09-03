@@ -18,13 +18,22 @@ using Test: @inferred
     include("meshes.jl")
     include("distancefields.jl")
     include("primitives.jl")
+    include("polytopes.jl")
     include("decompose.jl")
     include("simplerectangle.jl")
     include("hypersphere.jl")
     include("typeutils.jl")
+<<<<<<< HEAD
     include("simplices.jl")
     include("gjk.jl")
     include("lines.jl")
     include("polygons.jl")
     include("cylinder.jl")
+=======
+    include("angles.jl")
+<<<<<<< HEAD
+>>>>>>> wip
+=======
+    include("hypercube.jl")
+>>>>>>> round out some more tests
 end

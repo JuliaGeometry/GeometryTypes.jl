@@ -11,6 +11,12 @@ using IterTools: partition
 
 import Base: ==,
              *,
+<<<<<<< HEAD
+=======
+             angle,
+             call,
+             contains,
+>>>>>>> initial sketch of Polytope/Polygon/Polyhedron type
              convert,
              diff,
              getindex,
@@ -23,6 +29,8 @@ import Base: ==,
              merge,
              merge,
              minimum,
+             scale,
+             scale!,
              setindex!,
              show,
              size,
@@ -40,6 +48,7 @@ include("baseutils.jl")
 include("linalgutils.jl")
 include("simplices.jl")
 include("algorithms.jl")
+include("volume.jl")
 include("faces.jl")
 include("hyperrectangles.jl")
 include("hypersphere.jl")
@@ -52,14 +61,21 @@ include("distancefields.jl")
 include("setops.jl")
 include("display.jl")
 include("slice.jl")
+include("scale.jl")
+include("polytopes.jl")
+include("angles.jl")
 include("decompose.jl")
 include("deprecated.jl")
 include("center.jl")
+<<<<<<< HEAD
 include("convexhulls.jl")
 include("gjk.jl")
 include("polygons.jl")
 include("lines.jl")
 include("cylinder.jl")
+=======
+include("centroid.jl")
+>>>>>>> round out some more tests
 
 export AABB,
        AbstractFlexibleGeometry,
@@ -69,6 +85,7 @@ export AABB,
        AbstractSimplex,
        AbstractDistanceField,
        Circle,
+<<<<<<< HEAD
        centered,
        contains,
        Cube,
@@ -79,6 +96,9 @@ export AABB,
        direction,
        eltype_or,
        extremity,
+=======
+       Cube,
+>>>>>>> wip
        Face,
        FlexibleConvexHull,
        FlexibleSimplex,
@@ -117,6 +137,9 @@ export AABB,
        Particle,
        PlainMesh,
        Point,
+       Polygon,
+       Polytope,
+       Polyhedron,
        Pyramid,
        Quad,
        Rectangle,
@@ -135,13 +158,21 @@ export AABB,
        UVW,
        UVWMesh,
        Vec,
-       area,
        attributes,
        attributes_noVF,
        before,
+       centroid,
+       centered,
        colors,
        colortype,
+<<<<<<< HEAD
+=======
+       column,
+       decompose,
+       eltype_or,
+>>>>>>> wip
        during,
+       elements,
        faces,
        facetype,
        finishes,
@@ -170,8 +201,13 @@ export AABB,
        nvertices,
        overlaps,
        origin,
+<<<<<<< HEAD
        polygon2faces,
        radius,
+=======
+       radius,
+       row,
+>>>>>>> round out some more tests
        setindex,
        slice,
        spacedim,
@@ -183,8 +219,11 @@ export AABB,
        update,
        vertextype,
        vertices,
+<<<<<<< HEAD
        vertexmat,
        vertexmatrix,
+=======
+>>>>>>> wip
        volume,
        width,
        widths,

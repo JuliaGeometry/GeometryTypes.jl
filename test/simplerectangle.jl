@@ -3,6 +3,7 @@ using LinearAlgebra
 @testset "SimpleRectangle" begin
 @testset "constructors" begin
     s = SimpleRectangle(1,2,3,4)
+<<<<<<< HEAD
     @test typeof(s) == SimpleRectangle{Int}
     @test width(s) == 3
     @test height(s) == 4
@@ -12,6 +13,17 @@ using LinearAlgebra
     @test minimum(s) == Point(1,2)
     @test maximum(s) == Point(4,6)
     @test origin(s) == Point(1,2)
+=======
+    @fact typeof(s) --> SimpleRectangle{Int}
+    @fact width(s) --> 3
+    @fact height(s) --> 4
+    @fact volume(s) --> 12
+    @fact xwidth(s) --> 4
+    @fact yheight(s) --> 6
+    @fact minimum(s) --> Point(1,2)
+    @fact maximum(s) --> Point(4,6)
+    @fact origin(s) --> Point(1,2)
+>>>>>>> wip
     h = HyperRectangle(s)
     @test typeof(h) == HyperRectangle{2,Int}
     @test h == HyperRectangle(1,2,3,4)

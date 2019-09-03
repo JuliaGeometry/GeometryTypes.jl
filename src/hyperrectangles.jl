@@ -218,6 +218,7 @@ xwidth(a::SimpleRectangle)  = a.w + a.x
 width(a::SimpleRectangle)  = a.w
 yheight(a::SimpleRectangle) = a.h + a.y
 height(a::SimpleRectangle) = a.h
+<<<<<<< HEAD
 area(a::SimpleRectangle) = a.w*a.h
 widths(a::SimpleRectangle{T}) where {T} = Point{2,T}(a.w, a.h)
 maximum(a::SimpleRectangle{T}) where {T} = Point{2, T}(a.x + widths(a)[1], a.y +widths(a)[2])
@@ -228,6 +229,12 @@ SimpleRectangle(val::Vec{2, T}) where {T} = SimpleRectangle{T}(0, 0, val...)
 function SimpleRectangle(position::Vec{2,T}, width::Vec{2,T}) where T
     SimpleRectangle{T}(position..., width...)
 end
+=======
+widths{T}(a::SimpleRectangle{T}) = Point{2,T}(a.w, a.h)
+maximum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x + widths(a)[1], a.y +widths(a)[2])
+minimum{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
+origin{T}(a::SimpleRectangle{T}) = Point{2, T}(a.x, a.y)
+>>>>>>> wip
 
 function Base.to_indices(A::AbstractArray{T, 2}, I::Tuple{<: SimpleRectangle}) where T
     i = I[1]
