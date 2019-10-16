@@ -24,7 +24,7 @@ function area(contour::AbstractVector{Point{2, T}}) where {T}
     return A*T(0.5)
 end
 
-function area(contour::AbstractVector{Point{3, T}}) where {N, T}
+function area(contour::AbstractVector{Point{3, T}}) where {T}
     n = length(contour)
     A = zero(T)
     o = contour[1]
