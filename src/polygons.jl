@@ -24,6 +24,16 @@ function area(contour::AbstractVector{Point{2, T}}) where {T}
     return A*T(0.5)
 end
 
+function area(contour::AbstractVector{Point{3, T}}) where {N, T}
+    n = length(contour)
+    A = zero(T)
+    o = contour[1]
+    for i in 2:(n-1)
+        A += norm(cross(contour[i] - o, contour[i+1] - o))
+    end
+    return A*T(0.5)
+end
+
 """
  InsideTriangle decides if a point P is Inside of the triangle
  defined by A, B, C.
