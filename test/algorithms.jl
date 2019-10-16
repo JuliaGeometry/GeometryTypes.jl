@@ -1,8 +1,9 @@
-using Base.Test
+using Test, GeometryTypes
 
 @testset "algorithms.jl" begin
-pSphere = parseGtsFile( "./data/sphere5.gts" )
-sphere = ( nodes = pSphere[1], faces = pSphere[4] )
-
-@test area( reinterpret(Point{3,Float64},sphere.nodes), reinterpret(Point{3,Int},sphere.faces) ) ≈ 12.413436704726122
+    cube = HyperRectangle(Vec3f0(-0.5), Vec3f0(1))
+    cube_faces = decompose(Face{3,Int32}, cube)
+    cube_vertices = decompose(Point{3,Float32}, cube) |> Array
+    @test area( cube_vertices, cube_faces ) == 6
+    @test_broken volume( cube_vertices, cube_faces ) == 6
 end
