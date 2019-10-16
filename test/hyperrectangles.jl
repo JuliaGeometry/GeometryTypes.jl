@@ -1,3 +1,5 @@
+using LinearAlgebra
+
 @testset "Hyper Cubes" begin
     @testset "Core" begin
         x = centered(HyperCube)
@@ -205,7 +207,7 @@ end
     h = t * HyperRectangle(0, 0, 1, 2)
 
     @test h == HyperRectangle(0, 0, 2, 1)
-    m = eye(Mat4f0)
+    m = Mat4f0(1.0I)
     h = centered(HyperRectangle{3, Float32})
     @test h == h
 

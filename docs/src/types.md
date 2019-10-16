@@ -2,38 +2,64 @@
 
 ## Hyper Geometry
 
-@{
-    HyperRectangle
-    HyperSphere
-}
+```@docs
+HyperRectangle
+```
+
+```@docs
+HyperSphere
+```
 
 ## Primitives
 
-@{Simplex}
+```@docs
+Simplex
+```
 
-@{LineSegment}
+```@docs
+LineSegment
+```
 
-@{Circle}
+```@docs
+Circle
+```
 
-@{Sphere}
+```@docs
+Sphere
+```
 
 ## Meshes
 
-@{HomogenousMesh}
+```@docs
+HomogenousMesh
+```
 
 ### Faces
 
-@{Face}
+```@docs
+Face
+```
 
 ## DistanceFields
 
-@{SignedDistanceField}
+```@docs
+SignedDistanceField
+```
 
 ## Abstract Types
 
-@{
-    GeometryPrimitive
-    AbstractSimplex
-    AbstractMesh
-    AbstractDistanceField
-}
+```@docs
+GeometryPrimitive
+```
+
+```@docs
+AbstractSimplex
+```
+
+```@docs
+AbstractMesh
+```
+
+```@docs
+AbstractDistanceField
+```

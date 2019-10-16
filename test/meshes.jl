@@ -53,9 +53,9 @@ end
 
 @testset "Primitives" begin
     m = GLNormalMesh(Sphere(Point3f0(0), 1f0))
-    @test length(vertices(m)) == 577
-    @test length(faces(m)) == 1152
-
+    @test length(vertices(m)) == 576
+    @test length(faces(m)) == 1058
+    @test length(normals(m)) == 576
 end
 
 
@@ -182,6 +182,16 @@ end
     # test for https://github.com/JuliaGeometry/GeometryTypes.jl/issues/92
     m = HomogenousMesh(vs, fs)
     @test HomogenousMesh(m) == m
+end
+
+@testset "unique vertices" begin
+    # geom <> with overlapping verts for middle points
+    v = Point3f0[(0, 0, 0), (1, 1, 0), (1, -1, 0), (1, 1, 0), (2, 0, 0), (1, -1, 0)]
+    f = GLTriangle[(1, 2, 3), (4, 5, 6)]
+    m = GLPlainMesh(v, f)
+    GeometryTypes.remove_overlap!(m)
+    @test vertices(m) == Point3f0[(0, 0, 0), (1, 1, 0), (1, -1, 0), (2, 0, 0)]
+    @test faces(m) == GLTriangle[(1, 2, 3), (2, 4, 3)]
 end
 
 end

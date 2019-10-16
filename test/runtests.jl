@@ -1,12 +1,16 @@
 using GeometryTypes, ColorTypes
-using Compat
-using Compat: range
-using Compat.Test
-using Compat.Test: @inferred
-using Compat.LinearAlgebra
+using Test
+using Test: @inferred
 
+
+@test !isnan(Point3f0(1))
+@test isnan(Point3f0(NaN))
+@test unit(Point3f0, 1) == Point3f0(1, 0, 0)
+@test unit(Point3f0, 2) == Point3f0(0, 1, 0)
+@test unit(Point3f0, 3) == Point3f0(0, 0, 1)
 
 @testset "GeometryTypes" begin
+    include("baseutils.jl")
     include("convexhulls.jl")
     include("polygons.jl")
     include("hyperrectangles.jl")

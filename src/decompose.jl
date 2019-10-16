@@ -1,13 +1,3 @@
-# Handle https://github.com/JuliaLang/julia/pull/23750
-@static if VERSION >= v"0.7.0-DEV.2083"
-    _reshape_reinterpret(T, X, d...) = reshape(reinterpret(T, X), d...)
-else
-    _reshape_reinterpret(T, X, d...) = reinterpret(T, X, d...)
-end
-# TODO: when we drop support for Julia v0.6, change all instances of
-# _reshape_reinterpret(T, X, d...) to reshape(reinterpret(T, X), d...)
-
-
 """
 Allow to call decompose with unspecified vector type and infer types from
 primitive.
@@ -94,7 +84,7 @@ Extract all line segments in a Face.
 end
 
 """
-Decompose an N-Simplex into a tuple of Simplex{3}
+Decompose an N-Simplex into a tuple of `Simplex{3}`
 """
 @generated function decompose(::Type{Simplex{3, T1}},
                             f::Simplex{N, T2}) where {N, T1, T2}
@@ -115,7 +105,7 @@ end
 decompose(::Type{Simplex{3}}, f::Simplex{N, T}) where {N, T} = decompose(Simplex{3,T}, f)
 
 """
-Decompose an N-Simplex into tuple of Simplex{2}
+Decompose an N-Simplex into tuple of `Simplex{2}`
 """
 @generated function decompose(::Type{Simplex{2, T1}},
                             f::Simplex{N, T2}) where {N, T1, T2}
@@ -136,7 +126,7 @@ decompose(::Type{Simplex{2}}, f::Simplex{N, T}) where {N, T} =
     decompose(Simplex{2,T}, f)
 
 """
-Decompose an N-Simplex into a tuple of Simplex{1}
+Decompose an N-Simplex into a tuple of `Simplex{1}`
 """
 @generated function decompose(::Type{Simplex{1, T1}},
                             f::Simplex{N, T2}) where {N, T1, T2}
@@ -158,7 +148,7 @@ function decompose(
     w = widths(rect)
     o = origin(rect)
     points = T1[o[j]+((i>>(j-1))&1)*w[j] for j=1:N, i=0:(2^N-1)]
-    _reshape_reinterpret(PT, points, (2^N,))
+    reshape(reinterpret(PT, points), (2^N,))
 end
 """
 Get decompose a `HyperRectangle` into Texture Coordinates.
@@ -171,7 +161,7 @@ function decompose(
     w = Vec{3,T1}(1)
     o = Vec{3,T1}(0)
     points = T1[((i>>(j-1))&1) for j=1:N, i=0:(2^N-1)]
-    _reshape_reinterpret(UVWT, points, (8,))
+    reshape(reinterpret(UVWT, points), (8,))
 end
 decompose(::Type{FT}, faces::Vector{FT}) where {FT<:Face} = faces
 function decompose(::Type{FT1}, faces::Vector{FT2}) where {FT1<:Face, FT2<:Face}
@@ -309,8 +299,10 @@ end
 #Gets the normal attribute to a mesh
 function decompose(T::Type{Normal{3, NT}}, mesh::AbstractMesh) where NT
     n = mesh.normals
-    eltype(n) == T && return n
-    eltype(n) <: Normal{3} && return map(T, n)
+    if !isempty(n)
+        eltype(n) == T && return n
+        eltype(n) <: Normal{3} && return map(T, n)
+    end
     (n == Nothing[] || isempty(n)) && return normals(vertices(mesh), faces(mesh), T)
 end
 
@@ -350,15 +342,6 @@ end
 
 
 
-
-function spherical(theta::T, phi::T) where {T}
-    Point{3, T}(
-        sin(theta)*cos(phi),
-        sin(theta)*sin(phi),
-        cos(theta)
-    )
-end
-
 function decompose(PT::Type{Point{3, T}}, s::Circle, n=64) where T
     points2d = decompose(Point{2, T}, s, n)
     map(x-> Point{3, T}(x[1], x[2], 0), points2d)
@@ -374,53 +357,27 @@ function decompose(PT::Type{Point{2,T}}, s::Circle, n=64) where T
     end
 end
 
-function decompose(PT::Type{Point{N,T}}, s::Sphere, facets = 24) where {N,T}
-    vertices = Vector{PT}(undef, facets*facets+1)
-    vertices[end] = PT(s.center) - PT(0,0,radius(s)) #Create a vertex for last triangle fan
-    for j = 1:facets
-        theta = T((pi*(j-1))/facets)
-        for i = 1:facets
-            position = (i - 1) * facets + j
-            phi = T((2*pi*(i-1))/facets)
-            vertices[position] = (spherical(theta, phi)*T(s.r))+PT(s.center)
-        end
-    end
-    vertices
+function decompose(PT::Type{Point{N,T}}, s::Sphere, n = 24) where {N,T}
+    θ = LinRange(0, pi, n); φ = LinRange(0, 2pi, n)
+    vec(map((θ, φ) for θ in θ, φ in φ) do (θ, φ,)
+        Point3f0(cos(φ)*sin(θ), sin(φ)*sin(θ), cos(θ)) * T(s.r) + PT(s.center)
+    end)
 end
 
-function decompose(PT::Type{UV{T}}, s::Sphere, facets = 24) where T
-    vertices = decompose(Point{3, T}, s, facets)
-    o5 = T(0.5)
-    map(vertices) do n
-        u = atan2(n[1], n[3]) / T(2*pi) + o5
-        v = n[2] * o5 + o5
-        UV{Float32}(u, v)
-    end
+function decompose(PT::Type{UV{T}}, s::Sphere, n = 24) where T
+    ux = LinRange(0, 1, n)
+    vec([UV{Float32}(φ, θ) for θ in reverse(ux), φ in ux])
 end
 
-function decompose(::Type{FT}, s::Sphere, facets = 24) where FT <: Face
-    triangles = decompose(Face{3, eltype(FT)}, s, facets)
-    decompose(FT, triangles)
+function decompose(::Type{FT}, s::Sphere, n = 24) where FT <: Face
+    decompose(FT, SimpleRectangle(0, 0, 1, 1), (n, n))
 end
 
-function decompose(::Type{FT}, s::Sphere, facets = 24) where FT <: Face{3}
-    indexes          = Vector{FT}(undef, facets * facets * 2)
-    FTE              = eltype(FT)
-    psydo_triangle_i = facets*facets+1
-    index            = 1
-    for j=1:facets
-        for i=1:facets
-            next_index = mod1(i+1, facets)
-            i1 = (i - 1) * facets + j
-            i2 = (next_index - 1) * facets + j
-            i3 = (j != facets) ? ((i - 1) * facets + (j + 1)) : psydo_triangle_i
-            i6 = (j != facets) ? ((next_index - 1) * facets + (j + 1)) : psydo_triangle_i
-            indexes[index] = FT(i2, i1, i3) # convert to required Face index offset
-            indexes[index + 1] = FT(i2, i3, i6)
-            index += 2
-        end
-    end
-    indexes
+function decompose(::Type{T}, s::Sphere, n = 24) where T <: Normal
+    θ = LinRange(0, pi, n); φ = LinRange(0, 2pi, n)
+    vec(map((θ, φ) for θ in θ, φ in φ) do (θ, φ,)
+        T(cos(φ)*sin(θ), sin(φ)*sin(θ), cos(θ))
+    end)
 end
 
 isdecomposable(::Type{T}, ::Type{C}) where {T <:Point, C <:Cylinder3} = true
@@ -429,7 +386,7 @@ isdecomposable(::Type{T}, ::Type{C}) where {T <:Point, C <:Cylinder2} = true
 isdecomposable(::Type{T}, ::Type{C}) where {T <:Face, C <:Cylinder2} = true
 
 # def of resolution + rotation
-function decompose(PT::Type{Point{3, T}}, c::Cylinder{2, T}, resolution = (2, 2)) where T
+function decompose(PT::Type{Point{3, T}}, c::Cylinder{2}, resolution = (2, 2)) where T
     r = SimpleRectangle{T}(c.origin[1] - c.r/2, c.origin[2], c.r, height(c))
     M = rotation(c); vertices = decompose(PT, r, resolution)
     vo = length(c.origin) == 2 ? Point{3, T}(c.origin[1], c.origin[2], 0) : c.origin
@@ -438,7 +395,7 @@ function decompose(PT::Type{Point{3, T}}, c::Cylinder{2, T}, resolution = (2, 2)
     end
     return vertices
 end
-function decompose(PT::Type{Point{3,T}}, c::Cylinder{3, T}, resolution = 5) where T
+function decompose(PT::Type{Point{3, T}}, c::Cylinder{3}, resolution = 30) where T
     isodd(resolution) && (resolution = 2 * div(resolution, 2))
     resolution = max(8, resolution); nbv = div(resolution, 2)
     M = rotation(c); h = height(c)
@@ -452,11 +409,11 @@ function decompose(PT::Type{Point{3,T}}, c::Cylinder{3, T}, resolution = 5) wher
     return vertices
 end
 
-function decompose(::Type{FT}, c::Cylinder{2, T}, resolution = (2, 2)) where {FT <: Face, T}
-    r = SimpleRectangle{T}(c.origin[1] - c.r/2, c.origin[2], c.r, height(c))
+function decompose(::Type{FT}, c::Cylinder{2}, resolution = (2, 2)) where FT <: Face
+    r = SimpleRectangle(c.origin[1] - c.r/2, c.origin[2], c.r, height(c))
     return decompose(FT, r, resolution)
 end
-function decompose(::Type{FT}, c::Cylinder{3, T}, facets = 18) where {FT <: Face, T}
+function decompose(::Type{FT}, c::Cylinder{3}, facets = 30) where FT <: Face
     isodd(facets) ? facets = 2 * div(facets, 2) : nothing
     facets < 8 ? facets = 8 : nothing; nbv = Int(facets / 2)
     indexes = Vector{FT}(undef, facets); index = 1

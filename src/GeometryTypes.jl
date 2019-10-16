@@ -1,11 +1,8 @@
-__precompile__()
 module GeometryTypes
 
 using StaticArrays
-using StaticArrays.FixedSizeArrays
 using ColorTypes
-using Compat: fieldcount, isconcretetype, LinearIndices, Nothing, undef, range
-using Compat.LinearAlgebra
+using LinearAlgebra
 
 import FixedPointNumbers # U8
 
@@ -14,7 +11,6 @@ using IterTools: partition
 
 import Base: ==,
              *,
-             contains,
              convert,
              diff,
              getindex,
@@ -34,7 +30,8 @@ import Base: ==,
              union,
              unique
 
-
+include("FixedSizeArrays.jl")
+using .FixedSizeArrays
 
 include("types.jl")
 include("typeutils.jl")
@@ -74,6 +71,7 @@ export AABB,
        AbstractDistanceField,
        Circle,
        centered,
+       contains,
        Cube,
        Cylinder,
        Cylinder2,

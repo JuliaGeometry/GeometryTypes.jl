@@ -1,4 +1,4 @@
-import Base: +, -, abs, *, /, div, convert, ==, <=, >=, show, to_index
+import Base: +, -, abs, *, /, div, convert, ==, <=, >=, <, >, show, to_index, sub_with_overflow
 
 function show(io::IO, oi::OffsetInteger{O, T}) where {O, T}
     print(io, "|$(raw(oi)) (indexes as $(O >= 0 ? raw(oi) - O : raw(oi) + -O))|")
@@ -8,13 +8,11 @@ Base.eltype(::Type{OffsetInteger{O, T}}) where {O, T} = T
 Base.eltype(oi::OffsetInteger) = eltype(typeof(oi))
 
 # constructors and conversion
-convert(::Type{OffsetInteger{O1, T1}}, x::OffsetInteger{O2, T2}) where {O1, O2, T1 <: Integer, T2 <: Integer} =
-    OffsetInteger{O1, T1}(T2(x))
-convert(::Type{OffsetInteger{O}}, x::Integer) where {O} = convert(OffsetInteger{O, eltype(x)}, x)
-convert(::Type{OffsetInteger{O}}, x::OffsetInteger) where {O} = convert(OffsetInteger{O, eltype(x)}, x)
-convert(::Type{OffsetInteger{O, T}}, x::Integer) where {O, T <: Integer} = convert(OffsetInteger{O, T}, OneIndex{eltype(x)}(x))
+OffsetInteger{O1, T1}(x::OffsetInteger{O2, T2}) where {O1, O2, T1 <: Integer, T2 <: Integer} = OffsetInteger{O1, T1}(T2(x))
 
-convert(::Type{IT}, x::OffsetInteger{O, T}) where {IT <: Integer, O, T <: Integer} = IT(raw(x) + -O)
+OffsetInteger{O}(x::Integer) where {O} = OffsetInteger{O, eltype(x)}(x)
+OffsetInteger{O}(x::OffsetInteger) where {O} = OffsetInteger{O, eltype(x)}(x)
+(::Type{IT})(x::OffsetInteger{O, T}) where {IT <: Integer, O, T <: Integer} = IT(raw(x) - O)
 
 Base.@pure pure_max(x1, x2) = x1 > x2 ? x1 : x2
 Base.promote_rule(::Type{T1}, ::Type{OffsetInteger{O, T2}}) where {T1 <: Integer, O, T2} = T1
@@ -35,7 +33,7 @@ for op in (:(+), :(-), :(*), :(/), :div)
         end
     end
 end
-for op in (:(==), :(>=), :(<=))
+for op in (:(==), :(>=), :(<=), :(<) , :(>), :sub_with_overflow)
     @eval begin
         @inline function $(op)(x::OffsetInteger{O}, y::OffsetInteger{O}) where O
             $op(x.i, y.i)

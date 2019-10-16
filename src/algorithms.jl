@@ -144,3 +144,43 @@ function Base.checkbounds(m::AbstractMesh{VT, Face{FD, FT}}) where {VT, FD, FT}
     flat_inds = reinterpret(FT, faces(m))
     checkbounds(Bool, vertices(m), flat_inds)
 end
+
+
+
+function unique_verts!(verts::AbstractVector{T}) where T
+    table = Dict{T, Int}()
+    new_idx = 0
+    for (i, v) in enumerate(verts)
+        if !haskey(table, v)
+            new_idx += 1
+            table[v] = new_idx
+            # if index has moved, inplace rewrite verts
+            new_idx != i && (verts[new_idx] = v)
+        end
+    end
+    if new_idx != length(verts)
+        resize!(verts, new_idx)
+    end
+    table
+end
+
+function reface!(point2idx, verts, uverts, faces)
+    map!(faces, faces) do face
+        map(face) do i
+            point2idx[verts[i]]
+        end
+    end
+end
+
+"""
+    remove_overlap!(mesh::AbstractMesh)
+
+removes non unique vertices from a mesh, and relinks the faces to point to only shared vertices.
+"""
+function remove_overlap!(mesh::AbstractMesh)
+    verts = vertices(mesh)
+    orig_verts = copy(verts)
+    table = unique_verts!(verts)
+    reface!(table, orig_verts, verts, faces(mesh))
+    return
+end
