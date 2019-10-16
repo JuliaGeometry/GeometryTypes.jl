@@ -233,3 +233,17 @@ function Base.to_indices(A::AbstractArray{T, 2}, I::Tuple{<: SimpleRectangle}) w
     i = I[1]
     (i.x + 1 : (i.x + i.w), i.y + 1 : (i.y + i.h))
 end
+
+AbsoluteRectangle(mini::Vec{N,T}, maxi::Vec{N,T}) where {N,T} = HyperRectangle{N,T}(mini, maxi-mini)
+
+AABB(a) = AABB{Float32}(a)
+
+function (B::Type{AABB{T}})(a::Pyramid) where T
+    w,h = a.width/T(2), a.length
+    m = Vec{3,T}(a.middle)
+    B(m-Vec{3,T}(w,w,0), m+Vec{3,T}(w, w, h))
+end
+
+(B::Type{AABB{T}})(a::Cube) where {T} = B(origin(a), widths(a))
+
+(B::Type{AABB{T}})(a::AbstractMesh) where {T} = B(vertices(a))

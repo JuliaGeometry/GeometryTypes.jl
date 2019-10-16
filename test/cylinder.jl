@@ -69,5 +69,11 @@
             (2, 8, 1)
         ]
         @test faces == decompose(Face{3, Int}, s, 6)
+        m = GLPlainMesh(s, 8)
+        @test m.faces == faces
+        @test m.vertices ≈ positions
+        m = GLNormalMesh(s)# just test that it works without explicit resolution parameter
+        @test m isa GLNormalMesh
+
     end
 end

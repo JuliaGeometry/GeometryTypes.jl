@@ -1,3 +1,5 @@
+using LinearAlgebra
+
 @testset "SimpleRectangle" begin
 @testset "constructors" begin
     s = SimpleRectangle(1,2,3,4)

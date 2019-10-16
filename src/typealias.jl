@@ -24,7 +24,7 @@ end
 const U8 = FixedPointNumbers.Normed{UInt8, 8}
 
 """
-An alias for a one-simplex, corresponding to LineSegment{T} -> Simplex{2,T}.
+An alias for a one-simplex, corresponding to `LineSegment{T}` -> `Simplex{2,T}`.
 """
 const LineSegment{T} = Simplex{2,T}
 
@@ -40,19 +40,19 @@ const GLQuad = Face{4, GLIndex}
 const Cube{T} = HyperCube{3, T}
 
 """
-An alias for a HyperSphere of dimension 2. i.e. Circle{T} -> HyperSphere{2, T}
+An alias for a HyperSphere of dimension 2. i.e. `Circle{T}` -> `HyperSphere{2, T}`
 """
 const Circle{T} = HyperSphere{2, T}
 
 """
-An alias for a HyperSphere of dimension 3. i.e. Sphere{T} -> HyperSphere{3, T}
+An alias for a HyperSphere of dimension 3. i.e. `Sphere{T}` -> `HyperSphere{3, T}`
 """
 const Sphere{T} = HyperSphere{3, T}
 
 const AbsoluteRectangle{T} = HyperRectangle{2, T}
 
 """
-AABB, or Axis Aligned Bounding Box, is an alias for a 3D HyperRectangle.
+AABB, or Axis Aligned Bounding Box, is an alias for a 3D `HyperRectangle`.
 """
 const AABB{T} = HyperRectangle{3, T}
 AABB(m...) = HyperRectangle(m...)
@@ -108,3 +108,31 @@ const GLNormalUVWMesh = NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
 
 const NormalUVMesh{VT, FT, NT, UVT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, UV{UVT}, Nothing, Nothing, Nothing}
 const GLNormalUVMesh = NormalUVMesh{Float32, GLTriangle, Float32, Float32}
+
+for T in (
+        :SimpleMesh,
+        :PlainMesh,
+        :GLPlainMesh,
+        :Mesh2D,
+        :GLMesh2D,
+        :UVMesh,
+        :GLUVMesh,
+        :UVWMesh,
+        :GLUVWMesh,
+        :NormalMesh,
+        :GLNormalMesh,
+        :UVMesh2D,
+        :GLUVMesh2D,
+        :NormalColorMesh,
+        :GLNormalColorMesh,
+        :NormalVertexcolorMesh,
+        :GLNormalVertexcolorMesh,
+        :NormalAttributeMesh,
+        :GLNormalAttributeMesh,
+        :NormalUVWMesh,
+        :GLNormalUVWMesh,
+        :NormalUVMesh,
+        :GLNormalUVMesh,
+    )
+    @eval Base.show(io::IO, ::Type{<: $T}) = print(io, $(string(T)))
+end

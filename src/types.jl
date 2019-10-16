@@ -1,5 +1,4 @@
-using StaticArrays.FixedSizeArrays
-import StaticArrays.FixedSizeArrays: @fixed_vector
+import .FixedSizeArrays: @fixed_vector
 
 abstract type AbstractDistanceField end
 abstract type AbstractUnsignedDistanceField <: AbstractDistanceField end
@@ -73,7 +72,7 @@ communicating with 0-indexed systems such ad OpenGL.
 struct OffsetInteger{O, T <: Integer} <: Integer
     i::T
 
-    OffsetInteger{O, T}(x::Integer) where {O, T <: Integer} = new{O, T}(T(O >= 0 ? x + O : x - (-O)))
+    OffsetInteger{O, T}(x::Integer) where {O, T <: Integer} = new{O, T}(T(x + O))
 end
 
 
@@ -174,6 +173,25 @@ struct HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribI
     attribute_id        ::Vector{AttribIDT}
 end
 
+function HomogenousMesh(
+        vertices::AbstractVector{VertT},
+        faces::AbstractVector{FaceT},
+        normals::AbstractVector{NormalT},
+        texturecoordinates::AbstractVector{TexCoordT},
+        color::ColorT, attributes::AttribT,
+        attribute_id::AbstractVector{AttribIDT}
+    ) where {VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT}
+
+    HomogenousMesh{VertT, FaceT, NormalT, TexCoordT, ColorT, AttribT, AttribIDT}(
+        convert(Vector{VertT}, vertices),
+        convert(Vector{FaceT}, faces),
+        convert(Vector{NormalT}, normals),
+        convert(Vector{TexCoordT}, texturecoordinates),
+        color,
+        attributes,
+        convert(Vector{AttribIDT}, attribute_id),
+    )
+end
 """
 AbstractFlexibleGeometry{T}
 

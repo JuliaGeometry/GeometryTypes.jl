@@ -24,5 +24,13 @@
     s = Sphere(Point3f0(0), 1f0)
     f = decompose(Face{2, Int}, s, 3)
     # TODO 54 linesegments for 3 facets is too much.
-    @test length(f) == 54
+    @test length(f) == 16
+
+    s = Sphere(Point3f0(-1, 10, 5), 3f0)
+    ps = decompose(Point3f0, s)
+    bb = AABB(ps)
+    # The maximum radius doesn't get sampled in the sphere mesh, hence the smaller widths
+    @test all(x-> x > 5.9 && x <= 6.0, widths(bb))
+    middle = (minimum(bb) .+ (widths(bb) ./ 2))
+    @test all(((x,y),)-> isapprox(x, y, atol = 0.05), zip((-1, 10, 5), middle))
 end
