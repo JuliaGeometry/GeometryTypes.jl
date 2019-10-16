@@ -28,9 +28,9 @@ end
 @testset "area-2d" begin
     points = Point2f0[
         (0,0),
-        (0,1),
+        (1,0),
         (1,1),
-        (1,0)
+        (0,1)
     ]
     @test area(points) ≈ 1f0
 end
@@ -38,9 +38,11 @@ end
 @testset "area-3d" begin
     points = Point3f0[
         (0,0,0),
-        (0,1,0),
+        (1,0,0),
         (1,1,0),
-        (1,0,0)
+        (0,1,0)
     ]
     @test area(points) ≈ 1f0
+end
+
 end
