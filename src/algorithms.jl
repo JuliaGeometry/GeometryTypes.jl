@@ -1,4 +1,7 @@
-function normal( v1, v2, v3 )
+"""
+The unnormalized normal of three vertices.
+"""
+function edge_cross_product( v1, v2, v3 )
         a = v2 - v1
         b = v3 - v1
         cross(a, b)
@@ -22,7 +25,7 @@ function normals(
     for face in faces
         v = vertices[face]
         # we can get away with two edges since faces are planar.
-        n = normal(v[1], v[2], v[3])
+        n = edge_cross_product(v[1], v[2], v[3])
         for i =1:length(F)
             fi = face[i]
             normals_result[fi] = normals_result[fi] + n
@@ -44,7 +47,7 @@ function area(
 end
 
 """
-Calculate the area of all triangles using mapreduce.
+Calculate the area of all triangles.
 """
 function area(
         vertices::AbstractVector{Point{3, VT}},
@@ -61,12 +64,12 @@ function volume(
         face::Face{3,FT}
     ) where {VT,FT}
     v1, v2, v3 = vertices[face]
-    sig = sign( normal( v1, v2, v3 ) ⋅ v1 )
-    return sig * abs( v1 ⋅ ( v2 × v3 ) ) / eltype(vertices[1])(6)
+    sig = sign( edge_cross_product( v1, v2, v3 ) ⋅ v1 )
+    return sig * abs( v1 ⋅ ( v2 × v3 ) ) / 6
 end
 
 """
-Calculate the signed volume of all tetrahedra using mapreduce. Be sure the orientation of your surface is right.
+Calculate the signed volume of all tetrahedra. Be sure the orientation of your surface is right.
 """
 function volume(
         vertices::AbstractVector{Point{3, VT}},
