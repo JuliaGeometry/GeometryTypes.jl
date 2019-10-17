@@ -188,11 +188,11 @@ function decompose(
         FT::Type{Face{N, T}}, rect::HyperRectangle{3, T2}
     ) where {N, T, T2}
     faces = Face{4, Int}[
-        (1,2,4,3),
+        (1,3,4,2),
         (2,4,8,6),
         (4,3,7,8),
-        (1,3,7,5),
-        (1,5,6,2),
+        (1,5,7,3),
+        (1,2,6,5),
         (5,6,8,7),
     ]
     decompose(FT, faces)
