@@ -27,4 +27,5 @@ using Test: @inferred
     include("lines.jl")
     include("polygons.jl")
     include("cylinder.jl")
+    include("algorithms.jl")
 end

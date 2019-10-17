@@ -1,4 +1,13 @@
 """
+The unnormalized normal of three vertices.
+"""
+function orthogonal_vector( v1, v2, v3 )
+        a = v2 - v1
+        b = v3 - v1
+        cross(a, b)
+end
+
+"""
 ```
 normals{VT,FD,FT,FO}(vertices::Vector{Point{3, VT}},
                      faces::Vector{Face{FD,FT,FO}},
@@ -16,9 +25,7 @@ function normals(
     for face in faces
         v = vertices[face]
         # we can get away with two edges since faces are planar.
-        a = v[2] - v[1]
-        b = v[3] - v[1]
-        n = cross(a, b)
+        n = orthogonal_vector(v[1], v[2], v[3])
         for i =1:length(F)
             fi = face[i]
             normals_result[fi] = normals_result[fi] + n
@@ -28,6 +35,48 @@ function normals(
     normals_result
 end
 
+"""
+Calculate the area of one triangle.
+"""
+function area(
+        vertices::AbstractVector{Point{3, VT}},
+        face::Face{3,FT}
+    ) where {VT,FT}
+    v1, v2, v3 = vertices[face]
+    return 0.5norm( orthogonal_vector(v1, v2, v3) )
+end
+
+"""
+Calculate the area of all triangles.
+"""
+function area(
+        vertices::AbstractVector{Point{3, VT}},
+        faces::AbstractVector{Face{3,FT}}
+    ) where {VT,FT}
+    return sum( x->area( vertices, x ), faces )
+end
+
+"""
+Calculate the signed volume of one tetrahedron. Be sure the orientation of your surface is right.
+"""
+function volume(
+        vertices::AbstractVector{Point{3, VT}},
+        face::Face{3,FT}
+    ) where {VT,FT}
+    v1, v2, v3 = vertices[face]
+    sig = sign( orthogonal_vector( v1, v2, v3 ) ⋅ v1 )
+    return sig * abs( v1 ⋅ ( v2 × v3 ) ) / 6
+end
+
+"""
+Calculate the signed volume of all tetrahedra. Be sure the orientation of your surface is right.
+"""
+function volume(
+        vertices::AbstractVector{Point{3, VT}},
+        faces::AbstractVector{Face{3,FT}}
+    ) where {VT,FT}
+    return sum( x->volume( vertices, x), faces )
+end
 
 """
 Slice an AbstractMesh at the specified Z axis value.
