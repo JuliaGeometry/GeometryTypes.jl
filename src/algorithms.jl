@@ -1,7 +1,7 @@
 """
 The unnormalized normal of three vertices.
 """
-function edge_cross_product( v1, v2, v3 )
+function orthogonal_vector( v1, v2, v3 )
         a = v2 - v1
         b = v3 - v1
         cross(a, b)
@@ -25,7 +25,7 @@ function normals(
     for face in faces
         v = vertices[face]
         # we can get away with two edges since faces are planar.
-        n = edge_cross_product(v[1], v[2], v[3])
+        n = orthogonal_vector(v[1], v[2], v[3])
         for i =1:length(F)
             fi = face[i]
             normals_result[fi] = normals_result[fi] + n
@@ -43,7 +43,7 @@ function area(
         face::Face{3,FT}
     ) where {VT,FT}
     v1, v2, v3 = vertices[face]
-    return 0.5norm( ( v1 - v2 )×( v2 - v3 ) )
+    return 0.5norm( orthogonal_vector(v1, v2, v3) )
 end
 
 """
@@ -64,7 +64,7 @@ function volume(
         face::Face{3,FT}
     ) where {VT,FT}
     v1, v2, v3 = vertices[face]
-    sig = sign( edge_cross_product( v1, v2, v3 ) ⋅ v1 )
+    sig = sign( orthogonal_vector( v1, v2, v3 ) ⋅ v1 )
     return sig * abs( v1 ⋅ ( v2 × v3 ) ) / 6
 end
 
