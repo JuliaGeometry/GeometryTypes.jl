@@ -16,7 +16,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 function area(contour::AbstractVector{Point{2, T}}) where {T}
     n = length(contour)
     A = zero(T)
-    p=n; q=1
+    p=lastindex(contour)
+    q=firstindex(contour)
     while q <= n
         A += cross(contour[p], contour[q])
         p = q; q +=1
@@ -25,10 +26,9 @@ function area(contour::AbstractVector{Point{2, T}}) where {T}
 end
 
 function area(contour::AbstractVector{Point{3, T}}) where {T}
-    n = length(contour)
     A = zero(Vec3{T})
     o = contour[1]
-    for i in 2:(n-1)
+    for i in (firstindex(contour)+1):(lastindex(contour)-1)
         A += cross(contour[i] - o, contour[i+1] - o)
     end
     return norm(A)*T(0.5)
