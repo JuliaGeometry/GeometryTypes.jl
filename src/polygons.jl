@@ -26,12 +26,12 @@ end
 
 function area(contour::AbstractVector{Point{3, T}}) where {T}
     n = length(contour)
-    A = zero(T)
+    A = zero(Vec3{T})
     o = contour[1]
     for i in 2:(n-1)
-        A += norm(cross(contour[i] - o, contour[i+1] - o))
+        A += cross(contour[i] - o, contour[i+1] - o)
     end
-    return A*T(0.5)
+    return norm(A)*T(0.5)
 end
 
 """
