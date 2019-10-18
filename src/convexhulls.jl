@@ -61,7 +61,7 @@ vertexmat(s) = hcat(vertices(s)...)
 vertexmatrix(s::AbstractConvexHull) = Matrix(vertexmat(s))::Matrix{numtype(s)}
 
 (::Type{F})(g::Union{AbstractSimplex, AFG, GeometryPrimitive}) where {F <: AFG} = F(vertices(g))
-(::Type{F})(v::NTuple) where {F <: AFG} = F(collect(v))
+(::Type{F})(v::Union{NTuple,StaticArray}) where {F <: AFG} = F(collect(v))
 Base.convert(::Type{F}, s::Simplex) where {F <: AFG} = F(s)
 
 (::Type{R})(c::HyperCube) where {R <: HyperRectangle} = R(origin(c), widths(c))
