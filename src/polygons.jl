@@ -26,7 +26,7 @@ function area(contour::AbstractVector{Point{2, T}}) where {T}
 end
 
 function area(contour::AbstractVector{Point{3, T}}) where {T}
-    A = zero(Vec3{T})
+    A = zero(eltype(contour))
     o = contour[1]
     for i in (firstindex(contour)+1):(lastindex(contour)-1)
         A += cross(contour[i] - o, contour[i+1] - o)
