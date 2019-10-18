@@ -18,7 +18,7 @@ Base.copy(fl::FG) where {FG <: AFG} = FG(copy(vertices(fl)))
 push(fl::AFG, pt) = push!(copy(fl), pt)
 
 vertices(x::AbstractFlexibleGeometry) = x.vertices
-vertices(s::Simplex) = Tuple(s)
+vertices(s::Simplex) = SVector(s)
 
 standard_cube_vertices(::Type{Val{1}}) = [Vec(0), Vec(1)]
 _vcat(v1,v2) = Vec(Tuple(v1)..., Tuple(v2)...)
