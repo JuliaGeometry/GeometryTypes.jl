@@ -57,7 +57,7 @@ end
 
 vertices(c::HyperCube) = vertices(convert(HyperRectangle, c))
 
-vertexmat(s) = hcat(vertices(s)...)
+vertexmat(s) = hcat(Tuple(vertices(s))...)
 vertexmatrix(s::AbstractConvexHull) = Matrix(vertexmat(s))::Matrix{numtype(s)}
 
 (::Type{F})(g::Union{AbstractSimplex, AFG, GeometryPrimitive}) where {F <: AFG} = F(vertices(g))
