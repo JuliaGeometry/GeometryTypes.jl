@@ -1,10 +1,10 @@
 """
 Perform a union between two HyperRectangles.
 """
-function union(h1::HyperRectangle{N, T}, h2::HyperRectangle{N, T}) where {T,N}
+function union(h1::HyperRectangle{N, T1}, h2::HyperRectangle{N, T2}) where {T1, T2,N}
     m = min.(minimum(h1), minimum(h2))
     mm = max.(maximum(h1), maximum(h2))
-    HyperRectangle{N, T}(m, mm-m)
+    HyperRectangle{N, promote_type(T1,T2)}(m, mm-m)
 end
 
 
@@ -17,10 +17,10 @@ diff(h1::HyperRectangle, h2::HyperRectangle) = h1
 """
 Perform a intersection between two HyperRectangles.
 """
-function intersect(h1::HyperRectangle{N, T}, h2::HyperRectangle{N, T}) where {T,N}
+function intersect(h1::HyperRectangle{N, T1}, h2::HyperRectangle{N, T2}) where {T1, T2, N}
     m = max.(minimum(h1), minimum(h2))
     mm = min.(maximum(h1), maximum(h2))
-    HyperRectangle{N, T}(m, mm-m)
+    HyperRectangle{N, promote_type(T1,T2)}(m, mm-m)
 end
 
 function intersect(a::SimpleRectangle, b::SimpleRectangle)

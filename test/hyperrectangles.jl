@@ -157,6 +157,12 @@ end
     @test diff(c,d) == c
     @test diff(d,c) == d
 
+    #185
+    bb1 = HyperRectangle{2,Int64}([0, 0], [1, 1])
+    bb2 = HyperRectangle{2,Float64}([-3.436309307146981, -3.4222642784489077], [-8.886452461851743, -14.325391136732803])
+    @show bb1 ∩ bb2
+    @test_broken bb1 ∩ bb2
+
 end
 
 # fact relations
