@@ -6,10 +6,19 @@ deleteat{N,T,i}(x::NTuple{N,T}, ::Type{Val{i}})
 
 Return copy of x with ith entry ommited.
 """
-@generated function deleteat(x::Union{NTuple{N,T},SVector{N,T}}, ::Type{Val{i}}) where {N,T,i}
+@generated function deleteat(x::NTuple{N,T}, ::Type{Val{i}}) where {N,T,i}
     (1 <= i <= N) || throw(MethodError(drop_index, (x,Val{i})))
     args = [:(x[$j]) for j in deleteat!([1:N...], i)]
     Expr(:tuple, args...)
+end
+
+"""
+deleteat{N,T,i}(x::SVector{N,T}, ::Type{Val{i}})
+"""
+@generated function deleteat(x::SVector{N,T}, ::Type{Val{i}}) where {N,T,i}
+    (1 <= i <= N) || throw(MethodError(drop_index, (x,Val{i})))
+    args = [:(x[$j]) for j in deleteat!([1:N...], i)]
+    Expr(:call, SVector{N-1,T}, args...)
 end
 
 """
