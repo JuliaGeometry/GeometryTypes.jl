@@ -399,13 +399,15 @@ function decompose(PT::Type{Point{3, T}}, c::Cylinder{3}, resolution = 30) where
     isodd(resolution) && (resolution = 2 * div(resolution, 2))
     resolution = max(8, resolution); nbv = div(resolution, 2)
     M = rotation(c); h = height(c)
-    position = 1; vertices = Vector{PT}(undef, 2 * nbv)
+    position = 1; vertices = Vector{PT}(undef, 2 * nbv+2)
     for j = 1:nbv
         phi = T((2π * (j - 1)) / nbv)
         vertices[position] = PT(M * Point{3, T}(c.r * cos(phi), c.r * sin(phi),0)) + PT(c.origin)
         vertices[position+1] = PT(M * Point{3, T}(c.r * cos(phi), c.r * sin(phi),h)) + PT(c.origin)
         position += 2
     end
+    vertices[end-1] = PT(c.origin)
+    vertices[end] = PT(c.extremity)
     return vertices
 end
 
@@ -416,7 +418,8 @@ end
 function decompose(::Type{FT}, c::Cylinder{3}, facets = 30) where FT <: Face
     isodd(facets) ? facets = 2 * div(facets, 2) : nothing
     facets < 8 ? facets = 8 : nothing; nbv = Int(facets / 2)
-    indexes = Vector{FT}(undef, facets); index = 1
+    indexes = Vector{FT}(undef, facets)
+    index = 1
     for j = 1:(nbv-1)
         indexes[index] = (index + 2, index + 1, index)
         indexes[index + 1] = ( index + 3, index + 1, index + 2)
@@ -424,5 +427,9 @@ function decompose(::Type{FT}, c::Cylinder{3}, facets = 30) where FT <: Face
     end
     indexes[index] = (1, index + 1, index)
     indexes[index + 1] = (2, index + 1, 1)
+
+    for i = 1:length(indexes)
+        i%2 == 1 ? push!(indexes, (indexes[i][1], 2*nbv+1, indexes[i][3])) : push!(indexes,(indexes[i][2], 2*nbv+2, indexes[i][1]))
+    end
     return indexes
 end
