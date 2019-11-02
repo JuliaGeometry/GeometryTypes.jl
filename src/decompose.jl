@@ -429,7 +429,7 @@ function decompose(::Type{FT}, c::Cylinder{3}, facets = 30) where FT <: Face
     indexes[index + 1] = (2, index + 1, 1)
 
     for i = 1:length(indexes)
-        i%2 == 1 ? push!(indexes, (indexes[i][1], 2*nbv+1, indexes[i][3])) : push!(indexes,(indexes[i][2], 2*nbv+2, indexes[i][1]))
+        i%2 == 1 ? push!(indexes, (indexes[i][1], indexes[i][3], 2*nbv+1)) : push!(indexes,(indexes[i][2], indexes[i][1], 2*nbv+2))
     end
     return indexes
 end
