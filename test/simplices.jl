@@ -1,3 +1,5 @@
+using StaticArrays: @SVector
+
 @testset "example simplices" begin
     @testset "2d simplex in 2d" begin
         s = Simplex((Vec(1.0,0.0), Vec(0.0,1.0), Vec(0.0,0.0)))
@@ -66,5 +68,20 @@
 
         @test contains(s, Vec(0.2, 0.2, 0.2))
         @test !(contains(s, Vec(0.1, 0.0999, 0.1)))
+    end
+
+    @testset "Simplex SVector interaction" begin
+        # SVector of StaticVectors is interpreted as multiple vertices
+        s0 = Simplex((Vec(1.0,0.0,0.0), Vec(0.0,1.0,0.0), Vec(0.0,0.0,1.0), Vec(0.0,0.0,0.0)))
+        s1 = Simplex(@SVector [Vec(1.0,0.0,0.0), Vec(0.0,1.0,0.0), Vec(0.0,0.0,1.0), Vec(0.0,0.0,0.0)])
+
+        @test length(s0) == 4
+        @test length(s0[1]) == 3
+        @test s0 === s1
+
+        # SVector of Numbers is interpreted as single vertex
+        s3 = Simplex(@SVector[1.0, 0.0, 1.0])
+        @test length(s3) == 1
+        @test length(s3[1]) == 3
     end
 end
