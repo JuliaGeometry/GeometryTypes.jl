@@ -167,7 +167,7 @@ function merge(m1::M, meshes::M...) where M <: AbstractMesh
     f = copy(m1.faces)
     attribs = deepcopy(attributes_noVF(m1))
     for mesh in meshes
-        append!(f, mesh.faces .+ length(v))
+        append!(f, map(f-> f .+ length(v), mesh.faces))
         append!(v, mesh.vertices)
         for (v1, v2) in zip(values(attribs), values(attributes_noVF(mesh)))
             append!(v1, v2)
@@ -193,7 +193,7 @@ function merge(
     color_attrib = RGBA{U8}[RGBA{U8}(m1.color)]
     index        = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
     for mesh in meshes
-        append!(faces, mesh.faces .+ length(vertices))
+        append!(faces, map(f-> f .+ length(vertices), mesh.faces))
         append!(vertices, mesh.vertices)
         attribsb = attributes_noVF(mesh)
         for (k,v) in attribsb

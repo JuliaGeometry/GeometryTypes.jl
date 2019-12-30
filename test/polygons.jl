@@ -73,4 +73,11 @@ end
     @test area(reverse(points)) ≈ 0.5f0
 end
 
+@testset "points touching" begin
+    points = decompose(Point2f0, Circle(Point2f0(0), 1f0))
+    triangles = polygon2faces(points)
+    @test !isempty(triangles)
+    @test points[1] ≈ points[end]
+end
+
 end
