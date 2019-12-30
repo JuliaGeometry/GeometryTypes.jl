@@ -6,9 +6,6 @@ using LinearAlgebra
 
 import FixedPointNumbers # U8
 
-import IterTools
-using IterTools: partition
-
 import Base: ==,
              *,
              convert,
