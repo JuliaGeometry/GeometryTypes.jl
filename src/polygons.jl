@@ -72,21 +72,21 @@ function snip(
     return true;
 end
 
-
-
 """
 Triangulates a Polygon given as a `contour`::AbstractArray{Point} without holes.
 It will return a Vector{`facetype`}, defining indexes into `contour`
 """
 function polygon2faces(
-        contour::AbstractArray{P}, facetype = GLTriangle
+        _contour::AbstractArray{P}, facetype = GLTriangle
     ) where P<:Point
     #= allocate and initialize list of Vertices in polygon =#
     result = facetype[]
 
     # the algorithm doesn't like closed contours
-    if isapprox(last(contour), first(contour))
-        pop!(contour)
+    contour = if isapprox(last(_contour), first(_contour))
+        @view _contour[1:end-1]
+    else
+        @view _contour[1:end]
     end
 
     n = length(contour)
@@ -111,7 +111,6 @@ function polygon2faces(
             return result
         end
         count -= 1
-
 
         #= three consecutive vertices in current polygon, <u,v,w> =#
         u = v; (u > nv) && (u = 1) #= previous =#
