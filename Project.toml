@@ -5,15 +5,15 @@ version = "0.7.7"
 
 [deps]
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 FixedPointNumbers = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
 IterTools = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
-ColorTypes = "≥ 0.3.1"
-FixedPointNumbers = "≥ 0.3.0"
-StaticArrays = "≥ 0.11.0"
+ColorTypes = "0.8, 0.9"
+FixedPointNumbers = "0.5, 0.6, 0.7"
+StaticArrays = "0.10, 0.11, 0.12"
 julia = "1"
 
 [extras]
