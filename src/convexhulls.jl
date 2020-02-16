@@ -18,7 +18,7 @@ Base.copy(fl::FG) where {FG <: AFG} = FG(copy(vertices(fl)))
 push(fl::AFG, pt) = push!(copy(fl), pt)
 
 vertices(x::AbstractFlexibleGeometry) = x.vertices
-vertices(s::Simplex) = Tuple(s)
+vertices(s::Simplex) = SVector(s)
 
 standard_cube_vertices(::Type{Val{1}}) = [Vec(0), Vec(1)]
 _vcat(v1,v2) = Vec(Tuple(v1)..., Tuple(v2)...)
@@ -57,11 +57,11 @@ end
 
 vertices(c::HyperCube) = vertices(convert(HyperRectangle, c))
 
-vertexmat(s) = hcat(vertices(s)...)
+vertexmat(s) = hcat(Tuple(vertices(s))...)
 vertexmatrix(s::AbstractConvexHull) = Matrix(vertexmat(s))::Matrix{numtype(s)}
 
 (::Type{F})(g::Union{AbstractSimplex, AFG, GeometryPrimitive}) where {F <: AFG} = F(vertices(g))
-(::Type{F})(v::NTuple) where {F <: AFG} = F(collect(v))
+(::Type{F})(v::Union{NTuple,StaticArray}) where {F <: AFG} = F(collect(v))
 Base.convert(::Type{F}, s::Simplex) where {F <: AFG} = F(s)
 
 (::Type{R})(c::HyperCube) where {R <: HyperRectangle} = R(origin(c), widths(c))

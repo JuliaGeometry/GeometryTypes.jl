@@ -5,6 +5,9 @@
 function (::Type{S})(sv::StaticVector) where S <: Simplex
     Simplex{1, typeof(sv)}((sv,))
 end
+function (::Type{S})(sv::StaticVector{N,T}) where {S <: Simplex, N, T<:StaticVector}
+    Simplex{length(sv),eltype(sv)}((sv...,))
+end
 
 @inline function Simplex{S, T}(x) where {S, T}
     Simplex{S, T}(ntuple(i-> T(x), Val(S)))
