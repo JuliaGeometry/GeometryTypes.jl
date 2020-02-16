@@ -4,6 +4,7 @@ using LinearAlgebra
     @testset "Core" begin
         x = centered(HyperCube)
         @test origin(x) == Vec3f0(-0.5)
+        @test width(x) == 1.0f0
         @test widths(x) == Vec3f0(1.0)
         @test maximum(x) == Vec3f0(0.5)
         @test minimum(x) == Vec3f0(-0.5)
