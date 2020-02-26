@@ -10,9 +10,14 @@ end
     a = HyperRectangle(Vec(0,0),Vec(1,1))
     pt_expa = Point{2,Int}[(0,0), (1,0), (0,1), (1,1)]
     @test decompose(Point{2,Int},a) == pt_expa
+    mesh = GLNormalMesh(a)
+    @test decompose(Point2f0, mesh) == pt_expa
+
     b = HyperRectangle(Vec(1,1,1),Vec(1,1,1))
     pt_expb = Point{3,Int}[(1,1,1),(2,1,1),(1,2,1),(2,2,1),(1,1,2),(2,1,2),(1,2,2),(2,2,2)]
     @test decompose(Point{3,Int}, b) == pt_expb
+    mesh = NormalMesh{Int, GLTriangle, Int}(b)
+    # TODO order of NormalMesh & decompose doesn't agree -.-
 end
 
 @testset "Faces" begin
@@ -135,7 +140,6 @@ end
 
 end
 
-
 @testset "HyperSphere" begin
     sphere = Sphere{Float32}(Point3f0(0), 1f0)
 
@@ -154,12 +158,12 @@ end
         [4, 5, 8], [4, 8, 7], [5, 6, 9], [5, 9, 8]
     ]
     @test f == face_target
-
-    points = decompose(Point2f0, Circle(Point2f0(0), 0f0), 20)
+    circle = Circle(Point2f0(0), 1f0)
+    points = decompose(Point2f0, circle, 20)
     @test length(points) == 20
-
+    mesh = GLNormalMesh(circle, 32)
+    # end-1, since we add a middle point for the mesh!
+    @test decompose(Point2f0, mesh)[1:end-1] ≈ decompose(Point2f0, circle, 32)
 end
-
-
 
 end
