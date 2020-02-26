@@ -18,17 +18,17 @@ function (meshtype::Type{T})(c::GeometryPrimitive, args...) where T <: AbstractM
             newattribs[fieldname] = decompose(eltype(typ), c, args...)
         end
     end
-    T(newattribs)
+    return T(newattribs)
 end
 
 function to_pointn(::Type{Point{N, T}}, p::StaticVector{N2}, d = T(0)) where {T, N, N2}
-    Point(ntuple(i-> i <= N2 ? p[i] : d, Val{N}))
+    return Point{N, T}(ntuple(i-> i <= N2 ? T(p[i]) : T(d), N))
 end
 
 function (::Type{T})(c::Circle, n = 32) where T <: AbstractMesh
     newattribs = Dict{Symbol, Any}()
     VT = vertextype(T)
-    verts = decompose(VT, c)
+    verts = decompose(VT, c, n)
     N = length(verts)
     push!(verts, to_pointn(VT, origin(c))) # middle point
     middle_idx = length(verts)
@@ -36,12 +36,12 @@ function (::Type{T})(c::Circle, n = 32) where T <: AbstractMesh
     faces = map(1:N) do i
         FT(i, middle_idx, i + 1)
     end
-    T(vertices = verts, faces = faces)
+    return T(vertices = verts, faces = faces)
 end
 
 function (meshtype::Type{T})(
         c::Union{HyperCube{3,T}, HyperRectangle{3,HT}}
-    ) where {T <: HMesh,HT}
+    ) where {T <: HMesh, HT}
     xdir = Vec{3, HT}(1, 0, 0)
     ydir = Vec{3, HT}(0, 1, 0)
     zdir = Vec{3, HT}(0, 0, 1)
@@ -61,5 +61,5 @@ function (meshtype::Type{T})(
     map!(v, v) do v
         (v .* w) + o
     end
-    mesh
+    return mesh
 end
