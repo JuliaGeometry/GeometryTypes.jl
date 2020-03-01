@@ -43,18 +43,19 @@ function Rect(v1::Vec{N, T1}, v2::Vec{N, T2}) where {N,T1,T2}
     return Rect{N,T}(Vec{N, T}(v1), Vec{N, T}(v2))
 end
 
-function TRect{T}(v1::Vec{N, T1}, v2::Vec{N, T2}) where {N,T,T1,T2}
-    return Rect{N, T}(Vec{N, T}(v1), Vec{N, T}(v2))
+function TRect{T}(v1::VecTypes{N, T1}, v2::VecTypes{N, T2}) where {N,T,T1,T2}
+    if T <: Integer
+         Rect{N, T}(round.(T, v1), round.(T, v2))
+    else
+        return Rect{N, T}(Vec{N, T}(v1), Vec{N, T}(v2))
+    end
 end
 
-function Rect{N}(v1::Vec{N, T1}, v2::Vec{N, T2}) where {N,T1,T2}
+function Rect{N}(v1::VecTypes{N, T1}, v2::VecTypes{N, T2}) where {N,T1,T2}
     T = promote_type(T1, T2)
     return Rect{N,T}(Vec{N, T}(v1), Vec{N, T}(v2))
 end
 
-function Rect{N, T}(a::GeometryPrimitive) where {N, T}
-    return Rect{N, T}(Vec{N, T}(minimum(a)), Vec{N, T}(widths(a)))
-end
 
 """
 ```
@@ -128,6 +129,17 @@ function FRect3D(x::Rect2D{T}) where T
     return Rect{3, T}(Vec{3, T}(minimum(x)..., 0), Vec{3, T}(widths(x)..., 0.0))
 end
 
+function Rect2D{T}(a::Rect2D) where {T}
+    return Rect2D{T}(minimum(a), widths(a))
+end
+
+function TRect{T}(a::Rect2D) where {T}
+    return Rect2D{T}(minimum(a), widths(a))
+end
+
+function Rect{N, T}(a::GeometryPrimitive) where {N, T}
+    return Rect{N, T}(Vec{N, T}(minimum(a)), Vec{N, T}(widths(a)))
+end
 
 function Rect2D(xy::VecTypes{2}, w::Number, h::Number)
     return Rect2D(xy..., w, h)
