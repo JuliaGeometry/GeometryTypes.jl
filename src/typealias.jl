@@ -52,13 +52,18 @@ An alias for a HyperSphere of dimension 3. i.e. `Sphere{T}` -> `HyperSphere{3, T
 const Sphere{T} = HyperSphere{3, T}
 
 const Rect{N, T} = HyperRectangle{N, T}
-const Rect2D{T} = HyperRectangle{2, T}
-const FRect2D = Rect2D{Float32}
-
+const Rect2D{T} = Rect{2, T}
 const Rect3D{T} = Rect{3, T}
+const TRect{T} = Rect{N, T} where N
+
+const FRect{N} = Rect{N, Float32}
+const FRect2D = Rect2D{Float32}
 const FRect3D = Rect3D{Float32}
-const IRect3D = Rect3D{Int}
+
+const IRect{N} = HyperRectangle{N, Int}
 const IRect2D = Rect2D{Int}
+const IRect3D = Rect3D{Int}
+
 const VecTypes{N, T} = Union{StaticVector{N, T}, NTuple{N, T}}
 
 """

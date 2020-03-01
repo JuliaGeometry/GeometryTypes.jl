@@ -155,14 +155,11 @@ function polygon2faces(
 end
 
 function topoint(::Type{Point{3, T}}, p::Point{2, T}) where T
-    Point{3, T}(p[1], p[2], T(0))
-end
-function topoint(::Type{Point{3, T}}, p::Point{3, T}) where T
-    return p
+    return Point{3, T}(p[1], p[2], T(0))
 end
 
 function topoint(::Type{Point{2, T}}, p::Point{3, T}) where T
-    Point{2, T}(p[1], p[2])
+    return Point{2, T}(p[1], p[2])
 end
 
 function (::Type{M})(

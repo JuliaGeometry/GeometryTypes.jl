@@ -183,6 +183,15 @@ export AABB,
        OffsetInteger,
        ZeroIndex,
        OneIndex,
-       GLIndex
+       GLIndex,
+       Rect,
+       Rect2D,
+       Rect3D,
+       IRect,
+       IRect2D,
+       IRect3D,
+       FRect,
+       FRect2D,
+       FRect3D
 
 end # module

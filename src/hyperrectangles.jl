@@ -4,6 +4,9 @@ minimum(prim::HyperRectangle) = origin(prim)
 length(prim::HyperRectangle{N, T}) where {T, N} = N
 widths(prim::HyperRectangle) = prim.widths
 
+width(prim::HyperRectangle) = prim.widths[1]
+height(prim::HyperRectangle) = prim.widths[2]
+
 """
 Splits an HyperRectangle into two along an axis at a given location.
 """
@@ -20,28 +23,37 @@ function _split(b::H, axis, value) where H<:HyperRectangle
 end
 
 # empty constructor such that update will always include the first point
+Rect() = Rect{2, Float32}()
+
+TRect{T}() where {T} = Rect{2, T}()
+
+Rect{N}() where {N} = Rect{N, Float32}()
+
 function Rect{N, T}() where {T,N}
-    Rect(Vec{N,T}(typemax(T)), Vec{N,T}(typemin(T)))
+    return Rect(Vec{N,T}(typemax(T)), Vec{N,T}(typemin(T)))
 end
 
 # conversion from other HyperRectangles
 function Rect{N,T1}(a::Rect{N, T2}) where {N,T1,T2}
-    Rect(Vec{N, T1}(minimum(a)), Vec{N, T1}(widths(a)))
+    return Rect(Vec{N, T1}(minimum(a)), Vec{N, T1}(widths(a)))
 end
 
 function Rect(v1::Vec{N, T1}, v2::Vec{N, T2}) where {N,T1,T2}
     T = promote_type(T1, T2)
-    Rect{N,T}(Vec{N, T}(v1), Vec{N, T}(v2))
+    return Rect{N,T}(Vec{N, T}(v1), Vec{N, T}(v2))
 end
+
+function TRect{T}(v1::Vec{N, T1}, v2::Vec{N, T2}) where {N,T,T1,T2}
+    return Rect{N, T}(Vec{N, T}(v1), Vec{N, T}(v2))
+end
+
 function Rect{N}(v1::Vec{N, T1}, v2::Vec{N, T2}) where {N,T1,T2}
     T = promote_type(T1, T2)
-    Rect{N,T}(Vec{N, T}(v1), Vec{N, T}(v2))
+    return Rect{N,T}(Vec{N, T}(v1), Vec{N, T}(v2))
 end
 
-
-
 function Rect{N, T}(a::GeometryPrimitive) where {N, T}
-    Rect{N, T}(Vec{N, T}(minimum(a)), Vec{N, T}(widths(a)))
+    return Rect{N, T}(Vec{N, T}(minimum(a)), Vec{N, T}(widths(a)))
 end
 
 """
@@ -52,7 +64,7 @@ HyperRectangle constructor for indidually specified intervals.
 e.g. HyperRectangle(0,0,1,2) has origin == Vec(0,0) and
 width == Vec(1,2)
 """
-@generated function HyperRectangle(vals::Number...)
+@generated function Rect(vals::Number...)
     # Generated so we get goodish codegen on each signature
     n = length(vals)
     @assert iseven(n)
@@ -62,11 +74,33 @@ width == Vec(1,2)
     # TODO this can be inbounds
     append!(v1.args, [:(vals[$i]) for i = 1:mid])
     append!(v2.args, [:(vals[$i]) for i = mid+1:length(vals)])
-    Expr(:call, :HyperRectangle, v1, v2)
+    return Expr(:call, :HyperRectangle, v1, v2)
 end
 
-Rect{3}(a::Vararg{Number, 6}) = Rect{3}(Vec{3}(a[1], a[2], a[3]), Vec{3}(a[4], a[5], a[6]))
-Rect{3}(args::Vararg{Number, 4}) = Rect{3}(Rect{2}(args...))
+Rect3D(a::Vararg{Number, 6}) = Rect3D(Vec{3}(a[1], a[2], a[3]), Vec{3}(a[4], a[5], a[6]))
+Rect3D(args::Vararg{Number, 4}) = Rect3D(Rect{2}(args...))
+#=
+From different args
+=#
+function (Rect)(args::Vararg{Number, 4})
+    args_prom = promote(args...)
+    return Rect2D{typeof(args_prom[1])}(args_prom...)
+end
+
+function (Rect2D)(args::Vararg{Number, 4})
+    args_prom = promote(args...)
+    return Rect2D{typeof(args_prom[1])}(args_prom...)
+end
+
+function (Rect{2, T})(args::Vararg{Number, 4}) where {T}
+    x, y, w, h = T <: Integer ? round.(T, args) : args
+    return Rect2D{T}(Vec{2, T}(x, y), Vec{2, T}(w, h))
+end
+
+function TRect{T}(args::Vararg{Number, 4}) where {T}
+    x, y, w, h = T <: Integer ? round.(T, args) : args
+    return Rect2D{T}(Vec{2, T}(x, y), Vec{2, T}(w, h))
+end
 
 Rect(r::SimpleRectangle{T}) where T = HyperRectangle{2, T}(r)
 Rect{N}(r::SimpleRectangle{T}) where {N, T} = Rect{N, T}(r)
@@ -86,32 +120,29 @@ end
 From other types
 =#
 function Rect2D(xy::NamedTuple{(:x, :y)}, wh::NamedTuple{(:width, :height)})
-    Rect2D(xy.x, xy.y, wh.width, wh.height)
+    return Rect2D(xy.x, xy.y, wh.width, wh.height)
 end
 
 
 function FRect3D(x::Rect2D{T}) where T
-    Rect{3, T}(Vec{3, T}(minimum(x)..., 0), Vec{3, T}(widths(x)..., 0.0))
+    return Rect{3, T}(Vec{3, T}(minimum(x)..., 0), Vec{3, T}(widths(x)..., 0.0))
 end
 
-#=
-From different args
-=#
-function Rect2D(x::Number, y::Number, w::Number, h::Number)
-    args = promote(x, y, w, h)
-    Rect2D{eltype(args)}(args...)
-end
-function Rect2D{T}(args::Vararg{Number, 4}) where T
-    x, y, w, h = T <: Integer ? round.(T, args) : args
-    Rect{2, T}(Vec{2, T}(x, y), Vec{2, T}(w, h))
-end
 
 function Rect2D(xy::VecTypes{2}, w::Number, h::Number)
-    Rect2D(xy..., w, h)
+    return Rect2D(xy..., w, h)
 end
 
 function Rect2D(x::Number, y::Number, wh::VecTypes{2})
-    Rect2D(x, y, wh...)
+    return Rect2D(x, y, wh...)
+end
+
+function TRect{T}(xy::VecTypes{2}, w::Number, h::Number) where {T}
+    return Rect2D{T}(xy..., w, h)
+end
+
+function TRect{T}(x::Number, y::Number, wh::VecTypes{2}) where {T}
+    return Rect2D{T}(x, y, wh...)
 end
 
 #=
@@ -221,8 +252,8 @@ function *(m::Mat{4,4,T}, h::HyperRectangle{3,T}) where T
     HyperRectangle{3,T}(_vmin, _vmax - _vmin)
 end
 
-function HyperRectangle(geometry::AbstractArray{<: Point{N, T}}) where {N,T}
-    HyperRectangle{N,T}(geometry)
+function Rect(geometry::AbstractArray{<: Point{N, T}}) where {N,T}
+    return Rect{N,T}(geometry)
 end
 
 @inline function minmax(p::StaticVector, vmin, vmax)
@@ -243,7 +274,7 @@ end
 """
 Construct a HyperRectangle enclosing all points.
 """
-function (t::Type{HyperRectangle{N1, T1}})(
+function (t::Type{Rect{N1, T1}})(
         geometry::AbstractArray{PT}
     ) where {N1, T1, PT <: Point}
     N2, T2 = length(PT), eltype(PT)
@@ -257,14 +288,12 @@ function (t::Type{HyperRectangle{N1, T1}})(
     w = vmax - vmin
     if N1 > N2
         z = zero(Vec{N1-N2, T1})
-        return HyperRectangle{N1, T1}(vcat(o, z),
+        return Rect{N1, T1}(vcat(o, z),
                                      vcat(w, z))
     else
-        return HyperRectangle{N1, T1}(o, w)
+        return Rect{N1, T1}(o, w)
    end
 end
-
-
 
 xwidth(a::SimpleRectangle)  = a.w + a.x
 width(a::SimpleRectangle)  = a.w
@@ -297,6 +326,7 @@ end
 Rect{T}(a::Cube) where T = Rect{T}(origin(a), widths(a))
 
 Rect{T}(a::AbstractMesh) where T = Rect{T}(vertices(a))
+Rect{N, T}(a::AbstractMesh) where {N, T} = Rect{N, T}(vertices(a))
 
 function positive_widths(rect::Rect{N, T}) where {N, T}
     mini, maxi = minimum(rect), maximum(rect)
@@ -340,11 +370,10 @@ function intersect(a::SimpleRectangle, b::SimpleRectangle)
     SimpleRectangle(min_n[1], min_n[2], w[1], w[2])
 end
 
-
-
 function update(b::HyperRectangle{N, T}, v::Vec{N, T2}) where {N, T, T2}
     update(b, Vec{N, T}(v))
 end
+
 function update(b::HyperRectangle{N, T}, v::Vec{N, T}) where {N, T}
     m = min.(minimum(b), v)
     maxi = maximum(b)

@@ -153,7 +153,6 @@ function (::Type{HM})(x::Tuple{P, ConstAttrib}) where {HM <: HMesh, ConstAttrib,
     add_attribute(HM(any), const_attribute)
 end
 
-
 merge(m::AbstractVector{M}) where {M <: AbstractMesh} = merge(m...)
 
 """
@@ -215,16 +214,14 @@ end
 struct MeshMulFunctor{T}
     matrix::Mat{4,4,T}
 end
+
 (m::MeshMulFunctor{T})(vert) where {T} = Vec{3, T}(m.matrix*Vec{4, T}(vert..., 1))
+
 function *(m::Mat{4,4,T}, mesh::AbstractMesh) where T
     msh = deepcopy(mesh)
     map!(MeshMulFunctor(m), msh.vertices, msh.vertices)
     msh
 end
-
-
-
-
 
 """
 The unnormalized normal of three vertices.
