@@ -29,11 +29,31 @@
         @test v == vf
     end
 
-    @testset "negative offests and unsigned integers" begin
+    @testset "negative offsets and unsigned integers" begin
         oi = OffsetInteger{-1, UInt64}(UInt64(1))
         show(IOBuffer(), oi)
 
         oi = OffsetInteger{1, UInt64}(UInt64(1))
         show(IOBuffer(), oi)
+    end
+
+    @testset "sorting of offsets" begin
+        o1 = OffsetInteger{-2, Int}(-1)
+        o2 = OffsetInteger{-2, Int}(0)
+        o3 = OffsetInteger{-2, Int}(1)
+        @test o1 < o2
+        @test sort([o3, o1, o2]) == [o1, o2, o3]
+    end
+
+    @testset "operations on offsets" begin
+        o1 = OffsetInteger{-2, Int}(-1)
+        o2 = OffsetInteger{-2, Int}(0)
+        o3 = OffsetInteger{-2, Int}(1)
+        @test abs(o2) === o2
+        @test abs(o1) === o3
+        @test o1 + o3 === o2
+        @test -o1 === o3
+        @test -o3 === o1
+        @test -o2 === o2
     end
 end

@@ -4,6 +4,7 @@ using LinearAlgebra
     @testset "Core" begin
         x = centered(HyperCube)
         @test origin(x) == Vec3f0(-0.5)
+        @test width(x) == 1.0f0
         @test widths(x) == Vec3f0(1.0)
         @test maximum(x) == Vec3f0(0.5)
         @test minimum(x) == Vec3f0(-0.5)
@@ -220,6 +221,22 @@ end
     bb1 = HyperRectangle(x)
     bb2 = HyperRectangle(v)
     @test bb1 == bb2
+end
+
+@testset "face-orientation" begin
+    cube = HyperRectangle(Vec3f0(-0.5), Vec3f0(1))
+
+    cube_faces = decompose(Face{3,Int32}, cube)
+    cube_vertices = decompose(Point{3,Float32}, cube)
+
+    cube_tris = [cube_vertices[f] for f in cube_faces]
+
+    normals = [cross(t[2] - t[1], t[3] - t[1]) for t in cube_tris]
+    centroids = sum.(cube_tris) ./ 3f0
+
+    for (p, n) in zip(centroids, normals)
+        @test (p ⋅ n) > 0f0
+    end
 end
 
 end

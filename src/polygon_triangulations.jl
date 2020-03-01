@@ -12,17 +12,44 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 =#
+"""
+Calculate the area of one triangle.
+"""
+function area(vertices::AbstractVector{Point{3, VT}}, face::Face{3,FT}) where {VT,FT}
+    v1, v2, v3 = vertices[face]
+    return 0.5 * norm(orthogonal_vector(v1, v2, v3))
+end
+
+"""
+Calculate the area of all triangles.
+"""
+function area(
+        vertices::AbstractVector{Point{3, VT}},
+        faces::AbstractVector{Face{3,FT}}
+    ) where {VT,FT}
+    return sum(x->area(vertices, x), faces)
+end
 
 function area(contour::AbstractVector{<: AbstractPoint{N, T}}) where {N, T}
     n = length(contour)
     n < 3 && return zero(T)
     A = zero(T)
-    p = n; q = 1
+    p = lastindex(contour)
+    q = firstindex(contour)
     while q <= n
         A += cross(contour[p], contour[q])
         p = q; q +=1
     end
     return A * T(0.5)
+end
+
+function area(contour::AbstractVector{Point{3, T}}) where {T}
+    A = zero(eltype(contour))
+    o = contour[1]
+    for i in (firstindex(contour)+1):(lastindex(contour)-1)
+        A += cross(contour[i] - o, contour[i+1] - o)
+    end
+    return norm(A)*T(0.5)
 end
 
 """
@@ -32,9 +59,9 @@ end
 function InsideTriangle(A::T, B::T, C::T, P::T) where T <: AbstractPoint
     a = C-B; b = A-C; c = B-A
     ap = P-A; bp = P-B; cp = P-C
-    a_bp = a[1]*bp[2] - a[2]*bp[1];
-    c_ap = c[1]*ap[2] - c[2]*ap[1];
-    b_cp = b[1]*cp[2] - b[2]*cp[1];
+    a_bp = a[1] * bp[2] - a[2] * bp[1];
+    c_ap = c[1] * ap[2] - c[2] * ap[1];
+    b_cp = b[1] * cp[2] - b[2] * cp[1];
     t0 = zero(eltype(T))
     return ((a_bp >= t0) && (b_cp >= t0) && (c_ap >= t0))
 end
@@ -63,21 +90,21 @@ function snip(
     return true;
 end
 
-
-
 """
 Triangulates a Polygon given as a `contour`::AbstractArray{Point} without holes.
 It will return a Vector{`facetype`}, defining indexes into `contour`
 """
 function polygon2faces(
-        contour::AbstractArray{P}, facetype = GLTriangle
+        _contour::AbstractArray{P}, facetype = GLTriangle
     ) where P <: AbstractPoint
     #= allocate and initialize list of Vertices in polygon =#
     result = facetype[]
 
     # the algorithm doesn't like closed contours
-    if isapprox(last(contour), first(contour))
-        pop!(contour)
+    contour = if isapprox(last(_contour), first(_contour))
+        @view _contour[1:end-1]
+    else
+        @view _contour[1:end]
     end
 
     n = length(contour)
@@ -102,7 +129,6 @@ function polygon2faces(
             return result
         end
         count -= 1
-
 
         #= three consecutive vertices in current polygon, <u,v,w> =#
         u = v; (u > nv) && (u = 1) #= previous =#
@@ -132,8 +158,9 @@ function topoint(::Type{Point{3, T}}, p::Point{2, T}) where T
     Point{3, T}(p[1], p[2], T(0))
 end
 function topoint(::Type{Point{3, T}}, p::Point{3, T}) where T
-    p
+    return p
 end
+
 function topoint(::Type{Point{2, T}}, p::Point{3, T}) where T
     Point{2, T}(p[1], p[2])
 end

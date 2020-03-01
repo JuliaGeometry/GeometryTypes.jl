@@ -54,14 +54,6 @@ macro fsa(ex)
     esc(expr)
 end
 
-function unit(::Type{T}, i::Integer) where T <: StaticVector
-    T(ntuple(Val(length(T))) do j
-        ifelse(i == j, 1, 0)
-    end)
-end
-
-export unit
-
 macro fixed_vector(name, parent)
     esc(quote
         struct $(name){S, T} <: $(parent){S, T}
@@ -110,7 +102,7 @@ macro fixed_vector(name, parent)
         @inline function $(name){S}(x::T) where {S, T <: Tuple}
             $(name){S, StaticArrays.promote_tuple_eltype(T)}(x)
         end
-        $(name){S, T}(x::StaticVector) where {S, T} = $(name){S, T}(Tuple(x))
+        $(name){S, T}(x::FixedVector) where {S, T} = $(name){S, T}(Tuple(x))
         @generated function (::Type{$(name){S, T}})(x::$(name)) where {S, T}
             idx = [:(x[$i]) for i = 1:S]
             quote
@@ -123,7 +115,7 @@ macro fixed_vector(name, parent)
                 $($(name)){S, T}($(idx...))
             end
         end
-        @generated function (::Type{SV})(x::StaticVector) where SV <: $(name)
+        @generated function (::Type{SV})(x::FixedVector) where SV <: $(name)
             len = size_or(SV, size(x))[1]
             if length(x) == len
                 :(SV(Tuple(x)))
@@ -158,8 +150,34 @@ macro fixed_vector(name, parent)
     end)
 end
 
+function Base.isnan(x::FixedArray)
+    for elem in x
+        isnan(elem) && return true
+    end
+    false
+end
 
-@fixed_vector Vec StaticVector
-@fixed_vector Point StaticVector
+function unit(::Type{T}, i::Integer) where T <: FixedVector
+    T(ntuple(Val(length(T))) do j
+        ifelse(i == j, 1, 0)
+    end)
+end
+
+export unit
+
+function Base.extrema(a::AbstractVector{T}) where T <: FixedVector
+    ET = eltype(T)
+    reduce((x, v)-> (min.(x[1], v), max.(x[2], v)), a; init = (T(typemax(ET)), T(typemin(ET))))
+end
+function Base.minimum(a::AbstractVector{T}) where T <: FixedVector
+    reduce((x, v)-> min.(x, v), a; init=T(typemax(eltype(T))))
+end
+function Base.maximum(a::AbstractVector{T}) where T <: FixedVector
+    reduce((x, v)-> max.(x, v), a; init=T(typemin(eltype(T))))
+end
+
+
+@fixed_vector Vec FixedVector
+@fixed_vector Point FixedVector
 
 end

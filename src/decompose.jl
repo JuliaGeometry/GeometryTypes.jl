@@ -42,6 +42,7 @@ isdecomposable(::Type{T}, ::Type{HR}) where {T<:Normal, HR<:SimpleRectangle} = t
 isdecomposable(::Type{T}, ::Type{HR}) where {T<:Point, HR <: HyperSphere} = true
 isdecomposable(::Type{T}, ::Type{HR}) where {T<:Face, HR <: HyperSphere} = true
 isdecomposable(::Type{T}, ::Type{HR}) where {T<:TextureCoordinate, HR <: HyperSphere} = true
+isdecomposable(::Type{T}, ::Type{HR}) where {T<:Normal, HR <: HyperSphere} = true
 
 """
 ```
@@ -137,19 +138,26 @@ end
 # less strict version of above
 decompose(::Type{Simplex{1}}, f::Simplex{N, T}) where {N, T} = decompose(Simplex{1,T}, f)
 
+
+decompose(::Type{P}, points::AbstractVector{P}) where {P<: Point} = points
+function decompose(::Type{Point{N1, T1}}, points::AbstractVector{Point{N2, T2}}) where {N1, T1, N2, T2}
+    return map(x-> to_pointn(Point{N1, T1}, x), points)
+end
+
 """
 Get decompose a `HyperRectangle` into points.
 """
 function decompose(
-        PT::Type{Point{N, T1}}, rect::HyperRectangle{N, T2}
-    ) where {N, T1, T2}
+        PT::Type{Point{N1, T1}}, rect::HyperRectangle{N2, T2}
+    ) where {N1, N2, T1, T2}
     # The general strategy is that since there are a deterministic number of
     # points, we can generate all points by looking at the binary increments.
     w = widths(rect)
     o = origin(rect)
-    points = T1[o[j]+((i>>(j-1))&1)*w[j] for j=1:N, i=0:(2^N-1)]
-    reshape(reinterpret(PT, points), (2^N,))
+    points = T1[o[j]+((i>>(j-1))&1)*w[j] for j=1:N2, i=0:(2^N2-1)]
+    return decompose(PT, reshape(reinterpret(Point{N2, T1}, points), (2^N2,)))
 end
+
 """
 Get decompose a `HyperRectangle` into Texture Coordinates.
 """
@@ -163,7 +171,32 @@ function decompose(
     points = T1[((i>>(j-1))&1) for j=1:N, i=0:(2^N-1)]
     reshape(reinterpret(UVWT, points), (8,))
 end
+
+"""
+Get decompose a `HyperRectangle` into faces.
+"""
+function decompose(
+        FT::Type{Face{N, T}}, rect::HyperRectangle{3, T2}
+    ) where {N, T, T2}
+    faces = Face{4, Int}[
+        (1,3,4,2),
+        (2,4,8,6),
+        (4,3,7,8),
+        (1,5,7,3),
+        (1,2,6,5),
+        (5,6,8,7),
+    ]
+    decompose(FT, faces)
+end
+
+function decompose(
+        FT::Type{Face{N, T}}, rect::HyperRectangle{2, T2}
+    ) where {N, T, T2}
+    return decompose(FT, SimpleRectangle(minimum(rect), widths(rect)))
+end
+
 decompose(::Type{FT}, faces::Vector{FT}) where {FT<:Face} = faces
+
 function decompose(::Type{FT1}, faces::Vector{FT2}) where {FT1<:Face, FT2<:Face}
     isempty(faces) && return FT1[]
     N1,N2 = length(FT1), length(FT2)
@@ -178,24 +211,6 @@ function decompose(::Type{FT1}, faces::Vector{FT2}) where {FT1<:Face, FT2<:Face}
         end
     end
     outfaces
-end
-
-
-"""
-Get decompose a `HyperRectangle` into faces.
-"""
-function decompose(
-        FT::Type{Face{N, T}}, rect::HyperRectangle{3, T2}
-    ) where {N, T, T2}
-    faces = Face{4, Int}[
-        (1,2,4,3),
-        (2,4,8,6),
-        (4,3,7,8),
-        (1,3,7,5),
-        (1,5,6,2),
-        (5,6,8,7),
-    ]
-    decompose(FT, faces)
 end
 
 function decompose(P::Type{Point{2, PT}}, r::SimpleRectangle, resolution=(2,2)) where PT
@@ -283,10 +298,8 @@ end
 # Define decompose for your own meshtype, to easily convert it to Homogenous attributes
 
 #Gets the normal attribute to a mesh
-function decompose(T::Type{Point{3, VT}}, mesh::AbstractMesh) where VT
-    vts = mesh.vertices
-    eltype(vts) == T && return vts
-    eltype(vts) <: Point && return map(T, vts)
+function decompose(T::Type{Point{N, VT}}, mesh::AbstractMesh) where {N, VT}
+    return decompose(T, mesh.vertices)
 end
 
 # gets the wanted face type
@@ -386,7 +399,7 @@ isdecomposable(::Type{T}, ::Type{C}) where {T <:Point, C <:Cylinder2} = true
 isdecomposable(::Type{T}, ::Type{C}) where {T <:Face, C <:Cylinder2} = true
 
 # def of resolution + rotation
-function decompose(PT::Type{Point{3, T}}, c::Cylinder{2, T}, resolution = (2, 2)) where T
+function decompose(PT::Type{Point{3, T}}, c::Cylinder{2}, resolution = (2, 2)) where T
     r = SimpleRectangle{T}(c.origin[1] - c.r/2, c.origin[2], c.r, height(c))
     M = rotation(c); vertices = decompose(PT, r, resolution)
     vo = length(c.origin) == 2 ? Point{3, T}(c.origin[1], c.origin[2], 0) : c.origin
@@ -395,28 +408,32 @@ function decompose(PT::Type{Point{3, T}}, c::Cylinder{2, T}, resolution = (2, 2)
     end
     return vertices
 end
-function decompose(PT::Type{Point{3,T}}, c::Cylinder{3, T}, resolution = 5) where T
+function decompose(PT::Type{Point{3, T}}, c::Cylinder{3}, resolution = 30) where T
     isodd(resolution) && (resolution = 2 * div(resolution, 2))
     resolution = max(8, resolution); nbv = div(resolution, 2)
     M = rotation(c); h = height(c)
-    position = 1; vertices = Vector{PT}(undef, 2 * nbv)
+    position = 1; vertices = Vector{PT}(undef, 2 * nbv+2)
     for j = 1:nbv
         phi = T((2π * (j - 1)) / nbv)
         vertices[position] = PT(M * Point{3, T}(c.r * cos(phi), c.r * sin(phi),0)) + PT(c.origin)
         vertices[position+1] = PT(M * Point{3, T}(c.r * cos(phi), c.r * sin(phi),h)) + PT(c.origin)
         position += 2
     end
+    vertices[end-1] = PT(c.origin)
+    vertices[end] = PT(c.extremity)
     return vertices
 end
 
-function decompose(::Type{FT}, c::Cylinder{2, T}, resolution = (2, 2)) where {FT <: Face, T}
-    r = SimpleRectangle{T}(c.origin[1] - c.r/2, c.origin[2], c.r, height(c))
+function decompose(::Type{FT}, c::Cylinder{2}, resolution = (2, 2)) where FT <: Face
+    r = SimpleRectangle(c.origin[1] - c.r/2, c.origin[2], c.r, height(c))
     return decompose(FT, r, resolution)
 end
-function decompose(::Type{FT}, c::Cylinder{3, T}, facets = 18) where {FT <: Face, T}
+
+function decompose(::Type{FT}, c::Cylinder{3}, facets = 30) where FT <: Face
     isodd(facets) ? facets = 2 * div(facets, 2) : nothing
     facets < 8 ? facets = 8 : nothing; nbv = Int(facets / 2)
-    indexes = Vector{FT}(undef, facets); index = 1
+    indexes = Vector{FT}(undef, facets)
+    index = 1
     for j = 1:(nbv-1)
         indexes[index] = (index + 2, index + 1, index)
         indexes[index + 1] = ( index + 3, index + 1, index + 2)
@@ -424,5 +441,9 @@ function decompose(::Type{FT}, c::Cylinder{3, T}, facets = 18) where {FT <: Face
     end
     indexes[index] = (1, index + 1, index)
     indexes[index + 1] = (2, index + 1, 1)
+
+    for i = 1:length(indexes)
+        i%2 == 1 ? push!(indexes, (indexes[i][1], indexes[i][3], 2*nbv+1)) : push!(indexes,(indexes[i][2], indexes[i][1], 2*nbv+2))
+    end
     return indexes
 end

@@ -11,7 +11,7 @@ Some of the types offered by GeometryTypes visualized with [Makie](https://githu
 ```julia
 using Makie, GeometryTypes, AbstractPlotting
 AbstractPlotting.set_theme!(
-    plot = NT(show_axis = false, scale_plot = false),
+    plot = (show_axis = false, scale_plot = false),
     color = :turquoise1
 )
 poly(HyperRectangle(Vec2f0(0), Vec2f0(100)))

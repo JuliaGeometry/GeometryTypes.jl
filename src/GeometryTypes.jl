@@ -7,7 +7,6 @@ using LinearAlgebra
 import FixedPointNumbers
 using FixedPointNumbers: N0f8
 
-
 import Base: ==,
              *,
              convert,

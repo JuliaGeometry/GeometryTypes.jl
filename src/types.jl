@@ -75,12 +75,14 @@ communicating with 0-indexed systems such ad OpenGL.
 struct OffsetInteger{O, T <: Integer} <: Integer
     i::T
 
-    OffsetInteger{O, T}(x::Integer) where {O, T <: Integer} = new{O, T}(T(O >= 0 ? x + O : x - (-O)))
+    OffsetInteger{O, T}(x::Integer) where {O, T <: Integer} = new{O, T}(T(x + O))
 end
 
 
 raw(x::OffsetInteger) = x.i
 raw(x::Integer) = x
+value(x::OffsetInteger{O, T}) where {O, T} = raw(x) - O
+value(x::Integer) = x
 
 """
 A `HyperRectangle` is a generalization of a rectangle into N-dimensions.

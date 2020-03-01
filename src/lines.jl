@@ -64,24 +64,10 @@ function simple_concat(vec::AbstractVector, range, endpoint::P) where P
     result
 end
 
-struct Partition{N, T}
-    data::T
-    connect::Bool # build a pair connecting to first elements
-end
-Partition{N}(data, connect = false) where N = Partition{N, typeof(data)}(data, connect)
 
-# one less if not connect to first elements
-length(x::Partition{N}) where N = (length(x.data) ÷ (N - 1)) - (!x.connect)
-eltype(itr::Partition{N}) where N = NTuple{N, eltype(itr.data)}
-
-function iterate(iter::Partition{N}, state = 1) where N
-    state > length(iter) && return nothing
-    let data = iter.data, s = state
-        tup = ntuple(Val(N)) do i
-            data[mod1(((s - 1) * (N - 1)) + i, length(data))]
-        end
-        return tup, state + 1
-    end
+function consecutive_pairs(arr)
+    n = length(arr)
+    zip(view(arr, 1:n-1), view(arr, 2:n))
 end
 
 """
@@ -91,8 +77,8 @@ function self_intersections(points::AbstractVector{<: AbstractPoint})
     sections = similar(points, 0)
     intersections = Int[]
     wraparound = i-> mod1(i, length(points) - 1)
-    for (i, (a, b)) in enumerate(Partition{2}(points))
-        for (j, (a2, b2)) in enumerate(Partition{2}(points))
+    for (i, (a,b)) in enumerate(consecutive_pairs(points))
+        for (j, (a2, b2)) in enumerate(consecutive_pairs(points))
             is1, is2 = wraparound(i+1), wraparound(i-1)
             if i != j && is1 != j && is2 != j && !(i in intersections) && !(j in intersections)
                 intersected, p = intersects(LineSegment(a,b), LineSegment(a2, b2))
@@ -103,7 +89,7 @@ function self_intersections(points::AbstractVector{<: AbstractPoint})
             end
         end
     end
-    intersections, sections
+    return intersections, sections
 end
 
 """

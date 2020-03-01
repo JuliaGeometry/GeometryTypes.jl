@@ -167,7 +167,7 @@ function merge(m1::M, meshes::M...) where M <: AbstractMesh
     f = copy(m1.faces)
     attribs = deepcopy(attributes_noVF(m1))
     for mesh in meshes
-        append!(f, mesh.faces .+ length(v))
+        append!(f, map(f-> f .+ length(v), mesh.faces))
         append!(v, mesh.vertices)
         for (v1, v2) in zip(values(attribs), values(attributes_noVF(mesh)))
             append!(v1, v2)
@@ -193,7 +193,7 @@ function merge(
     color_attrib = RGBA{N0f8}[RGBA{N0f8}(m1.color)]
     index        = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
     for mesh in meshes
-        append!(faces, mesh.faces .+ length(vertices))
+        append!(faces, map(f-> f .+ length(vertices), mesh.faces))
         append!(vertices, mesh.vertices)
         attribsb = attributes_noVF(mesh)
         for (k,v) in attribsb
@@ -225,35 +225,40 @@ end
 
 
 
+
+"""
+The unnormalized normal of three vertices.
+"""
+function orthogonal_vector( v1, v2, v3 )
+    a = v2 - v1
+    b = v3 - v1
+    return cross(a, b)
+end
+
 """
 ```
 normals{VT,FD,FT,FO}(vertices::Vector{Point{3, VT}},
-                     faces::Vector{Face{FD,FT,FO}},
-                     NT = Normal{3, VT})
+                    faces::Vector{Face{FD,FT,FO}},
+                    NT = Normal{3, VT})
 ```
-
 Compute all vertex normals.
 """
-function normals(
-        vertices::AbstractVector{Point{3, VT}},
-        faces::AbstractVector{F},
-        NT = Normal{3, VT}
-    ) where {VT, F <: Face}
+function normals(vertices::AbstractVector{Point{3, VT}}, faces::AbstractVector{F},
+                 NT = Normal{3, VT}) where {VT, F <: Face}
     normals_result = zeros(Point{3, VT}, length(vertices)) # initilize with same type as verts but with 0
     for face in faces
         v = vertices[face]
         # we can get away with two edges since faces are planar.
-        a = v[2] - v[1]
-        b = v[3] - v[1]
-        n = cross(a, b)
+        n = orthogonal_vector(v[1], v[2], v[3])
         for i =1:length(F)
             fi = face[i]
             normals_result[fi] = normals_result[fi] + n
         end
     end
     normals_result .= NT.(normalize.(normals_result))
-    normals_result
+    return normals_result
 end
+
 
 
 """
@@ -358,6 +363,28 @@ function reface!(point2idx, verts, uverts, faces)
 end
 
 """
+Calculate the signed volume of one tetrahedron. Be sure the orientation of your surface is right.
+"""
+function volume(
+        vertices::AbstractVector{Point{3, VT}},
+        face::Face{3,FT}
+    ) where {VT,FT}
+    v1, v2, v3 = vertices[face]
+    sig = sign( orthogonal_vector( v1, v2, v3 ) ⋅ v1 )
+    return sig * abs( v1 ⋅ ( v2 × v3 ) ) / 6
+end
+
+"""
+Calculate the signed volume of all tetrahedra. Be sure the orientation of your surface is right.
+"""
+function volume(
+        vertices::AbstractVector{Point{3, VT}},
+        faces::AbstractVector{Face{3,FT}}
+    ) where {VT,FT}
+    return sum( x->volume( vertices, x), faces )
+end
+
+"""
     remove_overlap!(mesh::AbstractMesh)
 
 removes non unique vertices from a mesh, and relinks the faces to point to only shared vertices.
@@ -381,7 +408,6 @@ function show(io::IO, m::M) where M <: HMesh
 end
 
 
-
 function (meshtype::Type{T})(c::Pyramid) where T <: AbstractMesh
     T(vertices = decompose(vertextype(T), c), faces = decompose(facetype(T), c))
 end
@@ -401,17 +427,17 @@ function (meshtype::Type{T})(c::GeometryPrimitive, args...) where T <: AbstractM
             newattribs[fieldname] = decompose(eltype(typ), c, args...)
         end
     end
-    T(newattribs)
+    return T(newattribs)
 end
 
 function to_pointn(::Type{Point{N, T}}, p::StaticVector{N2}, d = T(0)) where {T, N, N2}
-    Point(ntuple(i-> i <= N2 ? p[i] : d, Val{N}))
+    return Point{N, T}(ntuple(i-> i <= N2 ? T(p[i]) : T(d), N))
 end
 
 function (::Type{T})(c::Circle, n = 32) where T <: AbstractMesh
     newattribs = Dict{Symbol, Any}()
     VT = vertextype(T)
-    verts = decompose(VT, c)
+    verts = decompose(VT, c, n)
     N = length(verts)
     push!(verts, to_pointn(VT, origin(c))) # middle point
     middle_idx = length(verts)
@@ -419,12 +445,12 @@ function (::Type{T})(c::Circle, n = 32) where T <: AbstractMesh
     faces = map(1:N) do i
         FT(i, middle_idx, i + 1)
     end
-    T(vertices = verts, faces = faces)
+    return T(vertices = verts, faces = faces)
 end
 
 function (meshtype::Type{T})(
         c::Union{HyperCube{3,T}, HyperRectangle{3,HT}}
-    ) where {T <: HMesh,HT}
+    ) where {T <: HMesh, HT}
     xdir = Vec{3, HT}(1, 0, 0)
     ydir = Vec{3, HT}(0, 1, 0)
     zdir = Vec{3, HT}(0, 0, 1)
@@ -444,7 +470,7 @@ function (meshtype::Type{T})(
     map!(v, v) do v
         (v .* w) + o
     end
-    mesh
+    return mesh
 end
 
 ==(a::AbstractMesh, b::AbstractMesh) = false

@@ -1,7 +1,7 @@
-import Base: +, -, abs, *, /, div, convert, ==, <=, >=, show, to_index
+import Base: +, -, abs, *, /, div, convert, ==, <=, >=, <, >, show, to_index, sub_with_overflow
 
 function show(io::IO, oi::OffsetInteger{O, T}) where {O, T}
-    print(io, "|$(raw(oi)) (indexes as $(O >= 0 ? raw(oi) - O : raw(oi) + -O))|")
+    print(io, "|$(raw(oi)) (indexes as $(value(oi))|")
 end
 
 Base.eltype(::Type{OffsetInteger{O, T}}) where {O, T} = T
@@ -12,7 +12,7 @@ OffsetInteger{O1, T1}(x::OffsetInteger{O2, T2}) where {O1, O2, T1 <: Integer, T2
 
 OffsetInteger{O}(x::Integer) where {O} = OffsetInteger{O, eltype(x)}(x)
 OffsetInteger{O}(x::OffsetInteger) where {O} = OffsetInteger{O, eltype(x)}(x)
-(::Type{IT})(x::OffsetInteger{O, T}) where {IT <: Integer, O, T <: Integer} = IT(raw(x) + -O)
+(::Type{IT})(x::OffsetInteger{O, T}) where {IT <: Integer, O, T <: Integer} = IT(value(x))
 
 Base.@pure pure_max(x1, x2) = x1 > x2 ? x1 : x2
 Base.promote_rule(::Type{T1}, ::Type{OffsetInteger{O, T2}}) where {T1 <: Integer, O, T2} = T1
@@ -24,16 +24,16 @@ to_index(I::OffsetInteger{0}) = raw(I)
 
 # basic operators
 for op in (:(-), :abs)
-    @eval $(op)(x::T) where {T <: OffsetInteger} = T($(op)(x.i))
+    @eval $(op)(x::T) where {T <: OffsetInteger} = T($(op)(value(x)))
 end
 for op in (:(+), :(-), :(*), :(/), :div)
     @eval begin
         @inline function $(op)(x::OffsetInteger{O}, y::OffsetInteger{O}) where O
-            OffsetInteger{O}($op(x.i, y.i))
+            OffsetInteger{O}($op(value(x), value(y)))
         end
     end
 end
-for op in (:(==), :(>=), :(<=))
+for op in (:(==), :(>=), :(<=), :(<) , :(>), :sub_with_overflow)
     @eval begin
         @inline function $(op)(x::OffsetInteger{O}, y::OffsetInteger{O}) where O
             $op(x.i, y.i)
