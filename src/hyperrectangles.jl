@@ -322,9 +322,11 @@ function SimpleRectangle(position::Vec{2,T}, width::Vec{2,T}) where T
     SimpleRectangle{T}(position..., width...)
 end
 
-function Base.to_indices(A::AbstractArray{T, 2}, I::Tuple{<: SimpleRectangle}) where T
-    i = I[1]
-    (i.x + 1 : (i.x + i.w), i.y + 1 : (i.y + i.h))
+function Base.to_indices(A::AbstractArray{T, 2}, I::Tuple{<: Union{Rect2D, SimpleRectangle}}) where T
+    rect = I[1]
+    mini = minimum(rect)
+    wh = widths(rect)
+    return (mini[1] + 1 : (mini[1] + wh[1]), mini[2] + 1 : (mini[2] + wh[2]))
 end
 
 AABB(a) = AABB{Float32}(a)
