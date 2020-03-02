@@ -153,7 +153,6 @@ function (::Type{HM})(x::Tuple{P, ConstAttrib}) where {HM <: HMesh, ConstAttrib,
     add_attribute(HM(any), const_attribute)
 end
 
-
 merge(m::AbstractVector{M}) where {M <: AbstractMesh} = merge(m...)
 
 """
@@ -190,7 +189,7 @@ function merge(
     faces        = copy(m1.faces)
     attribs      = Dict{Symbol, Any}(filter(((k,v),) -> k != :color, attributes_noVF(m1)))
     attribs      = Dict{Symbol, Any}([(k, copy(v)) for (k,v) in attribs])
-    color_attrib = RGBA{U8}[RGBA{U8}(m1.color)]
+    color_attrib = RGBA{N0f8}[RGBA{N0f8}(m1.color)]
     index        = Float32[length(color_attrib)-1 for i=1:length(m1.vertices)]
     for mesh in meshes
         append!(faces, map(f-> f .+ length(vertices), mesh.faces))
@@ -215,9 +214,266 @@ end
 struct MeshMulFunctor{T}
     matrix::Mat{4,4,T}
 end
+
 (m::MeshMulFunctor{T})(vert) where {T} = Vec{3, T}(m.matrix*Vec{4, T}(vert..., 1))
+
 function *(m::Mat{4,4,T}, mesh::AbstractMesh) where T
     msh = deepcopy(mesh)
     map!(MeshMulFunctor(m), msh.vertices, msh.vertices)
     msh
+end
+
+"""
+The unnormalized normal of three vertices.
+"""
+function orthogonal_vector( v1, v2, v3 )
+    a = v2 - v1
+    b = v3 - v1
+    return cross(a, b)
+end
+
+"""
+```
+normals{VT,FD,FT,FO}(vertices::Vector{Point{3, VT}},
+                    faces::Vector{Face{FD,FT,FO}},
+                    NT = Normal{3, VT})
+```
+Compute all vertex normals.
+"""
+function normals(vertices::AbstractVector{Point{3, VT}}, faces::AbstractVector{F},
+                 NT = Normal{3, VT}) where {VT, F <: Face}
+    normals_result = zeros(Point{3, VT}, length(vertices)) # initilize with same type as verts but with 0
+    for face in faces
+        v = vertices[face]
+        # we can get away with two edges since faces are planar.
+        n = orthogonal_vector(v[1], v[2], v[3])
+        for i =1:length(F)
+            fi = face[i]
+            normals_result[fi] = normals_result[fi] + n
+        end
+    end
+    normals_result .= NT.(normalize.(normals_result))
+    return normals_result
+end
+
+
+
+"""
+Slice an AbstractMesh at the specified Z axis value.
+Returns a Vector of LineSegments generated from the faces at the specified
+heights. Note: This will not slice in-plane faces.
+"""
+function slice(mesh::AbstractMesh{Point{3,VT}, Face{3, FT}}, height::Number) where {VT<:AbstractFloat,FT<:Integer}
+
+    height_ct = length(height)
+    # intialize the LineSegment array
+    slice = Simplex{2,Point{2,VT}}[]
+
+    for face in mesh.faces
+        v1,v2,v3 = mesh.vertices[face]
+        zmax = max(v1[3], v2[3], v3[3])
+        zmin = min(v1[3], v2[3], v3[3])
+        if height > zmax
+            continue
+        elseif zmin <= height
+            if v1[3] < height && v2[3] >= height && v3[3] >= height
+                p1 = v1
+                p2 = v3
+                p3 = v2
+            elseif v1[3] > height && v2[3] < height && v3[3] < height
+                p1 = v1
+                p2 = v2
+                p3 = v3
+            elseif v2[3] < height && v1[3] >= height && v3[3] >= height
+                p1 = v2
+                p2 = v1
+                p3 = v3
+            elseif v2[3] > height && v1[3] < height && v3[3] < height
+                p1 = v2
+                p2 = v3
+                p3 = v1
+            elseif v3[3] < height && v2[3] >= height && v1[3] >= height
+                p1 = v3
+                p2 = v2
+                p3 = v1
+            elseif v3[3] > height && v2[3] < height && v1[3] < height
+                p1 = v3
+                p2 = v1
+                p3 = v2
+            else
+                continue
+            end
+
+            start = Point{2,VT}(p1[1] + (p2[1] - p1[1]) * (height - p1[3]) / (p2[3] - p1[3]),
+                                p1[2] + (p2[2] - p1[2]) * (height - p1[3]) / (p2[3] - p1[3]))
+            finish = Point{2,VT}(p1[1] + (p3[1] - p1[1]) * (height - p1[3]) / (p3[3] - p1[3]),
+                                 p1[2] + (p3[2] - p1[2]) * (height - p1[3]) / (p3[3] - p1[3]))
+
+            push!(slice, Simplex{2,Point{2, VT}}(start, finish))
+        end
+    end
+
+    return slice
+end
+
+
+# TODO this should be checkbounds(Bool, ...)
+"""
+```
+checkbounds{VT,FT,FD,FO}(m::AbstractMesh{VT,Face{FD,FT,FO}})
+```
+
+Check the `Face` indices to ensure they are in the bounds of the vertex
+array of the `AbstractMesh`.
+"""
+function Base.checkbounds(m::AbstractMesh{VT, Face{FD, FT}}) where {VT, FD, FT}
+    isempty(faces(m)) && return true # nothing to worry about I guess
+    flat_inds = reinterpret(FT, faces(m))
+    checkbounds(Bool, vertices(m), flat_inds)
+end
+
+
+
+function unique_verts!(verts::AbstractVector{T}) where T
+    table = Dict{T, Int}()
+    new_idx = 0
+    for (i, v) in enumerate(verts)
+        if !haskey(table, v)
+            new_idx += 1
+            table[v] = new_idx
+            # if index has moved, inplace rewrite verts
+            new_idx != i && (verts[new_idx] = v)
+        end
+    end
+    if new_idx != length(verts)
+        resize!(verts, new_idx)
+    end
+    table
+end
+
+function reface!(point2idx, verts, uverts, faces)
+    map!(faces, faces) do face
+        map(face) do i
+            point2idx[verts[i]]
+        end
+    end
+end
+
+"""
+Calculate the signed volume of one tetrahedron. Be sure the orientation of your surface is right.
+"""
+function volume(
+        vertices::AbstractVector{Point{3, VT}},
+        face::Face{3,FT}
+    ) where {VT,FT}
+    v1, v2, v3 = vertices[face]
+    sig = sign( orthogonal_vector( v1, v2, v3 ) ⋅ v1 )
+    return sig * abs( v1 ⋅ ( v2 × v3 ) ) / 6
+end
+
+"""
+Calculate the signed volume of all tetrahedra. Be sure the orientation of your surface is right.
+"""
+function volume(
+        vertices::AbstractVector{Point{3, VT}},
+        faces::AbstractVector{Face{3,FT}}
+    ) where {VT,FT}
+    return sum( x->volume( vertices, x), faces )
+end
+
+"""
+    remove_overlap!(mesh::AbstractMesh)
+
+removes non unique vertices from a mesh, and relinks the faces to point to only shared vertices.
+"""
+function remove_overlap!(mesh::AbstractMesh)
+    verts = vertices(mesh)
+    orig_verts = copy(verts)
+    table = unique_verts!(verts)
+    reface!(table, orig_verts, verts, faces(mesh))
+    return
+end
+
+# functions related to displaying types
+
+function show(io::IO, m::M) where M <: HMesh
+    println(io, "HomogenousMesh(")
+    for (key,val) in attributes(m)
+        print(io, "    ", key, ": ", length(val), "x", eltype(val), ", ")
+    end
+    println(io, ")")
+end
+
+
+function (meshtype::Type{T})(c::Pyramid) where T <: AbstractMesh
+    T(vertices = decompose(vertextype(T), c), faces = decompose(facetype(T), c))
+end
+
+
+"""
+Standard way of creating a mesh from a primitive.
+Just walk through all attributes of the mesh and try to decompose it.
+If there are attributes missing, just hope it will get managed by the mesh constructor.
+(E.g. normal calculation, which needs to have vertices and faces present)
+"""
+function (meshtype::Type{T})(c::GeometryPrimitive, args...) where T <: AbstractMesh
+    attribs = attributes(T)
+    newattribs = Dict{Symbol, Any}()
+    for (fieldname, typ) in attribs
+        if isdecomposable(eltype(typ), c)
+            newattribs[fieldname] = decompose(eltype(typ), c, args...)
+        end
+    end
+    return T(newattribs)
+end
+
+function to_pointn(::Type{Point{N, T}}, p::StaticVector{N2}, d = T(0)) where {T, N, N2}
+    return Point{N, T}(ntuple(i-> i <= N2 ? T(p[i]) : T(d), N))
+end
+
+function (::Type{T})(c::Circle, n = 32) where T <: AbstractMesh
+    newattribs = Dict{Symbol, Any}()
+    VT = vertextype(T)
+    verts = decompose(VT, c, n)
+    N = length(verts)
+    push!(verts, to_pointn(VT, origin(c))) # middle point
+    middle_idx = length(verts)
+    FT = facetype(T)
+    faces = map(1:N) do i
+        FT(i, middle_idx, i + 1)
+    end
+    return T(vertices = verts, faces = faces)
+end
+
+function (meshtype::Type{T})(
+        c::Union{HyperCube{3,T}, HyperRectangle{3,HT}}
+    ) where {T <: HMesh, HT}
+    xdir = Vec{3, HT}(1, 0, 0)
+    ydir = Vec{3, HT}(0, 1, 0)
+    zdir = Vec{3, HT}(0, 0, 1)
+    o0 = zero(Vec{3, HT})
+    quads = [
+        Quad(zdir, xdir, ydir), # Top
+        Quad(o0,   ydir, xdir), # Bottom
+        Quad(xdir, ydir, zdir), # Right
+        Quad(o0,   zdir, ydir), # Left
+        Quad(o0,   xdir, zdir), # Back
+        Quad(ydir, zdir, xdir) #Front
+    ]
+    mesh = merge(map(meshtype, quads))
+    v = vertices(mesh)
+    w = widths(c)
+    o = origin(c)
+    map!(v, v) do v
+        (v .* w) + o
+    end
+    return mesh
+end
+
+==(a::AbstractMesh, b::AbstractMesh) = false
+function ==(a::M, b::M) where M <: AbstractMesh
+    for ((ka, va), (kb, vb)) in zip(all_attributes(a), all_attributes(b))
+        va != vb && return false
+    end
+    true
 end

@@ -4,7 +4,8 @@ using StaticArrays
 using ColorTypes
 using LinearAlgebra
 
-import FixedPointNumbers # U8
+import FixedPointNumbers
+using FixedPointNumbers: N0f8
 
 import Base: ==,
              *,
@@ -25,43 +26,34 @@ import Base: ==,
              size,
              split,
              union,
-             unique
+             unique,
+             iterate,
+             eltype
 
 include("FixedSizeArrays.jl")
 using .FixedSizeArrays
 
 include("types.jl")
-include("typeutils.jl")
+include("utils.jl")
 include("typealias.jl")
-include("baseutils.jl")
-include("linalgutils.jl")
 include("simplices.jl")
-include("algorithms.jl")
 include("faces.jl")
 include("hyperrectangles.jl")
 include("hypersphere.jl")
 include("hypercube.jl")
-include("relations.jl")
-include("operations.jl")
 include("meshes.jl")
-include("primitives.jl")
 include("distancefields.jl")
-include("setops.jl")
-include("display.jl")
-include("slice.jl")
 include("decompose.jl")
-include("deprecated.jl")
-include("center.jl")
 include("convexhulls.jl")
 include("gjk.jl")
-include("polygons.jl")
+include("polygon.jl")
+include("polygon_triangulations.jl")
 include("lines.jl")
 include("cylinder.jl")
 
 export AABB,
        AbstractFlexibleGeometry,
        AbstractGeometry,
-       AbsoluteRectangle,
        AbstractMesh,
        AbstractSimplex,
        AbstractDistanceField,
@@ -100,6 +92,7 @@ export AABB,
        HyperCube,
        HyperSphere,
        intersects,
+       isinside,
        LineSegment,
        Mat,
        Mesh2D,
@@ -190,6 +183,15 @@ export AABB,
        OffsetInteger,
        ZeroIndex,
        OneIndex,
-       GLIndex
+       GLIndex,
+       Rect,
+       Rect2D,
+       Rect3D,
+       IRect,
+       IRect2D,
+       IRect3D,
+       FRect,
+       FRect2D,
+       FRect3D
 
 end # module

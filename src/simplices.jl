@@ -186,3 +186,18 @@ proj_sqdist{T}(pt::T, s::Simplex{1, T}, best_sqd=eltype(T)(Inf))
 @inline function proj_sqdist(pt::T, s::Simplex{1, T}, best_sqd=Inf) where T
     proj_sqdist(pt, translation(s), best_sqd)
 end
+
+
+"""
+contains(s::Simplex, pt; atol=0., rtol=defaulrtol(eltype(pt)))
+
+Check if a point is contained inside a Simplex. If the intrinsic dimension
+of the simplex is smaller then the dimension of the surrounding space
+(for example a triangle in 3d) one needs the atol, rtol parameters.
+"""
+function contains(s::Simplex, pt; atol=0., rtol=Base.rtoldefault(eltype(pt)))
+    w = weights(pt, s)
+    all(w .>= -atol) || return false  # projection lies outside of s
+    pt_proj = vertexmat(s) * w
+    return isapprox(pt_proj, pt, atol=atol, rtol=rtol)
+end

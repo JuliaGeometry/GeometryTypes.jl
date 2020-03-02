@@ -428,6 +428,7 @@ function decompose(::Type{FT}, c::Cylinder{2}, resolution = (2, 2)) where FT <: 
     r = SimpleRectangle(c.origin[1] - c.r/2, c.origin[2], c.r, height(c))
     return decompose(FT, r, resolution)
 end
+
 function decompose(::Type{FT}, c::Cylinder{3}, facets = 30) where FT <: Face
     isodd(facets) ? facets = 2 * div(facets, 2) : nothing
     facets < 8 ? facets = 8 : nothing; nbv = Int(facets / 2)

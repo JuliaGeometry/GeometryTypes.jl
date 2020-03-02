@@ -12,17 +12,35 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 =#
+"""
+Calculate the area of one triangle.
+"""
+function area(vertices::AbstractVector{Point{3, VT}}, face::Face{3,FT}) where {VT,FT}
+    v1, v2, v3 = vertices[face]
+    return 0.5 * norm(orthogonal_vector(v1, v2, v3))
+end
 
-function area(contour::AbstractVector{Point{2, T}}) where {T}
+"""
+Calculate the area of all triangles.
+"""
+function area(
+        vertices::AbstractVector{Point{3, VT}},
+        faces::AbstractVector{Face{3,FT}}
+    ) where {VT,FT}
+    return sum(x->area(vertices, x), faces)
+end
+
+function area(contour::AbstractVector{<: AbstractPoint{N, T}}) where {N, T}
     n = length(contour)
+    n < 3 && return zero(T)
     A = zero(T)
-    p=lastindex(contour)
-    q=firstindex(contour)
+    p = lastindex(contour)
+    q = firstindex(contour)
     while q <= n
         A += cross(contour[p], contour[q])
         p = q; q +=1
     end
-    return A*T(0.5)
+    return A * T(0.5)
 end
 
 function area(contour::AbstractVector{Point{3, T}}) where {T}
@@ -38,18 +56,18 @@ end
  InsideTriangle decides if a point P is Inside of the triangle
  defined by A, B, C.
 """
-function InsideTriangle(A::T, B::T, C::T, P::T) where T<:Point
+function InsideTriangle(A::T, B::T, C::T, P::T) where T <: AbstractPoint
     a = C-B; b = A-C; c = B-A
     ap = P-A; bp = P-B; cp = P-C
-    a_bp = a[1]*bp[2] - a[2]*bp[1];
-    c_ap = c[1]*ap[2] - c[2]*ap[1];
-    b_cp = b[1]*cp[2] - b[2]*cp[1];
+    a_bp = a[1] * bp[2] - a[2] * bp[1];
+    c_ap = c[1] * ap[2] - c[2] * ap[1];
+    b_cp = b[1] * cp[2] - b[2] * cp[1];
     t0 = zero(eltype(T))
     return ((a_bp >= t0) && (b_cp >= t0) && (c_ap >= t0))
 end
 
 function snip(
-        contour::AbstractVector{Point{N, T}}, u, v, w, n, V
+        contour::AbstractVector{<: AbstractPoint{N, T}}, u, v, w, n, V
     ) where {N, T}
     A = contour[V[u]]
     B = contour[V[v]]
@@ -78,7 +96,7 @@ It will return a Vector{`facetype`}, defining indexes into `contour`
 """
 function polygon2faces(
         _contour::AbstractArray{P}, facetype = GLTriangle
-    ) where P<:Point
+    ) where P <: AbstractPoint
     #= allocate and initialize list of Vertices in polygon =#
     result = facetype[]
 
@@ -137,13 +155,11 @@ function polygon2faces(
 end
 
 function topoint(::Type{Point{3, T}}, p::Point{2, T}) where T
-    Point{3, T}(p[1], p[2], T(0))
+    return Point{3, T}(p[1], p[2], T(0))
 end
-function topoint(::Type{Point{3, T}}, p::Point{3, T}) where T
-    p
-end
+
 function topoint(::Type{Point{2, T}}, p::Point{3, T}) where T
-    Point{2, T}(p[1], p[2])
+    return Point{2, T}(p[1], p[2])
 end
 
 function (::Type{M})(

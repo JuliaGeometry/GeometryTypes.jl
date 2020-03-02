@@ -71,3 +71,16 @@ Base.convert(::Type{F}, c::HyperCube) where {F <: AFG} = F(c)
 function Base.isapprox(s1::AbstractConvexHull, s2::AbstractConvexHull;kw...)
     isapprox(vertexmat(s1), vertexmat(s2); kw...)
 end
+
+
+# could add an @symmetric macro, which defines min_euclidean(pt, s) from
+# min_euclidean(s, pt) automatically etc.
+@inline min_euclidean(pt1::Vec, pt2::Vec) = norm(pt1-pt2)
+min_euclidean(pt::Vec, s::Simplex) = √(sqdist(pt, s))
+min_euclidean(s::Simplex, pt::Vec) = min_euclidean(pt, s)
+min_euclidean(r1::HyperRectangle, r2::Vec) = sqrt(min_euclideansq(r1, r2))
+min_euclidean(r1::Vec, r2::HyperRectangle) = sqrt(min_euclideansq(r1, r2))
+min_euclidean(r1::HyperRectangle, r2::HyperRectangle) = sqrt(min_euclideansq(r1, r2))
+min_euclidean(c1::AbstractConvexHull, pt::Vec) = gjk(c1,pt)
+min_euclidean(pt::Vec, c2::AbstractConvexHull) = gjk(pt,c2)
+min_euclidean(c1::AbstractConvexHull, c2::AbstractConvexHull) = gjk(c1,c2)

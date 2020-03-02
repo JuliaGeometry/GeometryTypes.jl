@@ -14,6 +14,18 @@ end
 
 
 @testset "constructors and containment" begin
+    @test IRect() == IRect(Vec2(typemax(Int)), Vec2(typemin(Int)))
+    @test IRect2D() == IRect(Vec2(typemax(Int)), Vec2(typemin(Int)))
+    @test IRect3D() == IRect(Vec3(typemax(Int)), Vec3(typemin(Int)))
+
+    @test Rect() == Rect(Inf, Inf, -Inf, -Inf)
+    @test Rect2D() == Rect(Inf, Inf, -Inf, -Inf)
+    @test Rect3D() == Rect(Vec3(Inf), Vec3(-Inf))
+
+    @test FRect() == Rect(Inf, Inf, -Inf, -Inf)
+    @test FRect2D() == Rect(Inf, Inf, -Inf, -Inf)
+    @test FRect3D() == Rect(Vec3(Inf), Vec3(-Inf))
+
     # HyperRectangle(vals...)
     a = HyperRectangle(0,0,1,1)
     @test a == HyperRectangle{2,Int}(Vec(0,0),Vec(1,1))
@@ -60,7 +72,7 @@ end
 
     # AABB
     a = AABB(0,0,1,1)
-    @test a == HyperRectangle{2,Int}(Vec(0,0),Vec(1,1))
+    @test a == HyperRectangle{3,Int}(Vec(0,0, 0),Vec(1,1,0))
 
     centered_rect = centered(HyperRectangle)
     @test centered_rect == HyperRectangle{3,Float32}(Vec3f0(-0.5),Vec3f0(1))
@@ -137,7 +149,6 @@ end
     @test min_dist_dim(a, b2, 1) == 0
     @test min_dist_dim(a, b2, 2) == 0
 end
-
 @testset "set operations" begin
     a = HyperRectangle(Vec(0,0),Vec(1,1))
     b = HyperRectangle(Vec(1,1),Vec(1,1))

@@ -11,6 +11,6 @@ using Test, GeometryTypes
         (5,6,8,7),
     ])
     cube_vertices = decompose(Point{3,Float32}, cube) |> Array
-    @test area( cube_vertices, cube_faces ) == 6
-    @test volume( cube_vertices, cube_faces ) ≈ 1
+    @test area(cube_vertices, cube_faces) == 6
+    @test volume(cube_vertices, cube_faces) ≈ 1
 end

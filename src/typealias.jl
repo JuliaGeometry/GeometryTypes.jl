@@ -20,9 +20,11 @@ for i=1:4
     end
 end
 
-#Type aliases
-const U8 = FixedPointNumbers.Normed{UInt8, 8}
+const Vecf0{N} = Vec{N, Float32}
+const Pointf0{N} = Point{N, Float32}
+export Vecf0, Pointf0
 
+#Type aliases
 """
 An alias for a one-simplex, corresponding to `LineSegment{T}` -> `Simplex{2,T}`.
 """
@@ -49,13 +51,25 @@ An alias for a HyperSphere of dimension 3. i.e. `Sphere{T}` -> `HyperSphere{3, T
 """
 const Sphere{T} = HyperSphere{3, T}
 
-const AbsoluteRectangle{T} = HyperRectangle{2, T}
+const Rect{N, T} = HyperRectangle{N, T}
+const Rect2D{T} = Rect{2, T}
+const Rect3D{T} = Rect{3, T}
+const TRect{T} = Rect{N, T} where N
+
+const FRect{N} = Rect{N, Float32}
+const FRect2D = Rect2D{Float32}
+const FRect3D = Rect3D{Float32}
+
+const IRect{N} = HyperRectangle{N, Int}
+const IRect2D = Rect2D{Int}
+const IRect3D = Rect3D{Int}
+
+const VecTypes{N, T} = Union{StaticVector{N, T}, NTuple{N, T}}
 
 """
 AABB, or Axis Aligned Bounding Box, is an alias for a 3D `HyperRectangle`.
 """
 const AABB{T} = HyperRectangle{3, T}
-AABB(m...) = HyperRectangle(m...)
 
 const HMesh = HomogenousMesh
 
@@ -101,7 +115,7 @@ const NormalVertexcolorMesh{VT, FT, NT, CT} = HMesh{Point{3, VT}, FT, Normal{3, 
 const GLNormalVertexcolorMesh = NormalVertexcolorMesh{Float32, GLTriangle, Float32, RGBA{Float32}}
 
 const NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} = HMesh{Point{3, VT}, FT, Normal{3, NT}, Nothing, Nothing, AT, A_ID_T}
-const GLNormalAttributeMesh = NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBA{U8}}, Float32}
+const GLNormalAttributeMesh = NormalAttributeMesh{Float32, GLTriangle, Float32, Vector{RGBA{N0f8}}, Float32}
 
 const NormalUVWMesh{VT, FT, NT, UVT} = HMesh{Point{3, VT}, FT, Normal{3, NT}, UVW{UVT}, Nothing, Nothing, Nothing}
 const GLNormalUVWMesh = NormalUVWMesh{Float32, GLTriangle, Float32, Float32}
