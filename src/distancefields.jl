@@ -71,3 +71,37 @@ function SignedDistanceField(f::Function,
     nb_min = minimum(bounds)
     SignedDistanceField{2,T,fieldT}(HyperRectangle{2, T}(nb_min, nb_max-nb_min), vol)
 end
+
+#=
+@generated function SignedDistanceField{N,T}(f::Function,
+                                bounds::HyperRectangle{N,T},
+                                resolution=0.1,
+                                fieldT=Float64)
+
+    # grab the bounds to easily reference later
+    ib = minimum(bounds)
+    sb = maximum(bounds)
+
+    # compute the range
+    rng = maximum(bounds) - minimum(bounds)
+
+    # determine how many intervals cover the range
+    ct = map(x->ceil(Int, x/resolution), rng)
+
+    # adjust count for array since we have atleast two elements
+    rct = map(x->x+1, ct)
+
+    vol = Array{fieldT}(rct...)
+
+    # compute the new max value
+    nb_max = ib + ct*resolution
+
+    for i = 0:nx, j = 0:ny
+        x = x_min + resolution*i
+        y = y_min + resolution*j
+        @inbounds vol[i+1,j+1] = f(Vec{N,fieldT}(x,y))
+    end
+
+    SignedDistanceField{N,T,fieldT}(HyperRectangle(ib, nb_max), vol)
+end
+=#
