@@ -39,6 +39,7 @@ include("typealias.jl")
 include("simplices.jl")
 include("faces.jl")
 include("hyperrectangles.jl")
+include("hyperellipse.jl")
 include("hypersphere.jl")
 include("hypercube.jl")
 include("meshes.jl")
@@ -57,6 +58,7 @@ export AABB,
        AbstractMesh,
        AbstractSimplex,
        AbstractDistanceField,
+       Ellipse,
        Circle,
        centered,
        contains,
@@ -90,6 +92,7 @@ export AABB,
        HomogenousMesh,
        HyperRectangle,
        HyperCube,
+       HyperEllipse,
        HyperSphere,
        intersects,
        isinside,
@@ -116,6 +119,7 @@ export AABB,
        SimpleMesh,
        SimpleRectangle,
        Simplex,
+       Ellipsoid,
        Sphere,
        TextureCoordinate,
        Triangle,

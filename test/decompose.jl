@@ -140,6 +140,33 @@ end
 
 end
 
+@testset "HyperEllipse" begin
+    ellipsoid = Ellipsoid{Float32}(Point3f0(0), Vec3f0(1))
+
+    points = decompose(Point, ellipsoid, 3)
+    point_target = Point{3,Float32}[
+        [0.0, 0.0, 1.0], [1.0, 0.0, 6.12323e-17], [1.22465e-16, 0.0, -1.0],
+        [-0.0, 0.0, 1.0], [-1.0, 1.22465e-16, 6.12323e-17],
+        [-1.22465e-16, 1.49976e-32, -1.0], [0.0, -0.0, 1.0],
+        [1.0, -2.44929e-16, 6.12323e-17], [1.22465e-16,-2.99952e-32, -1.0]
+   ]
+    @test points ≈ point_target
+
+    f = decompose(Face{3, Int}, ellipsoid, 3)
+    face_target = Face{3,Int64}[
+        [1, 2, 5], [1, 5, 4], [2, 3, 6], [2, 6, 5],
+        [4, 5, 8], [4, 8, 7], [5, 6, 9], [5, 9, 8]
+    ]
+    @test f == face_target
+    ellipse = Ellipse(Point2f0(0), Vec2f0(1))
+    points = decompose(Point2f0, ellipse, 20)
+    @test length(points) == 20
+    # TODO: currently, no ellipse meshes
+    # mesh = GLNormalMesh(ellipse, 32)
+    # # end-1, since we add a middle point for the mesh!
+    # @test decompose(Point2f0, mesh)[1:end-1] ≈ decompose(Point2f0, ellipse, 32)
+end
+
 @testset "HyperSphere" begin
     sphere = Sphere{Float32}(Point3f0(0), 1f0)
 

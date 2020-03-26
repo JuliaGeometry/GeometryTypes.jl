@@ -530,6 +530,7 @@ function isinside(rect::SimpleRectangle, x::Real, y::Real)
 end
 
 # TODO only have point in c and deprecate above methods
+in(x::AbstractPoint{2}, c::Ellipse) = isinside(c, x...)
 in(x::AbstractPoint{2}, c::Circle) = isinside(c, x...)
 in(x::AbstractPoint{2}, c::SimpleRectangle) = isinside(c, x...)
 
