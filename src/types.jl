@@ -234,6 +234,16 @@ struct Cylinder{N,T<: AbstractFloat} <: GeometryPrimitive{N,T}
 end
 
 """
+A `Capsule` is a 2D line segment with a radius or a 3D Capsule defined by its origin point,
+its extremity and a radius. `origin`, `extremity` and `r`, must be specified.
+"""
+struct Capsule{N,T<: AbstractFloat} <: GeometryPrimitive{N,T}
+    origin::Point{N,T}
+    extremity::Point{N,T}
+    r::T
+end
+
+"""
 AbstractConvexHull
 
 Groups all geometry types, that can be described as the convex hull of finitely

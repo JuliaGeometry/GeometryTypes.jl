@@ -80,7 +80,12 @@ its extremity and a radius. `origin`, `extremity` and `r`, must be specified.
 const Cylinder2{T} = Cylinder{2, T}
 const Cylinder3{T} = Cylinder{3, T}
 
-
+"""
+A `Capsule2` or `Capsule3` is a 2D/3D capsule defined by its origin point,
+its extremity and a radius. `origin`, `extremity` and `r`, must be specified.
+"""
+const Capsule2{T} = Capsule{2, T}
+const Capsule3{T} = Capsule{3, T}
 
 const UV{T} = TextureCoordinate{2, T}
 const UVW{T} = TextureCoordinate{3, T}

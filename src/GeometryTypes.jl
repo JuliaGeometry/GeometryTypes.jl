@@ -50,6 +50,7 @@ include("polygon.jl")
 include("polygon_triangulations.jl")
 include("lines.jl")
 include("cylinder.jl")
+include("capsule.jl")
 
 export AABB,
        AbstractFlexibleGeometry,
@@ -64,6 +65,9 @@ export AABB,
        Cylinder,
        Cylinder2,
        Cylinder3,
+       Capsule,
+       Capsule2,
+       Capsule3,
        decompose,
        direction,
        eltype_or,
