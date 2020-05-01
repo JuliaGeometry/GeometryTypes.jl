@@ -1,14 +1,12 @@
 language: julia
 os:
   - linux
-  - osx
 julia:
-  - 1.0
-  - nightly
+  - 1
+if: branch = master OR tag IS present OR type = pull_request
 
 notifications:
   email: false
-sudo: false
 
 jobs:
    include:
@@ -21,4 +19,4 @@ jobs:
        after_success: skip
 
 after_success:
-  - julia -e 'using Pkg; cd(Pkg.dir("GeometryTypes")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'

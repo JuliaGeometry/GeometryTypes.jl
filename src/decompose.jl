@@ -447,3 +447,73 @@ function decompose(::Type{FT}, c::Cylinder{3}, facets = 30) where FT <: Face
     end
     return indexes
 end
+
+
+isdecomposable(::Type{T}, ::Type{C}) where {T <:Point, C <:Capsule3} = true
+isdecomposable(::Type{T}, ::Type{C}) where {T <:Face, C <:Capsule3} = true
+isdecomposable(::Type{T}, ::Type{C}) where {T <:Point, C <:Capsule2} = true
+isdecomposable(::Type{T}, ::Type{C}) where {T <:Face, C <:Capsule2} = true
+
+# def of resolution + rotation
+function decompose(PT::Type{Point{3, T}}, c::Capsule{2}, resolution = 10) where T
+    origin = length(c.origin) == 2 ? Point{3, T}(c.origin[1], c.origin[2], 0) : c.origin
+    nbv = 2*max.(4, resolution)
+    M = rotation(c); h = height(c)
+    vertices = Vector{PT}(undef, 2 * (nbv + 1))
+    for i = 0:nbv
+        theta = T((π * i) / nbv)
+        vertices[i + 1] =       PT(M * Point{3, T}( cos(theta) * c.r,   - sin(theta) * c.r, 0)) + origin
+        vertices[i + nbv + 2] = PT(M * Point{3, T}(-cos(theta) * c.r, h + sin(theta) * c.r, 0)) + origin
+    end
+    return vertices
+end
+
+function decompose(PT::Type{Point{3, T}}, c::Capsule{3}, resolution = (30, 10)) where T
+    nbv = max.(4, resolution)
+    M = rotation(c); h = height(c)
+    position = 1; vertices = Vector{PT}(undef, nbv[1] * (2 * nbv[2]) + 2)
+    for j = 1:nbv[1]
+        phi = T((2π * (j - 1)) / nbv[1])
+        for i = 0:(nbv[2]-1)
+            theta = T((π/2 * i) / nbv[2])
+            vertices[position + i] =          PT(M * Point{3, T}(cos(theta) * cos(phi) * c.r, cos(theta) * sin(phi) * c.r,   - sin(theta) * c.r)) + PT(c.origin)
+            vertices[position + i + nbv[2]] = PT(M * Point{3, T}(cos(theta) * cos(phi) * c.r, cos(theta) * sin(phi) * c.r, h + sin(theta) * c.r)) + PT(c.origin)
+        end
+        position += nbv[2] * 2
+    end
+    vertices[end-1] = PT(c.origin) + PT(M * Point{3, T}(0, 0, -c.r))
+    vertices[end] = PT(c.extremity) + PT(M * Point{3, T}(0, 0, c.r))
+    return vertices
+end
+
+function decompose(::Type{FT}, c::Capsule{2}, facets = 10) where FT <: Face
+    nbv = 4*max.(4, facets)
+    indexes = Vector{FT}(undef, nbv)
+    for j = 1:nbv
+        indexes[j] = (1, j + 2, j + 1)
+    end
+    return indexes
+end
+
+function decompose(::Type{FT}, c::Capsule{3}, facets = (30, 10)) where FT <: Face
+    nbv = max.(4, facets)
+    indexes = Vector{FT}(undef, nbv[1] * (4 * (nbv[2]-1) + 4))
+    index = 1
+    slice = nbv[2] * 2
+    last = nbv[1] * (2 * nbv[2]) + 2
+    for j = 0:(nbv[1]-1)
+        j_next = (j+1) % nbv[1]
+        indexes[index+0] = (j_next * slice + nbv[2] + 1, j_next * slice + 1, j * slice + 1)
+        indexes[index+1] = (j * slice + nbv[2] + 1, j_next * slice + nbv[2] + 1, j * slice + 1)
+        indexes[index+2] = (j * slice + nbv[2], j_next * slice + nbv[2], last - 1)
+        indexes[index+3] = (j_next * slice + 2 * nbv[2], j * slice + 2 * nbv[2], last)
+        for i = 0:(nbv[2]-2)
+            indexes[index + 4 + i*4 + 0] = (j_next * slice + i + 1, j_next * slice + i + 2, j * slice + i + 1)
+            indexes[index + 4 + i*4 + 1] = (j_next * slice + i + 2, j * slice + i + 2, j * slice + i + 1)
+            indexes[index + 4 + i*4 + 2] = (j_next * slice + nbv[2] + i + 2, j_next * slice + nbv[2] + i + 1, j * slice + nbv[2] + i + 1)
+            indexes[index + 4 + i*4 + 3] = (j_next * slice + nbv[2] + i + 2, j * slice + nbv[2] + i + 1, j * slice + nbv[2] + i + 2)
+        end
+        index += 4 * (nbv[2]-1) + 4
+    end
+    return indexes
+end
