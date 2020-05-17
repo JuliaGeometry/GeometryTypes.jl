@@ -56,6 +56,11 @@ end
     @test length(vertices(m)) == 576
     @test length(faces(m)) == 1058
     @test length(normals(m)) == 576
+
+    m = GLNormalMesh(Ellipsoid(Point3f0(0),Vec3f0(1)))
+    @test length(vertices(m)) == 576
+    @test length(faces(m)) == 1058
+    @test length(normals(m)) == 576
 end
 
 

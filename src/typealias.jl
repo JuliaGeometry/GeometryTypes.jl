@@ -42,6 +42,16 @@ const GLQuad = Face{4, GLIndex}
 const Cube{T} = HyperCube{3, T}
 
 """
+An alias for a HyperEllipse of dimension 2. i.e. `Ellipse{T}` -> `HyperEllipse{2, T}`
+"""
+const Ellipse{T} = HyperEllipse{2, T}
+
+"""
+An alias for a HyperEllipse of dimension 3. i.e. `Ellipsoid{T}` -> `HyperEllipse{3, T}`
+"""
+const Ellipsoid{T} = HyperEllipse{3, T}
+
+"""
 An alias for a HyperSphere of dimension 2. i.e. `Circle{T}` -> `HyperSphere{2, T}`
 """
 const Circle{T} = HyperSphere{2, T}

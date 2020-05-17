@@ -78,6 +78,11 @@ end
     triangles = polygon2faces(points)
     @test !isempty(triangles)
     @test points[1] ≈ points[end]
+
+    points = decompose(Point2f0, Ellipse(Point2f0(0), Vec2f0(1)))
+    triangles = polygon2faces(points)
+    @test !isempty(triangles)
+    @test points[1] ≈ points[end]
 end
 
 end

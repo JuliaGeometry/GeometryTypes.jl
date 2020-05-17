@@ -39,6 +39,11 @@ isdecomposable(::Type{T}, ::Type{HR}) where {T<:Face, HR<:SimpleRectangle} = tru
 isdecomposable(::Type{T}, ::Type{HR}) where {T<:TextureCoordinate, HR<:SimpleRectangle} = true
 isdecomposable(::Type{T}, ::Type{HR}) where {T<:Normal, HR<:SimpleRectangle} = true
 
+isdecomposable(::Type{T}, ::Type{HR}) where {T<:Point, HR <: HyperEllipse} = true
+isdecomposable(::Type{T}, ::Type{HR}) where {T<:Face, HR <: HyperEllipse} = true
+isdecomposable(::Type{T}, ::Type{HR}) where {T<:TextureCoordinate, HR <: HyperEllipse} = true
+isdecomposable(::Type{T}, ::Type{HR}) where {T<:Normal, HR <: HyperEllipse} = true
+
 isdecomposable(::Type{T}, ::Type{HR}) where {T<:Point, HR <: HyperSphere} = true
 isdecomposable(::Type{T}, ::Type{HR}) where {T<:Face, HR <: HyperSphere} = true
 isdecomposable(::Type{T}, ::Type{HR}) where {T<:TextureCoordinate, HR <: HyperSphere} = true
@@ -354,6 +359,21 @@ function decompose(::Type{T}, mesh::AbstractMesh) where T <: Colorant
 end
 
 
+function decompose(PT::Type{Point{3, T}}, s::Ellipse, n=64) where T
+    points2d = decompose(Point{2, T}, s, n)
+    map(x-> Point{3, T}(x[1], x[2], 0), points2d)
+end
+
+function decompose(PT::Type{Point{2,T}}, s::Ellipse, n=64) where T
+    rad = radius(s)
+    map(range(T(0), stop=T(2pi), length=n)) do fi
+        PT(
+           rad[1]*sin(fi + pi),
+           rad[2]*cos(fi + pi)
+        ) + origin(s)
+    end
+end
+
 
 function decompose(PT::Type{Point{3, T}}, s::Circle, n=64) where T
     points2d = decompose(Point{2, T}, s, n)
@@ -369,6 +389,31 @@ function decompose(PT::Type{Point{2,T}}, s::Circle, n=64) where T
         ) + origin(s)
     end
 end
+
+function decompose(PT::Type{Point{N,T}}, s::Ellipsoid, n = 24) where {N,T}
+    θ = LinRange(0, pi, n); φ = LinRange(0, 2pi, n)
+    vec(map((θ, φ) for θ in θ, φ in φ) do (θ, φ,)
+            Point3f0(cos(φ)*sin(θ), sin(φ)*sin(θ), cos(θ)) .* Point{N,T}(s.r) + PT(s.center)
+    end)
+end
+
+function decompose(PT::Type{UV{T}}, s::Ellipsoid, n = 24) where T
+    ux = LinRange(0, 1, n)
+    vec([UV{Float32}(φ, θ) for θ in reverse(ux), φ in ux])
+end
+
+function decompose(::Type{FT}, s::Ellipsoid, n = 24) where FT <: Face
+    decompose(FT, SimpleRectangle(0, 0, 1, 1), (n, n))
+end
+
+function decompose(::Type{T}, s::Ellipsoid, n = 24) where T <: Normal
+    r² = radius(s).^2
+    θ = LinRange(0, pi, n); φ = LinRange(0, 2pi, n)
+    vec(map((θ, φ) for θ in θ, φ in φ) do (θ, φ,)
+            normalize(Point{3,Float32}(cos(φ)*sin(θ), sin(φ)*sin(θ), cos(θ)) ./ r²)
+    end)
+end
+
 
 function decompose(PT::Type{Point{N,T}}, s::Sphere, n = 24) where {N,T}
     θ = LinRange(0, pi, n); φ = LinRange(0, 2pi, n)

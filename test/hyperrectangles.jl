@@ -233,6 +233,14 @@ end
     bb1 = HyperRectangle(x)
     bb2 = HyperRectangle(v)
     @test bb1 == bb2
+
+    s = Ellipsoid(Point3f0(0), Vec3f0(1,2,3))
+    f = decompose(Face{2, Int}, s, 3)
+    v = decompose(Point3f0, s, 3)
+    x = view(v, f)
+    bb1 = HyperRectangle(x)
+    bb2 = HyperRectangle(v)
+    @test bb1 == bb2
 end
 
 @testset "face-orientation" begin
