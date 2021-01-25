@@ -1,6 +1,6 @@
 function Polygon(
         points::AbstractVector;
-        boundingbox = Rect2D(points),
+        boundingbox = boundingbox(points),
         isconvex = isconvex(points),
         ishole = false
     )
@@ -17,6 +17,19 @@ boundingbox(poly::Polygon) = poly.boundingbox
 ishole(poly::Polygon) = poly.ishole
 isconvex(poly::Polygon) = poly.isconvex
 
+function boundingbox(poly::AbstractVector{Point{N, T}}) where {N, T}
+    origins = Vector{T}(undef, N)
+    widths  = Vector{T}(undef, N)
+
+    for i in 1:N
+        values = getindex.(poly, i)
+        min, max = extrema(values)
+        origins[i] = min
+        widths[i]  = max - min
+    end
+
+    return HyperRectangle{N, T}(origins, widths)
+end
 
 """
     in(point::AbstractPoint, poly::Polygon)
