@@ -8,12 +8,12 @@
         @test min_euclidean(Vec(1.0, 1.0), s) ≈√(0.5)
         @test (@inferred volume(s)) ≈1/2
         # containment
-        @test contains(s, Vec(0.1, 0.0))
+        @test GeometryTypes.contains(s, Vec(0.1, 0.0))
         for v in vertices(s)
-            @test contains(s, v)
+            @test GeometryTypes.contains(s, v)
         end
-        @test !( contains(s, Vec(1.0,0.1)) )
-        @test contains(s, Vec(1.0,0.1), atol = 0.1)
+        @test !( GeometryTypes.contains(s, Vec(1.0,0.1)) )
+        @test GeometryTypes.contains(s, Vec(1.0,0.1), atol = 0.1)
     end
 
     @testset "counterexample" begin
@@ -43,8 +43,8 @@
         @test min_euclidean(Vec(1.0, 1.0, 0.0), s) ≈ √(0.5)
         @test min_euclidean(Vec(1.0, 1.0, 1.0), s) ≈ √(3)*(2/3)
         @test (@inferred volume(s)) ≈ 1/6
-        @test !( contains(s, Vec(1.0, 0.0, 0.1)) )
-        @test contains(s, Vec(0.1, 0.0, 0.1))
+        @test !( GeometryTypes.contains(s, Vec(1.0, 0.0, 0.1)) )
+        @test GeometryTypes.contains(s, Vec(0.1, 0.0, 0.1))
     end
 
     @testset "1d simplex in 2d" begin
@@ -64,7 +64,7 @@
         @test min_euclidean(Vec(1.0, 0.0, 0.0), s) ≈ √(2/3)
         @test (@inferred volume(s)) ≈ √(3)
 
-        @test contains(s, Vec(0.2, 0.2, 0.2))
-        @test !(contains(s, Vec(0.1, 0.0999, 0.1)))
+        @test GeometryTypes.contains(s, Vec(0.2, 0.2, 0.2))
+        @test !(GeometryTypes.contains(s, Vec(0.1, 0.0999, 0.1)))
     end
 end

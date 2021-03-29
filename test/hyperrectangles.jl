@@ -60,11 +60,11 @@ end
 
     @test_throws MethodError HyperRectangle(Vec(1.0,2.0,3.0), Vec(1.0,2.0,3.0,4.0))
 
-    @test (in(a,b) && in(b,a) && contains(a,b) && contains(b,a))
+    @test (in(a,b) && in(b,a) && GeometryTypes.contains(a,b) && GeometryTypes.contains(b,a))
 
     c = HyperRectangle(Vec(1.1,2.1,3.1,4.1),Vec4f0(3.8))
 
-    @test (!in(a,c) && in(c,a) && contains(a,c) && !contains(c,a))
+    @test (!in(a,c) && in(c,a) && GeometryTypes.contains(a,c) && !GeometryTypes.contains(c,a))
 
     #conversion
     h = HyperRectangle(0,0,1,1)
@@ -194,9 +194,9 @@ end
 
 @testset "point membership" begin
     a = HyperRectangle{4, Float64}(Vec(1.0,2.0,3.0,4.0),Vec4f0(4.0))
-    @test (in(Vec(4,5,6,7),a) && contains(a,Vec(4,5,6,7)))
-    @test (in(Vec(5,6,7,8),a) && contains(a,Vec(5,6,7,8)))
-    @test (!in(Vec(6,7,8,9),a) && !contains(a,Vec(6,7,8,9)))
+    @test (in(Vec(4,5,6,7),a) && GeometryTypes.contains(a,Vec(4,5,6,7)))
+    @test (in(Vec(5,6,7,8),a) && GeometryTypes.contains(a,Vec(5,6,7,8)))
+    @test (!in(Vec(6,7,8,9),a) && !GeometryTypes.contains(a,Vec(6,7,8,9)))
 end
 
 @testset "from Points" begin
