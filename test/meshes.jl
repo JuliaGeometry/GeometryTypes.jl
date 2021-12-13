@@ -10,7 +10,7 @@ using GeometryTypes: slice
         (HyperRectangle{3,Float32}(Vec3f0(baselen), Vec3f0(baselen, baselen, dirlen)), RGBA(0f0,0f0,1f0,1f0))
     ]
 
-    am = map(GLNormalMesh, a)
+    am = [GLNormalMesh(x) for x in a]
     axis = merge(am)
     axis2 = merge(am)
     @test axis == axis2 # test ==

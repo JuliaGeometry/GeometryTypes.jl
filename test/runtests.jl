@@ -1,4 +1,5 @@
 using GeometryTypes, ColorTypes
+using GeometryTypes: contains
 using Test
 using Test: @inferred
 
