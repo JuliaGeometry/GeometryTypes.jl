@@ -83,6 +83,7 @@ raw(x::OffsetInteger) = x.i
 raw(x::Integer) = x
 value(x::OffsetInteger{O, T}) where {O, T} = raw(x) - O
 value(x::Integer) = x
+hash(x::OffsetInteger, h::UInt) = hash(value(x), h)
 
 """
 A `HyperRectangle` is a generalization of a rectangle into N-dimensions.
