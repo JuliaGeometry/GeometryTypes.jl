@@ -100,6 +100,15 @@ struct HyperCube{N, T} <: GeometryPrimitive{N, T}
     width::T
 end
 
+"""
+A `HyperEllipse` is a generalization of an ellipse into N-dimensions.
+A `center` and radii, `r` must be specified.
+"""
+struct HyperEllipse{N, T} <: GeometryPrimitive{N, T}
+    center::Point{N, T}
+    r::Vec{N, T}
+end
+
 
 """
 A `HyperSphere` is a generalization of a sphere into N-dimensions.
